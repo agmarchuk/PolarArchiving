@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
 	<database dbname="oa" connectionstring="polar:D:\home\FactographDatabases\polar\"/>
-  <LoadCassette regime="nodata">D:\Home\FactographProjects\SypCassete</LoadCassette>
+  <LoadCassette write="yes">D:\Home\FactographDatabases\testcassette</LoadCassette>
   
   <!--
+  <LoadCassette regime="nodata">D:\Home\FactographDatabases\test1</LoadCassette>
+
   <LoadCassette regime="nodata">F:\syp\syp_cassettes\SypCassete</LoadCassette>
   <LoadCassette regime="nodata">F:\syp\syp_cassettes\SypUsers</LoadCassette>
   <LoadCassette regime="nodata">F:\syp\syp_cassettes\Syp_2012_1</LoadCassette>

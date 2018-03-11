@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\CassettesCore\CassettesCore.csproj" />
+    <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<finfo>
+  <image>
+    <small previewBase="120" qualityLevel="90" />
+    <medium previewBase="480" qualityLevel="90" />
+    <normal previewBase="800" qualityLevel="90" />
+  </image>
+  <video>
+    <medium videoBitrate="400K" audioBitrate="22050" rate="10" framesize="384x288" />
+  </video>
+</finfo>
