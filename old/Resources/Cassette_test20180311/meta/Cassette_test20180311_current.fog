@@ -93,13 +93,13 @@
   <person rdf:about="syp2004-p-90">
     <name>Тихонова Татьяна Ивановна</name>
   </person>
-  <document rdf:about="Cassette_test20180311_0001_0009">
-    <name>Cassette_test20180311_test_636563613498448429</name>
-    <comment>D:\Home\dev2017\PolarArchiving\old\Resources\Cassette_test20180311\Cassette_test20180311_test_636563613498448429.fog</comment>
-    <iisstore uri="iiss://Cassette_test20180311@iis.nsk.su/0001/0001/0009" originalname="D:\Home\dev2017\PolarArchiving\old\Resources\Cassette_test20180311\Cassette_test20180311_test_636563613498448429.fog" size="247" documenttype="application/fog" documentcreation="2018-03-11T03:35:49" documentfirstuploaded="2018-03-11T10:35:49" documentmodification="2018-03-11T03:35:49" checksum="qwerty" owner="test" />
+  <document rdf:about="Cassette_test20180311_0001_0010">
+    <name>Cassette_test20180311_tester_636565276468061094</name>
+    <comment>D:\Home\FactographProjects\Cassette_test20180311\Cassette_test20180311_tester_636565276468061094.fog</comment>
+    <iisstore uri="iiss://Cassette_test20180311@iis.nsk.su/0001/0001/0010" originalname="D:\Home\FactographProjects\Cassette_test20180311\Cassette_test20180311_tester_636565276468061094.fog" size="253" documenttype="application/fog" documentcreation="2018-03-13T01:47:26" documentfirstuploaded="2018-03-13T08:47:26" documentmodification="2018-03-13T01:47:26" checksum="qwerty" owner="tester" />
   </document>
-  <collection-member rdf:about="Cassette_test20180311_Cassette_test20180311_cassetteId_Cassette_test20180311_0001_0009">
+  <collection-member rdf:about="Cassette_test20180311_Cassette_test20180311_cassetteId_Cassette_test20180311_0001_0010">
     <in-collection rdf:resource="Cassette_test20180311_cassetteId" />
-    <collection-item rdf:resource="Cassette_test20180311_0001_0009" />
+    <collection-item rdf:resource="Cassette_test20180311_0001_0010" />
   </collection-member>
 </rdf:RDF>
