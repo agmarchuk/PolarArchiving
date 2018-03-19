@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Polar.Cassettes;
 using Polar.Cassettes.DocumentStorage;
 
-namespace Turgunda6
+namespace Turgunda7
 {
     public class SObjects
     {
@@ -24,11 +24,11 @@ namespace Turgunda6
             storage.InitAdapter(engine);
 
             // Загрузка профиля и онтологии
-            //appProfile = XElement.Load(path + "PublicuemCommon/ApplicationProfile.xml");
-            //XElement ontology = XElement.Load(path + "PublicuemCommon/ontology_iis-v11-doc_ruen.xml");
-            //Models.Common.formats = appProfile.Element("formats");
-            //Models.Common.LoadOntNamesFromOntology(ontology);
-            //Models.Common.LoadInvOntNamesFromOntology(ontology);
+            appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
+            XElement ontology = XElement.Load(path + "wwwroot/ontology_iis-v12-doc_ruen.xml");
+            Models.Common.formats = appProfile.Element("formats");
+            Models.Common.LoadOntNamesFromOntology(ontology);
+            Models.Common.LoadInvOntNamesFromOntology(ontology);
 
             storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
             //storage.SaveDb("C:/Home/syp_db.xml");

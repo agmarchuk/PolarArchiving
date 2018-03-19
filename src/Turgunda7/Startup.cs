@@ -39,6 +39,7 @@ namespace Turgunda7
 
             app.UseStaticFiles();
             //app.UsePathBase()
+            Turgunda7.SObjects.Init(env.ContentRootPath);
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
