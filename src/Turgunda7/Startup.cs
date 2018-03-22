@@ -21,7 +21,10 @@ namespace Turgunda7
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc()
+                .AddSessionStateTempDataProvider();
+
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +41,7 @@ namespace Turgunda7
             }
 
             app.UseStaticFiles();
+            app.UseSession();
             //app.UsePathBase()
             Turgunda7.SObjects.Init(env.ContentRootPath);
             app.UseMvc(routes =>
@@ -46,6 +50,8 @@ namespace Turgunda7
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            //app.UseMvcWithDefaultRoute();
+
         }
     }
 }

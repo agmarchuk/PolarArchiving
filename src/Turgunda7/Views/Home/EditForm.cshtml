@@ -7,23 +7,22 @@
 }
 
 
-@if (insertnew)
+@*@if (insertnew)
 {
     <tr id="@Model.eid">@DrowTD(header)</tr>
 }
 else
 {
     @DrowTD(header)
-}
+}*@
 
-@helper DrowTD(XElement[] header)
-    {
+
 <td colspan="@Model.nc">
 
 <div style="border-width:thin; border-style:dashed; border-color:Black;">
 @{
-    string f_id = "frm_" + Model.eid;
- }
+            string f_id = "frm_" + Model.eid;
+        }
 <form id = "@f_id" style="margin-top:4px; margin-bottom:4px;">
     <input type="hidden" name="eid" value="@Model.eid" />
     <input type="hidden" name="bid" value="@Model.bid" />
@@ -54,7 +53,7 @@ else
                 if (valueTypeAtt != null)
                 {
                     string stvalue = Model.GetFValue(i);
-                    var variants = Turgunda6.Models.Common.GetEnumStates(valueTypeAtt.Value)
+                    var variants = Turgunda7.Models.Common.GetEnumStates(valueTypeAtt.Value)
                         .Select(st => new SelectListItem()
                         {
                             Selected = st.Attribute("value").Value == stvalue ? true : false,
@@ -63,16 +62,16 @@ else
                         }).ToList();
                     <select name="@fname">
                         <option value=" "></option>
-                        @foreach (var sel in variants) 
+                        @foreach (var sel in variants)
                         {
-                            if (sel.Selected) {
+                        if (sel.Selected) {
                             <option selected="selected" value="@sel.Value">@sel.Text</option>
                             }
-                            else
-                            {
+                        else
+                        {
                             <option value="@sel.Value">@sel.Text</option>
                             }
-                        }
+                    }
                     </select>
                 }
                 else
@@ -114,36 +113,36 @@ else
                     <select name="@sel_name">
                         @foreach (var str in types)
                         {
-                            if (str == t_variant) {
-                            <option selected="selected" value="@str">@Turgunda6.Models.Common.OntNames[str]</option>
+                        if (str == t_variant) {
+                            <option selected="selected" value="@str">@Turgunda7.Models.Common.OntNames[str]</option>
                             }
-                            else
-                            {
-                            <option value="@str">@Turgunda6.Models.Common.OntNames[str]</option>
+                        else
+                        {
+                            <option value="@str">@Turgunda7.Models.Common.OntNames[str]</option>
                             }
-                        } 
+                    }
                     </select>
                 }
-                <input name="@fname" style = "background-color:#e0eeff; width: 400px;" value="@Model.GetFValue(i)" 
+                <input name="@fname" style = "background-color:#e0eeff; width: 400px;" value="@Model.GetFValue(i)"
                     onkeypress="return KeyPress(event.keyCode, '@Model.eid', 'chk=chk&')" />
                                                            object searchindexobj = ViewData["searchindex"];
-                                                           if (searchindexobj != null)
-                                                           {
-                                                               int searchindex = (int)searchindexobj;
-                                                               if (searchindex == i)
-                                                               {
-                                                                   var co = "command=SetVariantNew&exchange=" + i + "|" + Model.GetTValue(i) + "|" + Server.UrlEncode(Model.GetFValue(i)) + "&";
+                if (searchindexobj != null)
+                {
+                    int searchindex = (int)searchindexobj;
+                    if (searchindex == i)
+                    {
+                        var co = "command=SetVariantNew&exchange=" + i + "|" + Model.GetTValue(i) + "|" + System.Web.HttpUtility.UrlEncode(Model.GetFValue(i)) + "&";
                         <div>[ <a href="" onclick="return SubmitForm('@Model.eid','@co')">нов.</a> ]</div>
-                                                                              Turgunda6.Models.SearchResult[] searchresults = (Turgunda6.Models.SearchResult[])ViewData["searchresults"];
-                                                                              foreach (Turgunda6.Models.SearchResult sr in searchresults)
-                                                                              {
-                                                                                  var commm = "command=SetVariant&exchange=" + i + "|" + sr.id + "|" +  Server.UrlEncode(sr.value) + "&";
+                        Turgunda7.Models.SearchResult[] searchresults = (Turgunda7.Models.SearchResult[])ViewData["searchresults"];
+                        foreach (Turgunda7.Models.SearchResult sr in searchresults)
+                        {
+                            var commm = "command=SetVariant&exchange=" + i + "|" + sr.id + "|" + System.Web.HttpUtility.UrlEncode(sr.value) + "&";
                                 <div>
                                     <a href="" onclick="return SubmitForm('@Model.eid','@commm')">@sr.value</a>
                                 </div>
                                                                               }
-                                                               }
-                                                           }
+                    }
+                }
 
             }
             </td>
@@ -152,12 +151,12 @@ else
     }
     </table>
 </form>
-<div style="margin-bottom:10px;">    
+<div style="margin-bottom:10px;">
     <button onclick="javascript:SubmitForm('@Model.eid', 'chk=chk&');">пров.</button>
     <button onclick="javascript:SubmitForm('@Model.eid', 'ok=ok&');">записать!</button>
     <button onclick="javascript:SubmitForm('@Model.eid', 'canc=cancel&');">отмен.</button>
 </div>
 </div>
 </td>
-}
+
  
