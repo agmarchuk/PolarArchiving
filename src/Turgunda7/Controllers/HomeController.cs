@@ -35,6 +35,7 @@ namespace Turgunda7.Controllers
         {
             if (id == null) return null;
             Models.PortraitModel pmodel = new Models.PortraitModel(id);
+            if (!pmodel.ok) return View("Index");
             return View(pmodel);
         }
         public ActionResult PortraitSpecial(string id)

@@ -18,13 +18,6 @@
     }
 }
 
-<script type="text/jscript">
-    var count = 0;
-    function Counter() {
-        return count++;
-    }
-</script>
-
 @foreach (XElement fd in row_format.Elements().Where(el => el.Name == "field" || el.Name == "direct"))
 {
     string prop = fd.Attribute("prop").Value;
@@ -57,21 +50,24 @@
 {
             <td>
                 @*@Ajax.ActionLink("ред", "EditForm", new { firsttime=true, bid = Model.bid, eid = Model.eid,
-        etype=Model.etype, iprop=Model.iprop, nc=Model.nc, d = System.DateTime.Now.Ticks }, new AjaxOptions()
-         {
-             HttpMethod = "Post",
-             InsertionMode = InsertionMode.Replace,
-             UpdateTargetId = Model.eid
-         })
-         @Ajax.ActionLink("x", "DeleteRow", new { eid = Model.eid, d = DateTime.Now.Ticks }, new AjaxOptions()
-            {
-                HttpMethod = "Get",
-                InsertionMode = InsertionMode.Replace,
-                UpdateTargetId = Model.eid,
-                Confirm = "Уничтожить?"
-            })*@
-                <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@Model.eid"
-                   href="/Home/EditForm?firsttime=true&amp;bid=Model.bid&amp;eid=Model.eid&amp;etype=Model.etype&amp;iprop=Model.iprop&amp;nc=Model.nc&amp;d=System.DateTime.Now.Ticks">ред</a>
-                (ajax)x
+                etype=Model.etype, iprop=Model.iprop, nc=Model.nc, d = System.DateTime.Now.Ticks }, new AjaxOptions()
+                 {
+                     HttpMethod = "Post",
+                     InsertionMode = InsertionMode.Replace,
+                     UpdateTargetId = Model.eid
+                 })*@
+<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@Model.eid" 
+    href="/Home/EditForm?firsttime=True&amp;bid=@Model.bid&amp;eid=@Model.eid&amp;etype=@Model.etype&amp;iprop=@Model.iprop&amp;nc=@Model.nc&amp;d=@System.DateTime.Now.Ticks">ред</a>
+
+                 @*@Ajax.ActionLink("x", "DeleteRow", new { eid = Model.eid, d = DateTime.Now.Ticks }, new AjaxOptions()
+                    {
+                        HttpMethod = "Get",
+                        InsertionMode = InsertionMode.Replace,
+                        UpdateTargetId = Model.eid,
+                        Confirm = "Уничтожить?"
+                    })*@
+
+<a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@Model.eid" 
+   href="/Home/DeleteRow?eid=@Model.eid&amp;d=@System.DateTime.Now.Ticks">x</a>
             </td>
 }

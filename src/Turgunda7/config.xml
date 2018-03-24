@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
 	<database dbname="oa" connectionstring="polar:D:\home\FactographDatabases\polar\"/>
-  <LoadCassette write="yes">D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
+  <LoadCassette write="yes">D:\Home\Cassette_test20180311</LoadCassette>
 
   <!--
   <LoadCassette regime="nodata">D:\Home\FactographDatabases\test1</LoadCassette>

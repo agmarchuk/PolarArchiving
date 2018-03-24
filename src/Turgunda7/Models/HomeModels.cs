@@ -27,6 +27,16 @@ namespace Turgunda7.Models
             new string[] {"http://fogid.net/o/degree", "степень"},
             new string[] {"http://fogid.net/o/", ""},
         };
+        public static Dictionary<string, string> icons = new Tuple<string,string>[] 
+        {
+            new Tuple<string, string>("http://fogid.net/o/document", "document_m.jpg"),
+            new Tuple<string, string>("http://fogid.net/o/photo-doc", "photo_m.jpg"),
+            new Tuple<string, string>("http://fogid.net/o/video-doc", "video_m.jpg"),
+            new Tuple<string, string>("http://fogid.net/o/audio-doc", "audio_m.jpg"),
+            new Tuple<string, string>("http://fogid.net/o/collection", "collection_m.jpg")
+        }
+        .ToDictionary(p => p.Item1, p => p.Item2);
+
         public static Dictionary<string, string> OntNames = new Dictionary<string, string>(
             OntPairs.ToDictionary(pa => pa[0], pa => pa[1]));
         public static Dictionary<string, string> InvOntNames = new Dictionary<string, string>();
@@ -93,6 +103,7 @@ namespace Turgunda7.Models
     }
     public class PortraitModel
     {
+        public bool ok = true;
         public string id;
         public string type_id;
         public string typelabel;
@@ -111,7 +122,11 @@ namespace Turgunda7.Models
         {
             DateTime tt0 = DateTime.Now;
             //XElement rec_format;
-            if (rec_format == null) this.type_id = GetFormat(id, out rec_format);
+            if (rec_format == null)
+            {
+                this.type_id = GetFormat(id, out rec_format);
+                if (rec_format == null) { ok = false; return; }
+            }
             else this.type_id = rec_format.Attribute("type").Value;
 
             this.typelabel = Common.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
@@ -152,7 +167,7 @@ namespace Turgunda7.Models
             // Нам нужен формат.
             XElement f_primitive = new XElement("record");
             XElement xtree0 = SObjects.GetItemById(id, f_primitive);
-            //if (xtree0 == null) { return null; }; // Как-то надо поступить с диагностикой ошибок//
+            if (xtree0 == null) { rec_format = null; return null; }; // Как-то надо поступить с диагностикой ошибок//
             type_id = xtree0.Attribute("type").Value;
             // Теперь установим нужный формат
             XElement xformat = Common.formats.Elements("record")
