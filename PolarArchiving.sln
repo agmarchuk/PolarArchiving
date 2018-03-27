@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CManager", "old\CManager\CM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turgunda6", "old\Turgunda6\Turgunda6.csproj", "{E2F35DCF-6D3E-4057-A377-405C9ACC4A50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenArchive", "src\OpenArchive\OpenArchive.csproj", "{8C9C0CE6-1BE7-42E0-931E-8E04D2EC46EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E2F35DCF-6D3E-4057-A377-405C9ACC4A50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2F35DCF-6D3E-4057-A377-405C9ACC4A50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2F35DCF-6D3E-4057-A377-405C9ACC4A50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C9C0CE6-1BE7-42E0-931E-8E04D2EC46EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C9C0CE6-1BE7-42E0-931E-8E04D2EC46EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C9C0CE6-1BE7-42E0-931E-8E04D2EC46EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C9C0CE6-1BE7-42E0-931E-8E04D2EC46EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
