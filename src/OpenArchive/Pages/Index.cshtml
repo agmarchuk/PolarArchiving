@@ -1,6 +1,6 @@
 ﻿@page
 @using System.Xml.Linq
-<div>Index</div>
+@using OpenArchive;
 @{
     //Layout = "~/_Layout.cshtml";
     XElement format = new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
@@ -22,6 +22,7 @@
     XElement item = null;
     try
     {
+        if (StaticObjects.funds_id == null) { return; }
         item = OpenArchive.StaticObjects.engine.GetItemById(StaticObjects.funds_id, format);
     }
     catch (Exception)
@@ -42,7 +43,6 @@
     catch (Exception) { }
     //@RenderPage("Portrait.cshtml", new { id=StaticObjects.funds_id, format=format })
 }
-<div>Index2</div>
 
 
 <p class="grad">

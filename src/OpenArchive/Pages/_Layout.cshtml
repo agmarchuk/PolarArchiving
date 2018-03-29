@@ -1,6 +1,12 @@
 ﻿@{
     string sv = ""; //Context.Request.Form["searchvariant"];
     string ss = ""; //Context.Request.Form["searchstring"];
+    if(Context.Request.HasFormContentType)
+    {
+        var form = Context.Request.Form;
+        sv = Context.Request.Form["searchvariant"];
+        ss = Context.Request.Form["searchstring"];
+    }
     string[] variants = { "person", "org-sys", "collection", "document", "city", "country" };
     string[] s = variants.Select(v => v == sv ? "selected" : "").ToArray();
 }
@@ -56,7 +62,7 @@
                         <div id="wrap">
                             <div class="fk-ie">
 
-                                <form method="post" action="Search.cshtml">
+                                <form method="post" action="Search">
                                     <div class="bsearch-1">
                                         <div class="bsearch-2">
                                             <div class="bsearch-3">
