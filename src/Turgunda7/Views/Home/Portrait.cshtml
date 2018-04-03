@@ -340,7 +340,7 @@ foreach (XElement r in elementset)
         parts.AddRange(fr.Elements("c").Select(c => c.Value));
         if (src == "")
         {
-            src = Url.Content("~/PublicuemCommon/icons/medium/" +
+            src = Url.Content("~/icons/medium/" +
                 (Turgunda7.Models.Common.icons.ContainsKey(rty) ? Turgunda7.Models.Common.icons[rty] : "default_m.jpg"));
         }
     }
@@ -361,7 +361,7 @@ foreach (XElement r in elementset)
 }
                 @if (edit && !string.IsNullOrEmpty(src_ext))
     {
-        var imguri = Url.Content("~/PublicuemCommon/icons/Zoom_in_16.gif");
+        var imguri = Url.Content("~/icons/Zoom_in_16.gif");
             <a href="@src_ext" target="_external"><img src="@imguri" alt="Посмотреть" style="border-width:0;" /></a>
 }
             </div>

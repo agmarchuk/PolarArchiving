@@ -156,7 +156,7 @@ namespace Turgunda7.Models
             }
 
             this.xresult = ConvertToResultStructure(rec_format, xtree);
-            //this.look = xtree;
+            this.look = xtree;
 
             this.message = "duration=" + ((DateTime.Now - tt0).Ticks / 10000L);
             //this.look = xresult;
