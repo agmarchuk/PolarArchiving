@@ -191,7 +191,7 @@ namespace OpenArchiveMVC.Models
             multimedia = c_members
                 .Where(m => m != null && m.Attribute("type") != null && m.Attribute("type").Value == "http://fogid.net/o/photo-doc");
 
-            look = item;
+            //look = item;
         }
     }
     public class PortraitOrgModel
@@ -309,12 +309,13 @@ namespace OpenArchiveMVC.Models
             parts = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/inDocument")
                 .Select(inv => inv.Element("record"))
-                .Select(rec => new {
+                .Select(rec => new
+                {
                     docpart = rec.Element("direct")?.Element("record"),
                     page = StaticObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
                 })
                 .OrderBy(pair => pair.page)
-                .ThenBy(pair => pair.docpart==null?"": StaticObjects.GetField(pair.docpart, "http://fogid.net/o/name"))
+                .ThenBy(pair => pair.docpart == null ? "" : StaticObjects.GetField(pair.docpart, "http://fogid.net/o/name"))
                 .Select(pair => pair.docpart);
             // Отражения
             reflections = item.Elements("inverse")
@@ -411,6 +412,65 @@ namespace OpenArchiveMVC.Models
             new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
             new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
             new XElement("field", new XAttribute("prop", "http://fogid.net/o/docmetainfo")),
+            null);
+    }
+    public class PortraitGeoModel
+    {
+        public string name, description, dates;
+        public IEnumerable<XElement> reflections, locations, locations_person, locations_org, locations_doc;
+        public PortraitGeoModel(string id)
+        {
+            XElement item = StaticObjects.engine.GetItemById(id, format);
+            if (item == null) { return; }
+            // Вытягиваем информацию
+            var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
+            name = name_el == null ? "noname" : name_el.Value;
+            // Описание
+            var desc_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/description");
+            description = desc_el == null ? "" : desc_el.Value;
+            // Даты
+            string _dates = StaticObjects.GetDates(item);
+            dates = string.IsNullOrEmpty(_dates) ? "" : "(" + _dates + ")";
+            // Отражения
+            reflections = item.Elements("inverse")
+                .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/reflected")
+                .Select(inv => inv.Element("record").Element("direct").Element("record"));
+            // Расположение
+            locations = item.Elements("inverse")
+                .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/location-place")
+                .Select(inv => inv.Element("record").Element("direct").Element("record"));
+            locations_person = locations
+                .Where(rec => rec.Attribute("type").Value == "http://fogid.net/o/person");
+            locations_org = locations
+                .Where(rec => rec.Attribute("type").Value == "http://fogid.net/o/org-sys");
+            locations_doc = locations
+                .Where(rec => rec.Attribute("type").Value == "http://fogid.net/o/document");
+
+        }
+        private static XElement format = new XElement("record",
+            // Отражение в документе
+            new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                new XElement("record",
+                    new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-doc"),
+                        new XElement("record", new XAttribute("type", "http://fogid.net/o/document"),
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
+                            null)))),
+            // Расположение сущностей разного типа
+            new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/location-place"),
+                new XElement("record",
+                    new XElement("direct", new XAttribute("prop", "http://fogid.net/o/something"),
+                        new XElement("record",
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/to-date")),
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
+                            null)))),
+            new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+            new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+            new XElement("field", new XAttribute("prop", "http://fogid.net/o/to-date")),
+            new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
             null);
 
     }

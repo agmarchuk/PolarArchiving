@@ -50,7 +50,7 @@ namespace OpenArchiveMVC.Controllers
             }
             else if (type == "http://fogid.net/o/city" || type == "http://fogid.net/o/country")
             {
-                //@RenderPage("PortraitGeo.cshtml", new { id = id, type = type })
+                return View("PortraitGeo", new PortraitGeoModel(id));
             }
             else
             {
