@@ -126,7 +126,7 @@ else
                                             </select>
                                         }
                                         <input name="@fname" style="background-color:#e0eeff; width: 400px;" value="@Model.GetFValue(i)"
-                                               onkeypress="return KeyPress(event.keyCode, '@Model.eid', 'chk=chk&')" />
+                                               onkeypress="return KeyP('EditForm',event.keyCode, '@Model.eid', 'chk=chk&')" />
                                         object searchindexobj = ViewData["searchindex"];
                                         if (searchindexobj != null)
                                         {
@@ -134,13 +134,13 @@ else
                                             if (searchindex == i)
                                             {
                                                 var co = "command=SetVariantNew&exchange=" + i + "|" + Model.GetTValue(i) + "|" + System.Web.HttpUtility.UrlEncode(Model.GetFValue(i)) + "&";
-                                                <div>[ <a href="" onclick="return SubmitForm('@Model.eid','@co')">нов.</a> ]</div>
+                                                <div>[ <a href="" onclick="return SubmitForm('EditForm','@Model.eid','@co')">нов.</a> ]</div>
                                                 Turgunda7.Models.SearchResult[] searchresults = (Turgunda7.Models.SearchResult[])ViewData["searchresults"];
                                                 foreach (Turgunda7.Models.SearchResult sr in searchresults)
                                                 {
                                                     var commm = "command=SetVariant&exchange=" + i + "|" + sr.id + "|" + System.Web.HttpUtility.UrlEncode(sr.value) + "&";
                                                     <div>
-                                                        <a href="" onclick="return SubmitForm('@Model.eid','@commm')">@sr.value</a>
+                                                        <a href="" onclick="return SubmitForm('EditForm','@Model.eid','@commm')">@sr.value</a>
                                                     </div>
                                                 }
                                             }
@@ -154,9 +154,9 @@ else
                 </table>
             </form>
             <div style="margin-bottom:10px;">
-                <button onclick="javascript:SubmitForm('@Model.eid', 'chk=chk&');">пров.</button>
-                <button onclick="javascript:SubmitForm('@Model.eid', 'ok=ok&');">записать!</button>
-                <button onclick="javascript:SubmitForm('@Model.eid', 'canc=cancel&');">отмен.</button>
+                <button onclick="javascript:SubmitForm('EditForm','@Model.eid', 'chk=chk&');">пров.</button>
+                <button onclick="javascript:SubmitForm('EditForm','@Model.eid', 'ok=ok&');">записать!</button>
+                <button onclick="javascript:SubmitForm('EditForm','@Model.eid', 'canc=cancel&');">отмен.</button>
             </div>
         </div>
     </td>

@@ -57,7 +57,7 @@
                      UpdateTargetId = Model.eid
                  })*@
 <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@Model.eid" 
-    href="/Home/EditForm?firsttime=True&amp;bid=@Model.bid&amp;eid=@Model.eid&amp;etype=@Model.etype&amp;iprop=@Model.iprop&amp;nc=@Model.nc&amp;d=@System.DateTime.Now.Ticks">ред</a>
+    href="~/Home/EditForm?firsttime=True&amp;bid=@Model.bid&amp;eid=@Model.eid&amp;etype=@Model.etype&amp;iprop=@Model.iprop&amp;nc=@Model.nc&amp;d=@System.DateTime.Now.Ticks">ред</a>
 
                  @*@Ajax.ActionLink("x", "DeleteRow", new { eid = Model.eid, d = DateTime.Now.Ticks }, new AjaxOptions()
                     {
@@ -68,6 +68,6 @@
                     })*@
 
 <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@Model.eid" 
-   href="/Home/DeleteRow?eid=@Model.eid&amp;d=@System.DateTime.Now.Ticks">x</a>
+   href="~/Home/DeleteRow?eid=@Model.eid&amp;d=@System.DateTime.Now.Ticks">x</a>
             </td>
 }

@@ -33,6 +33,16 @@ namespace Turgunda7
             storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
             //storage.SaveDb("C:/Home/syp_db.xml");
         }
+        public static bool tolog = true;
+        public static void Log(string message)
+        {
+            if (tolog)
+            {
+                var f = System.IO.File.AppendText(path + "wwwroot/log.txt");
+                f.WriteLine($"{System.DateTime.Now.ToUniversalTime()} {message}");
+                f.Close();
+            }
+        }
         private static XElement appProfile;
 
         public static void LoadFromCassettesExpress() { throw new NotImplementedException(); }
@@ -100,6 +110,7 @@ namespace Turgunda7
             {
                 item_corrected = storage.EditCommand(item_corrected);
             }
+            Log("PutItemToDb ok?");
             return item_corrected;
         }
     }

@@ -26,11 +26,13 @@
         alert("Alert");
         return false;
     }
-    function SubmitForm(eid, comm) {
+    function SubmitForm(u, eid, comm) {
         var data = comm + $('#frm_' + eid).serialize();
         //alert(data);
         var html = $.ajax({
-            url: '/Home/EditForm',
+            //url: '~/Home/EditForm',
+            //url: 'EditForm',
+            url: u,
             async: false,
             type: 'POST',
             dataType: 'html',
@@ -39,10 +41,10 @@
         $('#' + eid).html(html);
         return false;
     }
-    function KeyPress(key, eid, comm) {
+    function KeyP(u, key, eid, comm) {
         //alert('code=' + key);
         if (key == 13) {
-            SubmitForm(eid, comm);
+            SubmitForm(u, eid, comm);
             return false;
         } else {
             return true;
@@ -239,7 +241,7 @@ else
                                         UpdateTargetId = eid
                                     })*@
                                 <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                   href="/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=@eid&amp;etype=@ttype&amp;nc=@r.Elements().Count()&amp;d=@System.DateTime.Now.Ticks">ред</a>
+                                   href="~/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=@eid&amp;etype=@ttype&amp;nc=@r.Elements().Count()&amp;d=@System.DateTime.Now.Ticks">ред</a>
 
                                 @if (candelete)
                                 {
@@ -251,7 +253,7 @@ else
                                             Confirm = "Уничтожить?"
                                         })*@
                                     <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                       href="/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
+                                       href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
                                 }
                             </td>
                         }
@@ -295,7 +297,7 @@ else
         "_" + type_id.Substring(iprop.LastIndexOf('/') + 1)
         })*@
                 <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="before" data-ajax-update="#@targetId"
-                   href="/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=create888&amp;etype=@type_id&amp;iprop=@iprop&amp;nc=@ir.Element("header").Elements().Count()&amp;d=@System.DateTime.Now.Ticks">нов</a>
+                   href="~/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=create888&amp;etype=@type_id&amp;iprop=@iprop&amp;nc=@ir.Element("header").Elements().Count()&amp;d=@System.DateTime.Now.Ticks">нов</a>
                 ]
             </span>
 }
@@ -381,7 +383,7 @@ else
                         container = ir;
                         iprop = ip.Attribute("prop").Value;
                         ttype = ir.Attribute("type").Value;
-                        candelete = !hasinverse;
+                        candelete = true;
 
                         bodyid = iprop == null ? "_headerid_" : "_" + iprop.Substring(iprop.LastIndexOf('/') + 1) + "_" + ttype.Substring(iprop.LastIndexOf('/') + 1);
                         headerelements = container.Element("header").Elements().ToArray();
@@ -466,6 +468,9 @@ j++;
 }
 if (edit)
 {
+                        string url1 = Url.Content("~/Home/EditForm?firsttime=True&bid="+id+
+                            "&eid="+eid+"&etype="+ttype+"&iprop="+iprop+
+                            "&nc="+r.Elements().Count()+"&d="+System.DateTime.Now.Ticks);
             <td>
                 @*@Ajax.ActionLink("ред", "EditForm", new { firsttime = true, bid = id, eid = eid, etype = ttype, iprop = iprop, nc = r.Elements().Count(), d = System.DateTime.Now.Ticks }, new AjaxOptions()
         {
@@ -474,7 +479,7 @@ if (edit)
             UpdateTargetId = eid
         })*@
                 <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
-                   href="/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=@eid&amp;etype=@ttype&amp;nc=@r.Elements().Count()&amp;d=@System.DateTime.Now.Ticks">ред</a>
+                   href="@url1">ред</a>
 
                 @if (candelete)
     {
@@ -486,7 +491,7 @@ if (edit)
         Confirm = "Уничтожить?"
     })*@
             <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
-               href="/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
+               href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
 }
             </td>
 }
