@@ -291,3 +291,5 @@ __pycache__/
 /src/OpenArchive/config.xml
 /src/OpenArchiveMVC/config.xml
 /src/Turgunda7/wwwroot/log.txt
+/src/Turgunda7/wwwroot/ApplicationProfile.xml
+/src/Turgunda7/wwwroot/accounts.xml

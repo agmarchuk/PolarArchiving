@@ -23,6 +23,14 @@ namespace Turgunda7.Controllers
     {
         public ActionResult Index()
         {
+            string nm = Request.Query["name"];
+            if (nm == null) nm = "Фонды";
+            if ( nm != null)
+            {
+                XElement my_element = SObjects.SearchByName(nm).FirstOrDefault(x => 
+                    x.Elements("field").Any(f => f.Attribute("prop").Value == "http://fogid.net/o/name" && f.Value == nm));
+                if (my_element != null) return Redirect("~/Home/Portrait?id=" + my_element.Attribute("id").Value);
+            }
             return View();
         }
         public ActionResult Search(string searchstring, string type)
