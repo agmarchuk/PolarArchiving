@@ -38,6 +38,12 @@ namespace Turgunda7.Models
                 return _uuser;
             }
         }
+        public bool IsInRole(string role)
+        {
+            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("id").Value == Uuser);
+            if (acc == null) return false;
+            return acc.Elements("role").Any(r => r.Value == role);
+        }
 
     }
 }

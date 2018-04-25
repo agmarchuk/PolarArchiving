@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Xml.Linq;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 using Polar.Cassettes;
 using Polar.Cassettes.DocumentStorage;
@@ -10,6 +10,7 @@ namespace Turgunda7
 {
     public class SObjects
     {
+        public static XElement accounts = null;
         private static string path = null;
         internal static DStorage storage = null;
         private static DbAdapter engine = null;
@@ -17,23 +18,34 @@ namespace Turgunda7
         public static void Init(string pth)
         {
             path = pth + "/";
-            XElement xconfig = XElement.Load(path + "config.xml");
-            storage = new DStorage();
-            storage.Init(xconfig);
-            engine = new XmlDbAdapter();
-            storage.InitAdapter(engine);
+            try
+            {
+                XElement xconfig = XElement.Load(path + "config.xml");
+                storage = new DStorage();
+                storage.Init(xconfig);
+                engine = new XmlDbAdapter();
+                storage.InitAdapter(engine);
 
-            // Загрузка профиля и онтологии
-            appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
-            XElement ontology = XElement.Load(path + "wwwroot/ontology_iis-v12-doc_ruen.xml");
-            Models.Common.formats = appProfile.Element("formats");
-            Models.Common.LoadOntNamesFromOntology(ontology);
-            Models.Common.LoadInvOntNamesFromOntology(ontology);
+                // Загрузка профиля и онтологии
+                appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
+                XElement ontology = XElement.Load(path + "wwwroot/ontology_iis-v12-doc_ruen.xml");
+                Models.Common.formats = appProfile.Element("formats");
+                Models.Common.LoadOntNamesFromOntology(ontology);
+                Models.Common.LoadInvOntNamesFromOntology(ontology);
 
-            storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
-            //storage.SaveDb("C:/Home/syp_db.xml");
+                storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
+            }
+            catch (Exception e) { Log(e.Message); }
+                //storage.SaveDb("C:/Home/syp_db.xml");
+            try
+            {
+                accounts = XElement.Load(path + "wwwroot/accounts.xml");
+            } catch (Exception)
+            {
+                accounts = new XElement("accounts");
+            }
         }
-        public static bool tolog = true;
+        public static bool tolog = false;
         public static void Log(string message)
         {
             if (tolog)
@@ -110,7 +122,7 @@ namespace Turgunda7
             {
                 item_corrected = storage.EditCommand(item_corrected);
             }
-            Log("PutItemToDb ok?");
+            //Log("PutItemToDb ok?");
             return item_corrected;
         }
     }
