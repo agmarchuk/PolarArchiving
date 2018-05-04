@@ -6,7 +6,7 @@
 }
 
 <p class="grad">
-	<a href="Default.cshtml" class="nov"><img src="img/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+	<a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
 	&raquo;
 	Орг.системы
 	&raquo;
@@ -35,7 +35,7 @@
                 XElement personage = participant.Element("direct").Element("record");
                 string dts = StaticObjects.GetDates(participant);
                 string role = StaticObjects.GetField(participant, "http://fogid.net/o/role");
-			    <a href='/Home/Portrait?id=@personage.Attribute("id").Value'>@StaticObjects.GetField(personage, "http://fogid.net/o/name")</a>
+			    <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@StaticObjects.GetField(personage, "http://fogid.net/o/name")</a>
                 <span>@role</span>
                 if (!string.IsNullOrEmpty(dts))
                 {
@@ -51,7 +51,7 @@
                 if (personage == null) { continue; }
                 string dts = StaticObjects.GetDates(participant);
                 string role = StaticObjects.GetField(participant, "http://fogid.net/o/role");
-			    <a href='/Home/Portrait?id=@personage.Attribute("id").Value'>@StaticObjects.GetField(personage, "http://fogid.net/o/name")</a>
+			    <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@StaticObjects.GetField(personage, "http://fogid.net/o/name")</a>
                 <span>@role</span>
                 if (!string.IsNullOrEmpty(dts))
                 {
@@ -69,7 +69,7 @@
 		<td width="75%" class="line-info">
             @foreach (var location in m.locations)
             {
-			    <a href='/Home/Portrait?id=@location.Attribute("id").Value'>@StaticObjects.GetField(location, "http://fogid.net/o/name")</a>
+			    <a href='~/Home/Portrait?id=@location.Attribute("id").Value'>@StaticObjects.GetField(location, "http://fogid.net/o/name")</a>
                 <br />
             }
 		</td>
@@ -85,7 +85,7 @@
 		<td width="75%" class="line-info">
             @foreach (var au in m.auth)
             {
-			    <a href='/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>
+			    <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>
                 <br />
             }
 		</td>
@@ -121,7 +121,7 @@
         <tr valign="top">
 		<td width="15%">@dt</td>
 		<td width="70%">
-			 <a href='/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>
+			 <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>
              <span class="small">@ds</span>
 		</td>
 		<td width="15%">@au_s</td>
@@ -144,7 +144,7 @@
 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-docs">
 	<tr>
 		<th><a href="sort">Дата</a></th>
-		<th class="th-document-name"><a href="sort">Название документа<img src="img/ico-sort-down.gif" alt="" /></a></th>
+		<th class="th-document-name"><a href="sort">Название документа<img src="~/images/ico-sort-down.gif" alt="" /></a></th>
 		
 	</tr>
 
@@ -157,7 +157,7 @@
         <tr valign="top">
 		<td>@dt</td>
 		<td width="75%">
-			 <a href='/Home/Portrait?id=@refl.Attribute("id").Value'>@StaticObjects.GetField(refl, "http://fogid.net/o/name")</a>
+			 <a href='~/Home/Portrait?id=@refl.Attribute("id").Value'>@StaticObjects.GetField(refl, "http://fogid.net/o/name")</a>
              <span class="small">@ds</span>
 		
 		</td>

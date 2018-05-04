@@ -5,14 +5,14 @@
     PortraitDocumentModel m = Model;
 }
 <p class="grad">
-	<a href="/Home/Index" class="nov"><img src="/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+	<a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
 	&raquo;
-	<a href="/Home/Index">Фонды</a>
+	<a href="~/Home/Index">Фонды</a>
 	&raquo;
     @foreach (XElement cnode in StaticObjects.GetCollectionPath(m.id))
     {
         string nm = StaticObjects.GetField(cnode, "http://fogid.net/o/name");
-	    <a href='/Home/Portrait?id=@cnode.Attribute("id").Value'>@nm</a>
+	    <a href='~/Home/Portrait?id=@cnode.Attribute("id").Value'>@nm</a>
 	    <span>&raquo;</span>
     }
 	@m.name
@@ -24,7 +24,7 @@
 
     @if (!string.IsNullOrEmpty(m.uri) && m.contenttype == "image/jpeg")
     {
-        <img src="/Docs/GetPhoto?s=medium&u=@m.uri"/>
+        <img src="~/Docs/GetPhoto?s=medium&u=@m.uri" />
     }
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-document">
@@ -51,15 +51,16 @@
             {
                 if (doc == null) { continue; }
                 string nm = StaticObjects.GetField(doc, "http://fogid.net/o/name");
-                var fromuri = doc.Elements("inverse")
-                    .FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/forDocument");
-                if (fromuri == null) { continue; }
-                XElement rec = fromuri.Element("record");
-                string uri = StaticObjects.GetField(rec, "http://fogid.net/o/uri");
+                //var fromuri = doc.Elements("inverse")
+                //    .FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/forDocument");
+                //if (fromuri == null) { continue; }
+                //XElement rec = fromuri.Element("record");
+                //string uri = StaticObjects.GetField(rec, "http://fogid.net/o/uri");
+                string uri = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
                 string eid = doc.Attribute("id").Value;
-                    
+
 			<div class="show-small">
-				<a href="/Home/DocumentImage?id=@m.id&eid=@eid"><img src="/Docs/GetPhoto?s=small&u=@uri" border="0" vspace="10" hspace="10" alt="" /></a>
+				<a href="~/Home/DocumentImage?id=@m.id&eid=@eid"><img src="~/Docs/GetPhoto?s=small&u=@uri" border="0" vspace="10" hspace="10" alt="" /></a>
                 <br />
                 @nm
 			</div>
@@ -91,7 +92,7 @@
 		<td width="75%" class="line-info">
             @foreach (var who in m.reflections.Where(re => re != null))
             {
-                @sep; sep = ","; <a href='/Home/Portrait?id=@who.Attribute("id").Value'>@StaticObjects.GetField(who, "http://fogid.net/o/name")</a>;
+                @sep; sep = ","; <a href='~/Home/Portrait?id=@who.Attribute("id").Value'>@StaticObjects.GetField(who, "http://fogid.net/o/name")</a>;
 
             }
 		</td>
@@ -107,7 +108,7 @@
             @foreach (var au in m.authors)
             {
                 @sep; sep = ", ";  // Добавлен разделитель
-                <a href='/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>;
+                <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>;
             }
 		</td>
 	</tr>
@@ -121,7 +122,7 @@
             @foreach (var au in m.recipients)
             {
                 @sep; sep = ",";  // Добавлен разделитель
-                <a href='/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>;
+                <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>;
             }
 		</td>
 	</tr>
@@ -133,7 +134,7 @@
 		<td width="75%" class="line-info">
             @foreach (var geo in m.geoplaces.Where(g => g != null))
             {
-                <a href='/Home/Portrait?id=@geo.Attribute("id").Value'>@StaticObjects.GetField(geo, "http://fogid.net/o/name")</a>
+                <a href='~/Home/Portrait?id=@geo.Attribute("id").Value'>@StaticObjects.GetField(geo, "http://fogid.net/o/name")</a>
             }
 		</td>
 	</tr>
@@ -143,7 +144,7 @@
 	<tr valign="top">
 		<td width="25%" class="line-name">Источник поступления:</td>
 		<td width="75%" class="line-info">
-            <a href='/Home/Portrait?id=@m.infosource.Attribute("id").Value'>@StaticObjects.GetField(m.infosource, "http://fogid.net/o/name")</a>
+            <a href='~/Home/Portrait?id=@m.infosource.Attribute("id").Value'>@StaticObjects.GetField(m.infosource, "http://fogid.net/o/name")</a>
             @if (m.descr_infosource != null)
             {
             <span>@m.descr_infosource.Value</span>
@@ -158,7 +159,7 @@
 		<td width="75%" class="line-info">
             @foreach (XElement coll in m.collections)
             {
-                <a href='/Home/Portrait?id=@coll.Attribute("id").Value'>@StaticObjects.GetField(coll, "http://fogid.net/o/name")</a>
+                <a href='~/Home/Portrait?id=@coll.Attribute("id").Value'>@StaticObjects.GetField(coll, "http://fogid.net/o/name")</a>
                 <br />
             }
 		</td>

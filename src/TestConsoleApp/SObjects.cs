@@ -16,7 +16,7 @@ namespace Turgunda6
         public static void Init() { Init(path); }
         public static void Init(string pth)
         {
-            path = pth + "/";
+            path = pth + ((pth[pth.Length-1]=='/' || pth[pth.Length - 1] == '\\') ? "" : "/");
             XElement xconfig = XElement.Load(path + "config.xml");
             storage = new DStorage();
             storage.Init(xconfig);

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<accounts>
+  <account id="mag" pass="fetnaggi">
+    <role>user</role>
+  </account>
+  <account id="furs" pass="alexey">
+    <role>user</role>
+    <role>admin</role>
+  </account>
+  <account id="tester" pass="tester">
+    <role>user</role>
+  </account>
+</accounts>

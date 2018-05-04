@@ -14,6 +14,9 @@ namespace Turgunda7
         private static string path = null;
         internal static DStorage storage = null;
         private static DbAdapter engine = null;
+        public static bool Initiated = true;
+        private static System.Text.StringBuilder _errors = new System.Text.StringBuilder();
+        public static string Errors { get { return _errors.ToString(); } }
         public static void Init() { Init(path); }
         public static void Init(string pth)
         {
@@ -35,7 +38,7 @@ namespace Turgunda7
 
                 storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
             }
-            catch (Exception e) { Log(e.Message); }
+            catch (Exception e) { Initiated = false; _errors.Append(e.Message); Log(e.Message); }
                 //storage.SaveDb("C:/Home/syp_db.xml");
             try
             {

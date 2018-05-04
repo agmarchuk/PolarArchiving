@@ -6,7 +6,7 @@
 }
 
 <p class="grad">
-    <a href="Default.cshtml" class="nov"><img src="/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+    <a href="~/Home/Index" class="nov"><img src="/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
     &raquo;
     Гео-системы
     &raquo;
@@ -36,7 +36,7 @@
                     string nm = StaticObjects.GetField(ite, "http://fogid.net/o/name");
                     string dc = StaticObjects.GetField(ite, "http://fogid.net/o/description");
                     if (dc.Length > 72) { dc = dc.Substring(0, 72); }
-                    <a href='Portrait.cshtml?id=@ite.Attribute("id").Value'>@nm</a>
+                    <a href='~/Home/Portrait?id=@ite.Attribute("id").Value'>@nm</a>
                     if (!string.IsNullOrEmpty(dts))
                     {
                         <span>(@dts)</span>
@@ -60,7 +60,7 @@
                     string nm = StaticObjects.GetField(ite, "http://fogid.net/o/name");
                     string dc = StaticObjects.GetField(ite, "http://fogid.net/o/description");
                     if (dc.Length > 72) { dc = dc.Substring(0, 72); }
-                    <a href='Portrait.cshtml?id=@ite.Attribute("id").Value'>@nm</a>
+                    <a href='~/Home/Portrait?id=@ite.Attribute("id").Value'>@nm</a>
                     if (!string.IsNullOrEmpty(dts))
                     {
                         <span>(@dts)</span>
@@ -83,7 +83,7 @@
     <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-docs">
         <tr>
             <th><a href="sort">Дата</a></th>
-            <th class="th-document-name"><a href="sort">Название документа<img src="img/ico-sort-down.gif" alt="" /></a></th>
+            <th class="th-document-name"><a href="sort">Название документа<img src="~/images/ico-sort-down.gif" alt="" /></a></th>
         </tr>
         @foreach (XElement ite in m.locations_doc
                .OrderBy(it => StaticObjects.GetField(it, "http://fogid.net/o/from-date"), SCompare.comparer))
@@ -93,7 +93,7 @@
             <tr valign="top">
                 <td>@dt</td>
                 <td width="75%">
-                    <a href='Portrait.cshtml?id=@ite.Attribute("id").Value'>@StaticObjects.GetField(ite, "http://fogid.net/o/name")</a>
+                    <a href='~/Home/Portrait?id=@ite.Attribute("id").Value'>@StaticObjects.GetField(ite, "http://fogid.net/o/name")</a>
                     <span class="small">@ds</span>
                 </td>
             </tr>
@@ -101,8 +101,3 @@
 
     </table>
 }
-@*@foreach (XElement ite in m.locations_doc
-        .OrderBy(it => StaticObjects.GetField(it, "http://fogid.net/o/from-date"), SCompare.comparer))
-    {
-    }*@
-

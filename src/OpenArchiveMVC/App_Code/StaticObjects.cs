@@ -91,7 +91,7 @@ namespace OpenArchive
                 {
                     if (System.IO.File.Exists(_path + "logs/xtree.xml")) System.IO.File.Delete(_path + "logs/xtree.xml");
                 }
-                catch (Exception ex) { }
+                catch (Exception ) { }
                 CalculateConstants();
             }
             //catch (Exception) { }
@@ -159,7 +159,7 @@ namespace OpenArchive
                 {
                     xtree = XElement.Load(_path + "logs/xtree.xml");
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
                     xtree = new XElement(rec);
                     // Какая-то ошибка

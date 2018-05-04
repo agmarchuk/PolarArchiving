@@ -26,16 +26,16 @@ namespace OpenArchiveMVC.Controllers
             DateTime tt0 = DateTime.Now;
 
             //string id = Request.Query["id"];//.Params["id"];
-            if (string.IsNullOrEmpty(id)) { return new RedirectResult("/Home/Index"); }
+            if (string.IsNullOrEmpty(id)) { return new RedirectResult("~/Home/Index"); }
 
             XElement special = OpenArchive.StaticObjects.engine.GetItemByIdBasic(id, false);
-            if (special == null || special.Attribute("type") == null) { return new RedirectResult("/Home/Index"); }
+            if (special == null || special.Attribute("type") == null) { return new RedirectResult("~/Home/Index"); }
             string type = special.Attribute("type").Value;
 
             if (type == "http://fogid.net/o/person")
             {
                 return View("PortraitPerson", new PortraitPersonModel(id));
-}
+            }
             else if (type == "http://fogid.net/o/collection")
             {
                 return View("PortraitCollection", new PortraitCollectionModel(id));
@@ -61,13 +61,17 @@ namespace OpenArchiveMVC.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult DocumentImage(string id, string eid)
+        {
+            return View("DocumentImage", new DocumentImageModel(id, eid));
+        }
 
 
 
 
 
-
-        public IActionResult About()
+            public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
 

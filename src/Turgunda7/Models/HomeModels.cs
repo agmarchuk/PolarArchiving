@@ -101,6 +101,7 @@ namespace Turgunda7.Models
         }
 
     }
+    public class ErrorModel { public string mess; }
     public class PortraitModel
     {
         public bool ok = true;

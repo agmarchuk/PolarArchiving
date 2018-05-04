@@ -5,7 +5,7 @@
 }
 
 <p class="grad">
-	<a href="Default.cshtml" class="nov"><img src="img/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+	<a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
 	&raquo;
 	Персоны
 	&raquo;
@@ -51,7 +51,7 @@
                 var org = work.Element("direct").Element("record");
                 string nm = OpenArchive.StaticObjects.GetField(org, "http://fogid.net/o/name");
                 string dt = OpenArchive.StaticObjects.GetDates(work);
-			    <a href='/Home/Portrait?id=@org.Attribute("id").Value'>@nm</a>
+			    <a href='~/Home/Portrait?id=@org.Attribute("id").Value'>@nm</a>
                 if (!string.IsNullOrEmpty(dt)) 
                 {
                     <span>(@dt)</span>

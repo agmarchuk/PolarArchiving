@@ -21,8 +21,20 @@ namespace Turgunda7.Controllers
     }
     public class HomeController : Controller
     {
+        public ActionResult Error(string mess)
+        {
+            return View("Error", new Turgunda7.Models.ErrorModel() { mess = mess });
+        }
+        public ActionResult LoadDB()
+        {
+            Turgunda7.SObjects.Init();
+            return Redirect("~/Home/Index");
+        }
+
         public ActionResult Index()
         {
+            if (!Turgunda7.SObjects.Initiated) { return Redirect("~/Home/Error?mess=" +
+                System.Web.HttpUtility.UrlEncode(Turgunda7.SObjects.Errors)); }
             string nm = Request.Query["name"];
             if (nm == null) nm = "Фонды";
             if ( nm != null)

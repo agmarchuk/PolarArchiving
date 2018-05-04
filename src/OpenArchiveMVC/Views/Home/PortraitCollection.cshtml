@@ -7,15 +7,15 @@
 }
 
 <p class="grad">
-    <a href="/Home/Index" class="nov"><img src="/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+    <a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
     &raquo;
-    <a href="/Home/Index">Фонды</a>
+    <a href="~/Home/Index">Фонды</a>
     &raquo;
     @foreach (XElement cnode in StaticObjects.GetCollectionPath(m.id))
     {
         collection_depth++;
         string nm = StaticObjects.GetField(cnode, "http://fogid.net/o/name");
-        <a href='/Home/Portrait?id=@cnode.Attribute("id").Value'>@nm</a>
+        <a href='~/Home/Portrait?id=@cnode.Attribute("id").Value'>@nm</a>
         <span>&raquo;</span>
     }
     @m.name
@@ -45,7 +45,7 @@
             var ite_name_el = ite.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
             string ite_name = ite_name_el == null ? "noname" : ite_name_el.Value;
             if (collection_depth == 0 && ite_name.StartsWith("Исходные материалы")) { continue; }
-            <li><a href="/Home/Portrait?id=@ite_id">@ite_name</a></li>
+            <li><a href="~/Home/Portrait?id=@ite_id">@ite_name</a></li>
         }
     </ul>
     <br />
@@ -61,7 +61,7 @@
     <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-docs">
         <tr>
             <th width="16%"><a href="sort">Дата</a></th>
-            <th width="60%" class="th-document-name"><a href="sort">Название документа<img src="img/ico-sort-down.gif" alt="" /></a></th>
+            <th width="60%" class="th-document-name"><a href="sort">Название документа<img src="~/images/ico-sort-down.gif" alt="" /></a></th>
             <th width="25%"><a href="sort">Автор&nbsp;&nbsp;=>&nbsp;&nbsp;Адресат</a></th>
         </tr>
         @foreach (XElement ite in m.documents.OrderBy(it => StaticObjects.GetDates(it), SCompare.comparer))
@@ -117,7 +117,7 @@
                 <td width="60%" class="norma">
                     <!--			<a href="/Home/Portrait?id=@ite_id"><img src="img/icon-doc.png" class="icon-doc" alt="" />
                                 @ite_name</a><br />  Убрал А. Фурсенко-->
-                    <a href="/Home/Portrait?id=@ite_id">@ite_name</a><br />
+                    <a href="~/Home/Portrait?id=@ite_id">@ite_name</a><br />
                     <span class="small">@d</span>
                 </td>
                 <!--td width="25%"><a href="author">И.О. Фамилия</a>, <a href="author">Ф.И. Отчество</a></td -->
@@ -133,7 +133,7 @@
                             string idd = au.Attribute("id") == null ? "noid" : au.Attribute("id").Value;
                             @sep;
                             sep = ",";
-                            <a href='/Home/Portrait?id=@idd'>@nm</a>;
+                            <a href='~/Home/Portrait?id=@idd'>@nm</a>;
                             //                   sep = ",";                        // разделитель
                         }
                         sep = "";
@@ -147,7 +147,7 @@
                             @sep;
                             //                   <span>=></span> добавил class="icon-doc"
                             sep = ",";
-                            <a href='/Home/Portrait?id=@au.Attribute("id").Value'>@nm</a>;
+                            <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@nm</a>;
                         }
                     }
                 </td>
@@ -167,9 +167,9 @@
             string nm = StaticObjects.GetField(doc, "http://fogid.net/o/name");
             string uri = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
             <div class="show-small">
-                <a href="/Home/Portrait?id=@doc.Attribute("id").Value">
-                    <img src="/Docs/GetPhoto?s=small&u=@uri" border="0" vspace="10" hspace="10" alt="" /><br />
-                    <img src="/images/icon-zoom.png" hspace="5" border="0" alt="" />
+                <a href="~/Home/Portrait?id=@doc.Attribute("id").Value">
+                    <img src="~/Docs/GetPhoto?s=small&u=@uri" border="0" vspace="10" hspace="10" alt="" /><br />
+                    <img src="~/images/icon-zoom.png" hspace="5" border="0" alt="" />
                 </a>
                 @nm
             </div>
