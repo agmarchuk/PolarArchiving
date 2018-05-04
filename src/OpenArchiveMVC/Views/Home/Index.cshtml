@@ -1,44 +1,9 @@
 ﻿@using System.Xml.Linq
+@model IndexModel
+@{ 
+    IndexModel m = Model;
+}
 @{
-    //Layout = "~/_SiteLayout.cshtml";
-    XElement format = new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
-        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
-        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
-            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
-                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
-                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
-                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/reflected"),
-                            new XElement("record", new XAttribute("type", "http://fogid.net/o/reflection"),
-                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-doc"),
-                                    new XElement("record", new XAttribute("type", "http://fogid.net/o/photo-doc"),
-                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
-                                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/forDocument"),
-                                            new XElement("record", new XAttribute("type", "http://fogid.net/o/FileStore"),
-                                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri"))))
-                                                )))),
-                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
-
-    if (OpenArchive.StaticObjects.funds_id == null) { return; }
-    XElement item = null;
-    try
-    {
-        item = OpenArchive.StaticObjects.engine.GetItemById(OpenArchive.StaticObjects.funds_id, format);
-    }
-    catch (Exception)
-    {
-        return;
-    }
-    if (item == null)
-    {
-        return;
-    }
-    IEnumerable<XElement> fonds = Enumerable.Empty<XElement>();
-    try
-    {
-        fonds = item.Elements("inverse")
-            .Select((XElement inv) => inv.Element("record").Element("direct").Element("record"));
-    }
-    catch (Exception) { }
 }
 <p class="grad">
     <a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
@@ -47,9 +12,9 @@
 </p>
 
 <div class="heading1">
-    <h1>@item.Elements("field").First(f => f.Attribute("prop").Value == "http://fogid.net/o/name").Value</h1>
+    <h1>@m.name</h1>
 </div>
-@foreach (XElement r in fonds)
+@foreach (XElement r in m.fonds)
 {
     string name = r.Elements("field").First(f => f.Attribute("prop").Value == "http://fogid.net/o/name").Value;
     string img_src = "~/images/fund89x89.jpg";

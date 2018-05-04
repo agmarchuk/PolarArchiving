@@ -10,7 +10,7 @@
     IComparer<string> comparedates = new OpenArchive.SCompare();
 }
 <p class="grad">
-	<a href="/Home/Index" class="nov"><img src="img/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+	<a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
 	&raquo;
 	Результаты поиска
 </p>
@@ -28,7 +28,7 @@
         string dt = OpenArchive.StaticObjects.GetDates(ite);
         string descr = OpenArchive.StaticObjects.GetField(ite, "http://fogid.net/o/description");
         <li>
-            <a href='/Home/Portrait?id=@ite.Attribute("id").Value'>@nm</a>
+            <a href='~/Home/Portrait?id=@ite.Attribute("id").Value'>@nm</a>
             @if (!string.IsNullOrEmpty(dt))
             {
                 <span>(@dt)</span>

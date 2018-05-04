@@ -13,7 +13,7 @@ namespace OpenArchiveMVC.Controllers
     {
         public IActionResult Index()
         {
-            return View("Index");
+            return View("Index", new IndexModel());
         }
         [HttpPost]
         public IActionResult Search()

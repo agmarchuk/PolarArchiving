@@ -7,6 +7,54 @@ using System.Xml.Linq;
 
 namespace OpenArchiveMVC.Models
 {
+    public class IndexModel
+    {
+        public string name;
+        public IEnumerable<XElement> fonds;
+        public IndexModel()
+        {
+            if (OpenArchive.StaticObjects.funds_id == null) { return; }
+            XElement item = null;
+            try
+            {
+                item = OpenArchive.StaticObjects.engine.GetItemById(OpenArchive.StaticObjects.funds_id, format);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+            if (item == null)
+            {
+                return;
+            }
+            name = item.Elements("field").First(f => f.Attribute("prop").Value == "http://fogid.net/o/name").Value;
+            fonds = Enumerable.Empty<XElement>();
+            try
+            {
+                fonds = item.Elements("inverse")
+                    .Select((XElement inv) => inv.Element("record").Element("direct").Element("record"));
+            }
+            catch (Exception) { }
+
+        }
+        private static XElement format = new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
+                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                            new XElement("record", new XAttribute("type", "http://fogid.net/o/reflection"),
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-doc"),
+                                    new XElement("record", new XAttribute("type", "http://fogid.net/o/photo-doc"),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/forDocument"),
+                                            new XElement("record", new XAttribute("type", "http://fogid.net/o/FileStore"),
+                                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri"))))
+                                                )))),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
+
+    }
     public class PortraitPersonModel
     {
         public string id;

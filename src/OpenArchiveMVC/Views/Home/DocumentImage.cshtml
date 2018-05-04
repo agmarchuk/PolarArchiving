@@ -7,9 +7,9 @@
 @{
 }
 <p class="grad">
-    <a href="Default.cshtml" class="nov"><img src="img/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
+    <a href="~/Home/Index" class="nov"><img src="img/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
     &raquo;
-    <a href="Default.cshtml">Фонды</a>
+    <a href="~/Home/Index">Фонды</a>
     &raquo;
     @foreach (XElement cnode in StaticObjects.GetCollectionPath(m.id))
     {
@@ -40,7 +40,7 @@
     @if (m.part_ind < m.parts.Length - 1)
     {
         string idd = m.parts[m.part_ind + 1].Attribute("id").Value;
-        <a href="DocumentImage.cshtml?id=@m.id&eid=@idd">след.</a>
+        <a href="~/Home/DocumentImage?id=@m.id&eid=@idd">след.</a>
     }
     else
     {
