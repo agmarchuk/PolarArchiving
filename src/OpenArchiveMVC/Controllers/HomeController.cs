@@ -20,6 +20,15 @@ namespace OpenArchiveMVC.Controllers
         {
             return View();
         }
+        public IActionResult ExtSearch()
+        {
+            return View("ExtSearch", new ExtSearchModel());
+        }
+        [HttpPost]
+        public IActionResult ExtSearch(string fund, string context, string person, string org, string coll, string geo, string fdate, string tdate)
+        {
+            return View("ExtSearch", new ExtSearchModel(fund, context, person, org, coll, geo, fdate, tdate));
+        }
         [HttpGet]
         public IActionResult Portrait(string id)
         {
@@ -71,18 +80,20 @@ namespace OpenArchiveMVC.Controllers
 
 
 
-            public IActionResult About()
+        public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
 
             return View();
         }
-
-        public IActionResult Contact()
+        public IActionResult Participants()
         {
-            ViewData["Message"] = "Your contact page.";
-
             return View();
+        }
+
+        public IActionResult Contacts()
+        {
+             return View();
         }
 
         public IActionResult Error()

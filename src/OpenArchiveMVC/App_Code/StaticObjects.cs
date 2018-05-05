@@ -234,6 +234,20 @@ namespace OpenArchive
                     else return null;
                 });
         }
+        public static IEnumerable<string> CollectAllChildDocumentIds(string id)
+        {
+            XElement xt = _engine.GetItemById(id, formattochildfromcollection);
+            var query = xt.Elements("inverse")
+                .Where(xi => xi.Attribute("prop").Value == "http://fogid.net/o/in-collection")
+                .SelectMany(xi => 
+                {
+                    XElement child = xi.Element("record").Element("direct").Element("record");
+                    if (child.Attribute("type").Value == "http://fogid.net/o/collection") return CollectAllChildDocumentIds(child.Attribute("id").Value);
+                    else if (child.Attribute("type").Value == "http://fogid.net/o/document") return new string[] { child.Attribute("id").Value };
+                    else return Enumerable.Empty<string>();
+                });
+            return query;
+        }
 
         // ====== Вспомогательные процедуры Log - area
         private static object locker = new object();

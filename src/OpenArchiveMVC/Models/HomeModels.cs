@@ -55,6 +55,151 @@ namespace OpenArchiveMVC.Models
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
 
     }
+
+    public class ExtSearchModel
+    {
+        public XElement funds_coll = null;
+        public XElement[] funds;
+        public IComparer<string> comparedates;
+
+        public ExtSearchModel()
+        { Init(); }
+        private void Init()
+        {
+            try
+            {
+                funds_coll = StaticObjects.engine.GetItemById(StaticObjects.funds_id, format_funds_coll);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+            funds = funds_coll.Elements("inverse")
+                .Select((XElement inv) => inv.Element("record").Element("direct").Element("record")).ToArray();
+            string fund_id = funds.First().Attribute("id").Value;
+            var qu = StaticObjects.GetDocsFromCollection(fund_id);
+
+            comparedates = new SCompare();
+        }
+        public string fund = null, context = null, person = null, org = null, coll = null, geo = null, fdate = null, tdate = null;
+        public bool IsPost = false;
+        public IEnumerable<XElement> query = Enumerable.Empty<XElement>();
+
+        public ExtSearchModel(string fund, string context, string person, string org, string coll, string geo, string fdate, string tdate)
+        {
+            Init();
+            //string fund = Request.Form["fund"];
+            //string context = Request.Form["context"];
+            //string person = Request.Form["person"];
+            //string org = Request.Form["org"];
+            //string coll = Request.Form["coll"];
+            //string geo = Request.Form["geo"];
+            //string fdate = Request.Form["fdate"];
+            //string tdate = Request.Form["tdate"];
+            this.fund = fund; this.context = context; this.person = person; this.org = org; this.coll = coll; this.geo = geo; this.fdate = fdate; this.tdate = tdate;
+            IsPost = true;
+            //var docs = StaticObjects.GetDocsFromCollection(fund != null && fund != "all" ? fund : StaticObjects.funds_id);
+            //IEnumerable<string> searchresults = docs
+            //    .Select(x => x.Attribute("id").Value);
+            IEnumerable<string> searchresults = StaticObjects.CollectAllChildDocumentIds(fund);
+            var xarr = searchresults.Distinct().ToArray();
+            XElement searchformat = new XElement("record",
+                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                string.IsNullOrEmpty(context) ? null : new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
+                // Отражения
+                string.IsNullOrEmpty(person) && string.IsNullOrEmpty(org) ? null : new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-doc"),
+                    new XElement("record",
+                        new XElement("direct", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))),
+                // Авторство документов
+                string.IsNullOrEmpty(person) && string.IsNullOrEmpty(org) ? null : new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/adoc"),
+                    new XElement("record",
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/authority-specificator")),
+                        new XElement("direct", new XAttribute("prop", "http://fogid.net/o/author"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))),
+                // Геоинформация
+                string.IsNullOrEmpty(geo) ? null : new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/something"),
+                    new XElement("record",
+                        new XElement("direct", new XAttribute("prop", "http://fogid.net/o/location-place"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))),
+                // В коллекциях
+                string.IsNullOrEmpty(coll) ? null : new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                    new XElement("record",
+                        new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))),
+
+                null);
+
+            // =========== Формирование результата поиска ============
+            query = searchresults
+                //.Select(id => StaticObjects.engine.GetItemByIdBasic(id, false))
+                .Select(id => StaticObjects.engine.GetItemById(id, searchformat))
+                ;
+            if (!string.IsNullOrEmpty(context))
+            {
+                string[] words = context.Split(' ')
+                    .Where(w => !string.IsNullOrEmpty(w))
+                    .Select(w => w.ToLower())
+                    .ToArray();
+                query = query
+                    .Where(x =>
+                    {
+                        string text = StaticObjects.GetField(x, "http://fogid.net/o/name").ToLower();
+                        string descr = StaticObjects.GetField(x, "http://fogid.net/o/description");
+                        if (descr != null)
+                        {
+                            text = text + " " + descr.ToLower();
+                        }
+                        if (words.All(w => text.Contains(w))) { return true; }
+
+                        return false;
+                    });
+            }
+            if (!string.IsNullOrEmpty(person))
+            {
+                string word = person.ToLower();
+                query = query
+                    .Where(x =>
+                    {
+                        XElement xrec = x.Elements("inverse")
+                            .Where(xi => xi.Attribute("prop").Value == "http://fogid.net/o/in-doc")
+                            .Select(xi => xi.Element("record")?.Element("direct")?.Element("record"))
+                            .FirstOrDefault();
+                        if (xrec == null) { return false; }
+                        string text = StaticObjects.GetField(xrec, "http://fogid.net/o/name").ToLower();
+                        return text.StartsWith(word);
+                    });
+            }
+            if (!string.IsNullOrEmpty(org))
+            {
+                string word = org.ToLower();
+                query = query
+                    .Where(x =>
+                    {
+                        XElement xrec = x.Elements("inverse")
+                            .Where(xi => xi.Attribute("prop").Value == "http://fogid.net/o/in-doc")
+                            .Select(xi => xi.Element("record").Element("direct").Element("record"))
+                            .FirstOrDefault();
+                        if (xrec == null) { return false; }
+                        string text = StaticObjects.GetField(xrec, "http://fogid.net/o/name").ToLower();
+                        return text.StartsWith(word);
+                    });
+            }
+        }
+        private static XElement format_funds_coll = new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
+                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
+
+    }
     public class PortraitPersonModel
     {
         public string id;

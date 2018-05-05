@@ -1,39 +1,10 @@
-﻿@using System.Xml.Linq
-@model IndexModel
-@{
-    IndexModel m = Model;
-}
-@{
-}
-<p class="grad">
+﻿<p class="grad">
     <a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
     &raquo;
-    <a href="~/Home/Index">Фонды</a>
+    Участники
 </p>
 
-<div class="heading1">
-    <h1>@m.name</h1>
-</div>
-@foreach (XElement r in m.fonds)
-{
-    string name = r.Elements("field").First(f => f.Attribute("prop").Value == "http://fogid.net/o/name").Value;
-    string img_src = "~/images/fund89x89.jpg";
-    var qq = r.Elements("inverse").FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/reflected");
-    if (qq != null)
-    {
-        img_src = "~/Docs/GetPhoto?s=small&u=" + qq.Value;
-    }
-    string id = r.Attribute("id").Value;
-    <div class="block-25 small">
-        <a href="~/Home/Portrait?id=@id">
-            <img src="@Url.Content(img_src)" class="fund-face" alt="" /><br /><img src="~/images/line-person.gif" class="line-face" alt="" /><br />
-            <span>@name</span>
-        </a>
-    </div>
-}
-<br clear="all" />
 
-@*@RenderPage("PageParticipants.cshtml")*@
 <div class="heading1">
     <h1>Участники проекта</h1>
 </div>
@@ -55,22 +26,7 @@
     <li><a href="~/Home/Contacts">Контакты</a></li>
 </ul>
 
-
-@section rightpanel {
-    @*@RenderPage("PageAboutSmall.cshtml")*@
-    <div class="heading3">
-        <h3>О проекте</h3>
-    </div>
-    <p class="small">
-        <b class="drop-cap">П</b>роект
-        базируется на&nbsp;идеологии синтеза гуманитарных наук &nbsp;и информационных технологий. Для введения в&nbsp;научный оборот широкого круга исторических источников создано специализированное информационно-коммуникативное пространство&nbsp;&mdash; Открытый электронный архив СО&nbsp;РАН.
-    </p>
-    <p class="small">
-        Такая форма представления источников расширяет сферу приложения информационных технологий как средства визуализации артефактов, удобной среды для работы с&nbsp;архивными и&nbsp;музейными материалами, их&nbsp;систематизации и&nbsp;атрибутирования.
-    </p>
-    <p class="small"><a href="About.cshtml">Подробнее<img src="img/arrow.png" class="ico-arrow" alt="&raquo;" /></a></p>
-
-    <br />
+@section rightpanel    {
 
     @*@RenderPage("PageUseLinks.cshtml")*@
     <div class="heading3">
@@ -87,4 +43,5 @@
         <li><a href="http://books.mathtree.ru/">Коллекция старинных математических книг</a></li>
         <li><a href="http://www.museum.ru/">Портал &laquo;Музеи России&raquo;</a></li>
     </ul>
+
 }
