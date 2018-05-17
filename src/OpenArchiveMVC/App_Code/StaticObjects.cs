@@ -283,7 +283,14 @@ namespace OpenArchive
         }
         public static string GetField(XElement item, string prop)
         {
-            var el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == prop);
+            XElement el = null;
+            try
+            {
+                el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == prop);
+            } catch (Exception)
+            {
+                Console.WriteLine("Exception");
+            }
             return el == null ? "" : el.Value;
         }
         public static IEnumerable<XElement> GetCollectionPath(string id)

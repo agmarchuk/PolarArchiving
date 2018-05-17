@@ -88,7 +88,7 @@
 		<td width="75%" class="line-info">
             @foreach (var live in m.livings)
             {
-            <a href='/Home/Portrait?id=@live.Attribute("id").Value'>@OpenArchive.StaticObjects.GetField(live, "http://fogid.net/o/name")</a><span> </span> 
+            <a href='~/Home/Portrait?id=@live.Attribute("id").Value'>@OpenArchive.StaticObjects.GetField(live, "http://fogid.net/o/name")</a><span> </span> 
             }
 		</td>
 	</tr>
@@ -108,7 +108,7 @@
 		<th width="65%" class="th-document-name"><a href="sort">Название документа<img src="img/ico-sort-down.gif" alt="" /></a></th>
 		<th width="20%"><a href="sort">автор/получатель</a></th>
 	</tr>
-    @foreach (XElement doc in m.auth.Select(au => au.Element("direct").Element("record")).OrderBy(d => OpenArchive.StaticObjects.GetField(d, "http://fogid.net/o/from-date")))
+    @foreach (XElement doc in m.auth.Select(au => au.Element("direct")?.Element("record")).Where(r => r != null).OrderBy(d => OpenArchive.StaticObjects.GetField(d, "http://fogid.net/o/from-date")))
     {
         string dt = OpenArchive.StaticObjects.GetDates(doc);
         string nm = OpenArchive.StaticObjects.GetField(doc, "http://fogid.net/o/name");
@@ -119,7 +119,7 @@
 	<tr valign="top">
 		<td width="15%">@dt</td>
 		<td width="65%">
-			<a href='/Home/Portrait?id=@doc.Attribute("id").Value'>@nm</a><br />
+			<a href='~/Home/Portrait?id=@doc.Attribute("id").Value'>@nm</a><br />
 			<span class="small">@ds</span>
 		</td>
 		<td width="20%">
@@ -151,7 +151,7 @@
 	<tr valign="top">
 		<td width="20%">@dt</td>
 		<td width="80%">
-            <a href='/Home/Portrait?id=@doc.Attribute("id").Value'>@nm</a><br />
+            <a href='~/Home/Portrait?id=@doc.Attribute("id").Value'>@nm</a><br />
 			<span class="small">@ds</span>
 		</td>
 		<!--td width="25%">

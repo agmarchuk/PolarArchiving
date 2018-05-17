@@ -314,7 +314,9 @@ namespace OpenArchiveMVC.Models
             refl_docs = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/reflected")
                 .Select(inv => inv.Element("record"))
-                .Select(rec => rec.Element("direct").Element("record"))
+                .Select(rec => rec.Element("direct")?.Element("record"))
+                .Where(r => r != null)
+                .ToArray()
                 ;
 
         }
