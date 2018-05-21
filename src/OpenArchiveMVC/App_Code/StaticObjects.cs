@@ -37,21 +37,26 @@ namespace OpenArchive
             InitLog(out turlog, _path + "wwwroot/logs/turlog.txt", true);
             turlog("OpenArchive initiating... path=" + path);
 
-            _config = XElement.Load(_path + "config.xml");
-            string connectionstring = _config.Element("database").Attribute("connectionstring").Value;
+            string configpath = _path + "config.xml";
+            _config = System.IO.File.Exists(configpath) ? XElement.Load(configpath) : new XElement("config");
+            XElement xdb = _config.Element("database");
+            string connectionstring = xdb == null ? "" : xdb.Attribute("connectionstring").Value;
             // Инициируем движок
             storage = new DStorage();
             storage.Init(_config);
             if (connectionstring.StartsWith("xml:"))
             {
-                _engine = new XmlDbAdapter();
+                //_engine = new XmlDbAdapter();
             }
             else if (connectionstring.StartsWith("polar:"))
             {
                 connectionstring = connectionstring.Substring("polar:".Length);
                 //_engine = new sema2012m.PolarBasedAdapter(connectionstring);
             }
-            else throw new Exception("Unknown engine: " + connectionstring);
+            //else throw new Exception("Unknown engine: " + connectionstring);
+            // Экспериментальный коннектор
+            _engine = new OpenArchiveMVC.App_Code.HttpConnector();
+
             storage.InitAdapter(_engine);
 
             // Присоединимся к кассетам через список из конфигуратора (это надо перенести в загрузочную часть) 

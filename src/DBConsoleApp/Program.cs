@@ -4,7 +4,7 @@ using Polar.Cassettes.DocumentStorage;
 
 namespace DBConsoleApp
 {
-    class Program
+    partial class Program
     {
         private static string _path;
         private static XElement _config;
@@ -22,7 +22,7 @@ namespace DBConsoleApp
         {
             Console.WriteLine("Start DBConsoleApp");
             // Сначала прочитаем конфигуратор и создадим базу данных на основе указанных кассет
-            _path = "../../../"; 
+            _path = ""; //"../../../"; 
 
             _config = XElement.Load(_path + "config.xml");
             string connectionstring = _config.Element("database").Attribute("connectionstring").Value;
@@ -68,7 +68,7 @@ namespace DBConsoleApp
                 Console.WriteLine(e.ToString());
             }
             // Теперь надо поставить слушателя и начать обрабатывать послания
-
+            SimpleListenerExample(_engine, new string[] { "http://localhost:5005/" });
 
         }
     }

@@ -10,7 +10,7 @@ namespace OpenArchiveMVC.Models
     public class IndexModel
     {
         public string name;
-        public IEnumerable<XElement> fonds;
+        public IEnumerable<XElement> fonds = Enumerable.Empty<XElement>();
         public IndexModel()
         {
             if (OpenArchive.StaticObjects.funds_id == null) { return; }
