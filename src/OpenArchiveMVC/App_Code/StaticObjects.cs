@@ -34,7 +34,7 @@ namespace OpenArchive
             if (_path[_path.Length - 1] != '/' && _path[_path.Length - 1] != '\\') _path = _path + "/";
 
             // Инициирование системного лога проекта Тургунда
-            InitLog(out turlog, _path + "logs/turlog.txt", true);
+            InitLog(out turlog, _path + "wwwroot/logs/turlog.txt", true);
             turlog("OpenArchive initiating... path=" + path);
 
             _config = XElement.Load(_path + "config.xml");
@@ -241,7 +241,8 @@ namespace OpenArchive
                 .Where(xi => xi.Attribute("prop").Value == "http://fogid.net/o/in-collection")
                 .SelectMany(xi => 
                 {
-                    XElement child = xi.Element("record").Element("direct").Element("record");
+                    XElement child = xi.Element("record")?.Element("direct")?.Element("record");
+                    if (child == null) { return Enumerable.Empty<string>(); }
                     if (child.Attribute("type").Value == "http://fogid.net/o/collection") return CollectAllChildDocumentIds(child.Attribute("id").Value);
                     else if (child.Attribute("type").Value == "http://fogid.net/o/document") return new string[] { child.Attribute("id").Value };
                     else return Enumerable.Empty<string>();

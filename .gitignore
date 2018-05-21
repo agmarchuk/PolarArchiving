@@ -294,3 +294,6 @@ __pycache__/
 /src/Turgunda7/wwwroot/ApplicationProfile.xml
 /src/Turgunda7/wwwroot/accounts.xml
 /.vscode
+/src/DBConsoleApp/logs
+/src/DBConsoleApp/config.xml
+/src/OpenArchiveMVC/wwwroot/logs
