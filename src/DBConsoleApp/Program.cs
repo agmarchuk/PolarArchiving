@@ -68,6 +68,7 @@ namespace DBConsoleApp
                 Console.WriteLine(e.ToString());
             }
             // Теперь надо поставить слушателя и начать обрабатывать послания
+            //SimpleListenerExample(_engine, new string[] { "http://localhost:5005/" });
             SimpleListenerExample(_engine, new string[] { "http://localhost:5005/" });
 
         }
