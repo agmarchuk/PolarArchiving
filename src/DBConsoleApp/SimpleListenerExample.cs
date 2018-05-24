@@ -53,19 +53,34 @@ namespace DBConsoleApp
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
 
-                string responseString = $"<HTML><BODY> Hello {System.DateTime.Now} world!</BODY></HTML>";
+                string responseString = "<result></result>";
+                response.ContentEncoding = System.Text.Encoding.UTF8;
+                response.ContentType = "text/xml";
                 string comm = request.QueryString["c"];
                 if (comm == "SearchByName")
                 {
                     string name = request.QueryString["name"];
                     var res = engine.SearchByName(name);
-                    foreach (XElement r in res)
-                    {
-                        Console.WriteLine("res=" + r.ToString());
-                    }
-                    response.ContentEncoding = System.Text.Encoding.UTF8;
                     responseString = (new XElement("result", res.Select(r => new XElement(r)))).ToString();
-                    response.ContentType = "text/xml";
+                }
+                else if (comm == "GetItemByIdBasic")
+                {
+                    string id = request.QueryString["id"];
+                    string addinverse = request.QueryString["addinverse"];
+                    var res = engine.GetItemByIdBasic(id, addinverse=="true"?true:false);
+                    responseString = res.ToString();
+                }
+                else if (comm == "GetItemById")
+                {
+                    Console.WriteLine("GetItemById");
+                    string id = request.QueryString["id"];
+                    Console.WriteLine("id=" + id);
+                    
+                    Stream rstream = request.InputStream;
+                    XElement format = XElement.Load(rstream);
+                    Console.WriteLine(format.ToString());
+                    var res = engine.GetItemById(id, format);
+                    responseString = res.ToString();
                 }
 
 

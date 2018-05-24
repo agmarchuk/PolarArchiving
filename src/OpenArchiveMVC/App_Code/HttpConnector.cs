@@ -12,12 +12,42 @@ namespace OpenArchiveMVC.App_Code
     {
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            WebRequest request = WebRequest.Create("http://localhost:5005/?c=SearchByName&name=марчук");
+            string requeststring = "http://localhost:5005/?c=SearchByName&name=" + searchstring;
+            XElement result = AskByRequest(requeststring);
+            return result.Elements();
+        }
+
+        private static XElement AskByRequest(string requeststring)
+        {
+            WebRequest request = WebRequest.Create(requeststring);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             Stream dataStream = response.GetResponseStream();
             XElement result = XElement.Load(dataStream);
+            return result;
+        }
 
-            return result.Elements();
+        public override XElement GetItemByIdBasic(string id, bool addinverse)
+        {
+            string requeststring = "http://localhost:5005/?c=GetItemByIdBasic&id=" + id + "&addinverse=" + addinverse.ToString();
+            XElement result = AskByRequest(requeststring);
+            return result;
+        }
+        public override XElement GetItemById(string id, XElement format)
+        {
+            string requeststring = "http://localhost:5005/?c=GetItemById&id=" + id;
+            WebRequest request = WebRequest.Create(requeststring);
+            request.Method = "POST";
+            request.ContentType = "text/xml";
+            string contentstring = format.ToString();
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(contentstring);
+            request.ContentLength = buffer.Length;
+            Stream requStream = request.GetRequestStream();
+            requStream.Write(buffer, 0, buffer.Length);
+
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Stream dataStream = response.GetResponseStream();
+            XElement result = XElement.Load(dataStream);
+            return result;
         }
 
         public override XElement Add(XElement record)
@@ -40,15 +70,7 @@ namespace OpenArchiveMVC.App_Code
             throw new NotImplementedException();
         }
 
-        public override XElement GetItemById(string id, XElement format)
-        {
-            throw new NotImplementedException();
-        }
 
-        public override XElement GetItemByIdBasic(string id, bool addinverse)
-        {
-            throw new NotImplementedException();
-        }
 
         public override XElement GetItemByIdSpecial(string id)
         {
