@@ -11,8 +11,13 @@ namespace CassetteData
         private DStorage storage = null;
         private DbAdapter _engine;
         private DbAdapter engine { get { return _engine; } }
-        public CassetteIntegration(XElement config, bool networking)
+        public CassetteIntegration(XElement xconfig, bool networking)
         {
+            storage = new DStorage();
+            storage.Init(xconfig);
+            _engine = new XmlDbAdapter();
+            storage.InitAdapter(_engine);
+            storage.LoadFromCassettesExpress();
 
         }
     }
