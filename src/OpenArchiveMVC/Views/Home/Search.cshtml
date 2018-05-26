@@ -4,9 +4,9 @@
     string sv = Context.Request.Form["searchvariant"];
     string ss = Context.Request.Form["searchstring"];
     if (string.IsNullOrEmpty(ss)) { return; }
-    var searchresults = OpenArchive.StaticObjects.engine.SearchByName(ss)
+    var searchresults = OpenArchive.StaticObjects.Engine.SearchByName(ss)
         .Where(ite => string.IsNullOrEmpty(sv) || ite.Attribute("type").Value == "http://fogid.net/o/" + sv)
-        .Select(ite => OpenArchive.StaticObjects.engine.GetItemByIdBasic(ite.Attribute("id").Value, false));
+        .Select(ite => OpenArchive.StaticObjects.Engine.GetItemByIdBasic(ite.Attribute("id").Value, false));
     IComparer<string> comparedates = new OpenArchive.SCompare();
 }
 <p class="grad">

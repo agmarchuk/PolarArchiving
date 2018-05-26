@@ -13,7 +13,7 @@ namespace OpenArchiveMVC.Controllers
         public IActionResult GetPhoto(string s, string u)
         {
             if (u == null) { return new EmptyResult(); }
-            string filename = OpenArchive.StaticObjects.storage.GetPhotoFileName(u, s) + ".jpg";
+            string filename = OpenArchive.StaticObjects.Engine.storage.GetPhotoFileName(u, s) + ".jpg";
             return new PhysicalFileResult(filename, "image/jpeg");
         }
     } 
