@@ -17,7 +17,7 @@ namespace OpenArchiveMVC.Models
             XElement item = null;
             try
             {
-                item = OpenArchive.StaticObjects.engine.GetItemById(OpenArchive.StaticObjects.funds_id, format);
+                item = OpenArchive.StaticObjects.Engine.GetItemById(OpenArchive.StaticObjects.funds_id, format);
             }
             catch (Exception)
             {
@@ -68,7 +68,7 @@ namespace OpenArchiveMVC.Models
         {
             try
             {
-                funds_coll = StaticObjects.engine.GetItemById(StaticObjects.funds_id, format_funds_coll);
+                funds_coll = StaticObjects.Engine.GetItemById(StaticObjects.funds_id, format_funds_coll);
             }
             catch (Exception)
             {
@@ -137,8 +137,8 @@ namespace OpenArchiveMVC.Models
 
             // =========== Формирование результата поиска ============
             query = searchresults
-                //.Select(id => StaticObjects.engine.GetItemByIdBasic(id, false))
-                .Select(id => StaticObjects.engine.GetItemById(id, searchformat))
+                //.Select(id => StaticObjects.Engine.GetItemByIdBasic(id, false))
+                .Select(id => StaticObjects.Engine.GetItemById(id, searchformat))
                 ;
             if (!string.IsNullOrEmpty(context))
             {
@@ -268,7 +268,7 @@ namespace OpenArchiveMVC.Models
         {
             this.id = id;
 
-            XElement item = OpenArchive.StaticObjects.engine.GetItemById(id, format);
+            XElement item = OpenArchive.StaticObjects.Engine.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -356,7 +356,7 @@ namespace OpenArchiveMVC.Models
         {
             if (id == null) { return; }
             this.id = id;
-            XElement item = StaticObjects.engine.GetItemById(id, format);
+            XElement item = StaticObjects.Engine.GetItemById(id, format);
 
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -398,7 +398,7 @@ namespace OpenArchiveMVC.Models
         {
             this.id = id;
 
-            XElement item = StaticObjects.engine.GetItemById(id, format);
+            XElement item = StaticObjects.Engine.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -485,7 +485,7 @@ namespace OpenArchiveMVC.Models
         {
             this.id = id;
             if (id == null) { return; }
-            XElement item = StaticObjects.engine.GetItemById(id, format);
+            XElement item = StaticObjects.Engine.GetItemById(id, format);
             typeid = item.Attribute("id").Value;
             if (item == null) { return; }
             // Вытягиваем информацию
@@ -617,7 +617,7 @@ namespace OpenArchiveMVC.Models
         public IEnumerable<XElement> reflections, locations, locations_person, locations_org, locations_doc;
         public PortraitGeoModel(string id)
         {
-            XElement item = StaticObjects.engine.GetItemById(id, format);
+            XElement item = StaticObjects.Engine.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -680,7 +680,7 @@ namespace OpenArchiveMVC.Models
         public DocumentImageModel(string id, string eid)
         {
             this.id = id;
-            item = StaticObjects.engine.GetItemById(id, format);
+            item = StaticObjects.Engine.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
