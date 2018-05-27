@@ -12,8 +12,11 @@ namespace Turgunda7
     {
         public static XElement accounts = null;
         private static string path = null;
-        internal static DStorage storage = null;
-        private static DbAdapter engine = null;
+        //internal static DStorage storage = null;
+        //private static DbAdapter engine = null;
+        private static CassetteData.CassetteIntegration _engine;
+        public static CassetteData.CassetteIntegration Engine { get { return _engine; } }
+
         public static bool Initiated = true;
         private static System.Text.StringBuilder _errors = new System.Text.StringBuilder();
         public static string Errors { get { return _errors.ToString(); } }
@@ -24,10 +27,11 @@ namespace Turgunda7
             try
             {
                 XElement xconfig = XElement.Load(path + "config.xml");
-                storage = new DStorage();
-                storage.Init(xconfig);
-                engine = new XmlDbAdapter();
-                storage.InitAdapter(engine);
+                //storage = new DStorage();
+                //storage.Init(xconfig);
+                //engine = new XmlDbAdapter();
+                //storage.InitAdapter(engine);
+                _engine = new CassetteData.CassetteIntegration(xconfig, false);
 
                 // Загрузка профиля и онтологии
                 appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
@@ -36,7 +40,7 @@ namespace Turgunda7
                 Models.Common.LoadOntNamesFromOntology(ontology);
                 Models.Common.LoadInvOntNamesFromOntology(ontology);
 
-                storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
+                //storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
             }
             catch (Exception e) { Initiated = false; _errors.Append(e.Message); Log(e.Message); }
                 //storage.SaveDb("C:/Home/syp_db.xml");
@@ -62,10 +66,10 @@ namespace Turgunda7
 
         public static void LoadFromCassettesExpress() { throw new NotImplementedException(); }
 
-        public static IEnumerable<XElement> SearchByName(string searchstring) { return engine.SearchByName(searchstring); }
+        public static IEnumerable<XElement> SearchByName(string searchstring) { return _engine.SearchByName(searchstring); }
         //public static string GetType(string id) { return adapter.GetType(id); }
-        public static XElement GetItemById(string id, XElement format) { return engine.GetItemById(id, format); }
-        public static XElement GetItemByIdSpecial(string id) { return engine.GetItemByIdBasic(id, true); }
+        public static XElement GetItemById(string id, XElement format) { return _engine.GetItemById(id, format); }
+        public static XElement GetItemByIdSpecial(string id) { return _engine.GetItemByIdBasic(id, true); }
 
         // ============== Редактирование базы данных ===============
         public static string AddInvRelation(string eid, string prop, string rtype, string username)
@@ -123,7 +127,7 @@ namespace Turgunda7
             item_corrected.Add(new XAttribute("owner", username), new XAttribute("mT", DateTime.Now.ToUniversalTime().ToString("u")));
             lock (saveInDb)
             {
-                item_corrected = storage.EditCommand(item_corrected);
+                item_corrected = _engine.storage.EditCommand(item_corrected);
             }
             //Log("PutItemToDb ok?");
             return item_corrected;

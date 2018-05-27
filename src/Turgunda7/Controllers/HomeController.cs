@@ -124,7 +124,7 @@ namespace Turgunda7.Controllers
                 {   // Проверка. Находим первый ряд такой, что: а) это прямое отношение, б) набран текст и есть тип, в) нет ссылки. 
                     // Делаем поисковый запрос через SearchModel. Результаты SearchResult[] помещаем в ViewData под именем searchresults,
                     // а в ViewData["searchindex"] поместим индекс
-                    var pair = hrows.Select((hr, ind) => new { hr = hr, ind = ind })
+                    var pair = hrows.Select((hr, ind) => new { hr, ind })
                         .FirstOrDefault(hrind =>
                         {
                             var hr = hrind.hr;
@@ -148,7 +148,7 @@ namespace Turgunda7.Controllers
                     // Соберем получившуюся запись
                     XElement record = new XElement(ONames.GetXName(rmodel.etype),
                         new XAttribute(ONames.rdfabout, rmodel.eid),
-                        hrows.Select((fd, ind) => new { fd = fd, ind = ind })
+                        hrows.Select((fd, ind) => new { fd, ind })
                         .Select(fdind =>
                         {
                             XElement fd = fdind.fd;

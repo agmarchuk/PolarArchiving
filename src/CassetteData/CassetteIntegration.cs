@@ -20,32 +20,42 @@ namespace CassetteData
             storage.LoadFromCassettesExpress();
         }
         // ============== API ==============
-        public override void Init(string connectionstring)
-        {
-            throw new NotImplementedException();
-        }
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
             return _adapter.SearchByName(searchstring);
         }
-
         public override XElement GetItemByIdBasic(string id, bool addinverse)
         {
             return _adapter.GetItemByIdBasic(id, addinverse);
         }
-
         public override XElement GetItemById(string id, XElement format)
         {
             return _adapter.GetItemById(id, format);
-
         }
-
         public override XElement GetItemByIdSpecial(string id)
         {
             return _adapter.GetItemByIdSpecial(id);
         }
+        public override XElement Delete(string id)
+        {
+            return _adapter.Delete(id);
+        }
+        public override XElement Add(XElement record)
+        {
+            return _adapter.Add(record);
+        }
+        public override XElement AddUpdate(XElement record)
+        {
+            return _adapter.AddUpdate(record);
+        }
 
+
+
+        public override void Init(string connectionstring)
+        {
+            throw new NotImplementedException();
+        }
         public override void StartFillDb(Action<string> turlog)
         {
             throw new NotImplementedException();
@@ -66,20 +76,6 @@ namespace CassetteData
             throw new NotImplementedException();
         }
 
-        public override XElement Delete(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override XElement Add(XElement record)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override XElement AddUpdate(XElement record)
-        {
-            throw new NotImplementedException();
-        }
 
         public override void LoadXFlowUsingRiTable(IEnumerable<XElement> xflow)
         {
