@@ -2,35 +2,12 @@
 using System.Xml.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Net.Http.Server;
+
 
 namespace CassetteData
 {
     class Program
     {
-        static void Main()
-        {
-            var settings = new WebListenerSettings();
-            settings.UrlPrefixes.Add("http://localhost:8080");
-
-            using (WebListener listener = new WebListener(settings))
-            {
-                listener.Start();
-
-                while (true)
-                {
-                    var context = await listener.AcceptAsync();
-                    byte[] bytes = Encoding.ASCII.GetBytes("Hello World: " + DateTime.Now);
-                    context.Response.ContentLength = bytes.Length;
-                    context.Response.ContentType = "text/plain";
-
-                    await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
-                    context.Dispose();
-                }
-            }
-        }
         static void Main1(string[] args)
         {
             var task = Listener();
