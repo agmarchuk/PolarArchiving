@@ -1,10 +1,81 @@
 ﻿using System;
 using System.Xml.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Net.Http.Server;
 
 namespace CassetteData
 {
     class Program
     {
+        static void Main()
+        {
+            var settings = new WebListenerSettings();
+            settings.UrlPrefixes.Add("http://localhost:8080");
+
+            using (WebListener listener = new WebListener(settings))
+            {
+                listener.Start();
+
+                while (true)
+                {
+                    var context = await listener.AcceptAsync();
+                    byte[] bytes = Encoding.ASCII.GetBytes("Hello World: " + DateTime.Now);
+                    context.Response.ContentLength = bytes.Length;
+                    context.Response.ContentType = "text/plain";
+
+                    await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+                    context.Dispose();
+                }
+            }
+        }
+        static void Main1(string[] args)
+        {
+            var task = Listener();
+            Task.Run(() => task);
+            Console.WriteLine("exit?");
+            Console.ReadKey();
+
+        }
+        static async Task Listener()
+        { 
+            // Create a listener.
+            HttpListener listener = new HttpListener();
+            // Add the prefixes.
+            listener.Prefixes.Add("http://localhost:5000");
+
+            listener.Start();
+            bool tocontinue = true;
+
+            while (tocontinue)
+            {
+                Console.WriteLine("Listening...");
+                // Note: The GetContext method blocks while waiting for a request. 
+                HttpListenerContext context = await listener.GetContextAsync();
+                Console.WriteLine(context.Request.Url);
+                HttpListenerRequest request = context.Request;
+
+                // Obtain a response object.
+                HttpListenerResponse response = context.Response;
+
+                string responseString = "ok";
+                response.ContentEncoding = System.Text.Encoding.UTF8;
+                response.ContentType = "text/plain";
+
+                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+                // Get a response stream and write the response to it.
+                response.ContentLength64 = buffer.Length;
+                System.IO.Stream output = response.OutputStream;
+                output.Write(buffer, 0, buffer.Length);
+                // You must close the output stream.
+                output.Close();
+            }
+
+            listener.Stop();
+
+        }
         static void Main0(string[] args)
         {
             Console.WriteLine("Start CassetteData module");
