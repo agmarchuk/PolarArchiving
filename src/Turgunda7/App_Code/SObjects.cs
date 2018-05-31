@@ -66,10 +66,9 @@ namespace Turgunda7
 
         public static void LoadFromCassettesExpress() { throw new NotImplementedException(); }
 
-        public static IEnumerable<XElement> SearchByName(string searchstring) { return _engine.SearchByName(searchstring); }
-        //public static string GetType(string id) { return adapter.GetType(id); }
-        public static XElement GetItemById(string id, XElement format) { return _engine.GetItemById(id, format); }
-        public static XElement GetItemByIdSpecial(string id) { return _engine.GetItemByIdBasic(id, true); }
+        //public static IEnumerable<XElement> SearchByName(string searchstring) { return _engine.SearchByName(searchstring); }
+        //public static XElement GetItemById(string id, XElement format) { return _engine.GetItemById(id, format); }
+        //public static XElement GetItemByIdSpecial(string id) { return _engine.GetItemByIdBasic(id, true); }
 
         // ============== Редактирование базы данных ===============
         public static string AddInvRelation(string eid, string prop, string rtype, string username)

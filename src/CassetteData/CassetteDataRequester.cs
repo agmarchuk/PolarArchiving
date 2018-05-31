@@ -10,9 +10,16 @@ namespace CassetteData
 {
     public class CassetteDataRequester : Polar.Cassettes.DocumentStorage.DbAdapter
     {
+        private string host_port_contr = "http://localhost:52018/Serv/";
+        public string Ping()
+        {
+            WebRequest request = WebRequest.Create(host_port_contr + "Ping");
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            return "Pong";
+        }
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            string requeststring = "http://localhost:5005/?c=SearchByName&name=" + searchstring;
+            string requeststring = host_port_contr + "SearchByName?ss=" + searchstring;
             XElement result = AskByRequest(requeststring);
             return result.Elements();
         }
@@ -34,11 +41,11 @@ namespace CassetteData
         }
         public override XElement GetItemById(string id, XElement format)
         {
-            string requeststring = "http://localhost:5005/?c=GetItemById&id=" + id;
+            string requeststring = host_port_contr + "GetItemById";
             WebRequest request = WebRequest.Create(requeststring);
             request.Method = "POST";
             request.ContentType = "text/xml";
-            string contentstring = format.ToString();
+            string contentstring = "id=" + id + "&format=" + System.Web.HttpUtility.UrlEncode(format.ToString());
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(contentstring);
             request.ContentLength = buffer.Length;
             Stream requStream = request.GetRequestStream();

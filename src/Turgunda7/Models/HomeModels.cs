@@ -133,7 +133,7 @@ namespace Turgunda7.Models
             this.typelabel = Common.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
             if (this.typelabel == null) this.typelabel = type_id;
             // Получим портретное х-дерево
-            this.xtree = SObjects.GetItemById(id, rec_format);
+            this.xtree = SObjects.Engine.GetItemById(id, rec_format);
             if (this.xtree == null) return;
             // По дереву вычислим и зафиксируем остальные поля
             // поле идентификатора
@@ -167,7 +167,7 @@ namespace Turgunda7.Models
             string type_id;
             // Нам нужен формат.
             XElement f_primitive = new XElement("record");
-            XElement xtree0 = SObjects.GetItemById(id, f_primitive);
+            XElement xtree0 = SObjects.Engine.GetItemById(id, f_primitive);
             if (xtree0 == null) { rec_format = null; return null; }; // Как-то надо поступить с диагностикой ошибок//
             type_id = xtree0.Attribute("type").Value;
             // Теперь установим нужный формат
@@ -274,7 +274,7 @@ namespace Turgunda7.Models
                     // Найдем один, если есть, элемент direct, удовлетворяющий условиям 
                     var direct = fieldsAndDirects.Where(fd => fd.Name == "direct")
                         .FirstOrDefault(d => d.Attribute("prop").Value == prop);
-                    var record = direct == null ? null : direct.Element("record");
+                    var record = direct?.Element("record");
                     if (direct == null || record == null) yield return new XElement("r");
                     else
                     {
@@ -369,7 +369,7 @@ namespace Turgunda7.Models
         public void LoadFromDb()
         {
             CalculateFormat();
-            _xtree = SObjects.GetItemById(eid, _format);
+            _xtree = SObjects.Engine.GetItemById(eid, _format);
         }
         public IEnumerable<XElement> GetHeaderFlow()
         {
@@ -782,7 +782,7 @@ namespace Turgunda7.Models
             //type = "http://fogid.net/o/person"; // для отладки
             this.type = type;
             //if (string.IsNullOrEmpty(searchstring)) { _results = new SearchResult[0]; return; }
-            var query = SObjects.SearchByName(searchstring)
+            var query = SObjects.Engine.SearchByName(searchstring)
                 .Select(xres =>
                 {
                     XElement name_el = xres
@@ -827,7 +827,7 @@ namespace Turgunda7.Models
         public PortraitSpecialModel(string id)
         {
             DateTime tt0 = DateTime.Now;
-            XElement record = SObjects.GetItemByIdSpecial(id);
+            XElement record = SObjects.Engine.GetItemByIdSpecial(id);
             if (record == null) return;
             this.id = record.Attribute("id").Value;
             string type_id = record.Attribute("type") == null ? "notype" : record.Attribute("type").Value;
@@ -838,7 +838,7 @@ namespace Turgunda7.Models
                 .FirstOrDefault();
             this.name = name_el == null ? "noname" : name_el.Value;
             farr = record.Elements("field")
-                .Select(el => new Field() { prop = el.Attribute("prop").Value, value = el.Value, lang = (el.Attribute(ONames.xmllang) == null ? null : el.Attribute(ONames.xmllang).Value) })
+                .Select(el => new Field() { prop = el.Attribute("prop").Value, value = el.Value, lang = el.Attribute(ONames.xmllang)?.Value })
                 .ToArray();
             darr = record.Elements("direct")
                 .Select(el => new Direct() { prop = el.Attribute("prop").Value, resource = el.Element("record").Attribute("id").Value })

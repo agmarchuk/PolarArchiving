@@ -24,65 +24,57 @@ namespace Turgunda7.Controllers
         {
             string name = ss;
             XElement res = new XElement("sequense", SObjects.Engine.SearchByName(name));
-            var cr = new ContentResult();
-            cr.ContentType = "text/xml";
-            cr.Content = res.ToString();
-            return cr; 
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpGet]
         public ActionResult GetItemByIdSpecial(string id)
         {
             XElement res = SObjects.Engine.GetItemByIdSpecial(id);
-            var cr = new ContentResult();
-            cr.ContentType = "text/xml";
-            cr.Content = res.ToString();
-            return cr;
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpGet]
         public ActionResult GetItemByIdBasic(string id, bool addinverse)
         {
             XElement res = SObjects.Engine.GetItemByIdBasic(id, addinverse);
-            var cr = new ContentResult();
-            cr.ContentType = "text/xml";
-            cr.Content = res.ToString();
-            return cr;
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpGet]
         public ActionResult Delete(string id)
         {
             XElement res = SObjects.Engine.Delete(id);
-            var cr = new ContentResult();
-            cr.ContentType = "text/xml";
-            cr.Content = res.ToString();
-            return cr;
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpPost]
         public ActionResult GetItemById(string id, XElement format)
         {
             XElement res = SObjects.Engine.GetItemById(id, format);
-            var cr = new ContentResult();
-            cr.ContentType = "text/xml";
-            cr.Content = res.ToString();
-            return cr;
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpPost]
         public ActionResult Add(XElement record)
         {
             XElement res = SObjects.Engine.Add(record);
-            var cr = new ContentResult();
-            cr.ContentType = "text/xml";
-            cr.Content = res.ToString();
-            return cr;
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpPost]
         public ActionResult AddUpdate(XElement record)
         {
             XElement res = SObjects.Engine.AddUpdate(record);
-            var cr = new ContentResult();
-            cr.ContentType = "text/xml";
-            cr.Content = res.ToString();
-            return cr;
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
+
+        // ======= Проверки ========
+        [HttpGet]
+        public ActionResult Ping()
+        {
+            return new ContentResult { ContentType = "text/plain", Content = "Pong" };
+        }
+        [HttpPost]
+        public ActionResult PostTest(string id, string innerText)
+        {
+            return new ContentResult { ContentType = "text/xml", Content = $"<test>{innerText}</test>" };
+        }
+
 
     }
 }
