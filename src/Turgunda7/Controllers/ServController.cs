@@ -45,10 +45,10 @@ namespace Turgunda7.Controllers
             return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpPost]
-        public ActionResult GetItemById(string id, XElement format)
+        public ActionResult GetItemById(string id, string format)
         {
-            XElement res = SObjects.Engine.GetItemById(id, format);
-            return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
+            XElement res = SObjects.Engine.GetItemById(id, XElement.Parse(format));
+            return new ContentResult { ContentType = "text/xml", Content = res.ToString(SaveOptions.DisableFormatting) };
         }
         [HttpPost]
         public ActionResult Add(XElement record)

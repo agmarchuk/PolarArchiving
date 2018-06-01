@@ -35,7 +35,7 @@ namespace CassetteData
 
         public override XElement GetItemByIdBasic(string id, bool addinverse)
         {
-            string requeststring = "http://localhost:5005/?c=GetItemByIdBasic&id=" + id + "&addinverse=" + addinverse.ToString();
+            string requeststring = host_port_contr + "GetItemByIdBasic?id=" + id + "&addinverse=" + addinverse.ToString();
             XElement result = AskByRequest(requeststring);
             return result;
         }
@@ -44,8 +44,8 @@ namespace CassetteData
             string requeststring = host_port_contr + "GetItemById";
             WebRequest request = WebRequest.Create(requeststring);
             request.Method = "POST";
-            request.ContentType = "text/xml";
-            string contentstring = "id=" + id + "&format=" + System.Web.HttpUtility.UrlEncode(format.ToString());
+            request.ContentType = "application/x-www-form-urlencoded";
+            string contentstring = "id=" + id + "&format=" + System.Web.HttpUtility.UrlEncode(format.ToString(SaveOptions.DisableFormatting));
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(contentstring);
             request.ContentLength = buffer.Length;
             Stream requStream = request.GetRequestStream();
