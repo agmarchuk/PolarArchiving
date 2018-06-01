@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenArchiveMVC", "src\OpenA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBConsoleApp", "src\DBConsoleApp\DBConsoleApp.csproj", "{9C5E3762-C607-4CD7-B042-E4C3BB891B5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CassetteData", "src\CassetteData\CassetteData.csproj", "{1CF594A8-A49C-466E-ABFB-58BC32988E4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassetteData", "src\CassetteData\CassetteData.csproj", "{1CF594A8-A49C-466E-ABFB-58BC32988E4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
