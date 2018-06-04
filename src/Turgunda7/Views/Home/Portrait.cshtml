@@ -13,6 +13,9 @@
     //int pos = page_url.ToLower().IndexOf("home/portrait");
     //string ef_url = page_url.Substring(0, pos - 1);
 
+    bool astable = false;
+    string at = Context.Request.Query["at"];
+    if (at != null) { astable = true; }
 
 }
 
@@ -278,7 +281,7 @@ else
     {
         //if (ir.Elements("r").Count() == 0) { continue; }
         XAttribute view_att = ir.Attribute("view");
-        if (view_att == null || view_att.Value != "largeicons")
+        if (!astable && (view_att == null || view_att.Value != "largeicons"))
         {
             string type_id = ir.Attribute("type").Value;
             iprop = ip.Attribute("prop").Value;
@@ -303,12 +306,13 @@ else
 }
             </div>
 }
-if (view_att != null && view_att.Value == "largeicons")
+if (!astable && (view_att != null && view_att.Value == "largeicons"))
 {
 var elementset = ir.Elements("r").OrderBy(rr => rr.Value);
 string[] doclist = elementset.Where(rr => rr.Element("r") != null && rr.Element("r").Attribute("id") != null)
     .Select(rr => rr.Element("r").Attribute("id").Value).ToArray();
 if (doclist.Length > 0) { Context.Session.SetString("doclist", doclist.Aggregate((sum, s) => sum += s)); }
+            <a href="?id=@id&at=1">T</a>
 foreach (XElement r in elementset)
 {
     string url = "";
@@ -379,14 +383,14 @@ else
     @HTable(ir, id, prop, ir.Attribute("type").Value, edit && candelete, candelete)
     ==============================================================================*@
 
-                        // Parameters
-                        container = ir;
-                        iprop = ip.Attribute("prop").Value;
-                        ttype = ir.Attribute("type").Value;
-                        candelete = true;
+// Parameters
+container = ir;
+iprop = ip.Attribute("prop").Value;
+ttype = ir.Attribute("type").Value;
+candelete = true;
 
-                        bodyid = iprop == null ? "_headerid_" : "_" + iprop.Substring(iprop.LastIndexOf('/') + 1) + "_" + ttype.Substring(iprop.LastIndexOf('/') + 1);
-                        headerelements = container.Element("header").Elements().ToArray();
+bodyid = iprop == null ? "_headerid_" : "_" + iprop.Substring(iprop.LastIndexOf('/') + 1) + "_" + ttype.Substring(iprop.LastIndexOf('/') + 1);
+headerelements = container.Element("header").Elements().ToArray();
             <table>
                 <thead>
                     <tr>
@@ -468,9 +472,9 @@ j++;
 }
 if (edit)
 {
-                        string url1 = Url.Content("~/Home/EditForm?firsttime=True&bid="+id+
-                            "&eid="+eid+"&etype="+ttype+"&iprop="+iprop+
-                            "&nc="+r.Elements().Count()+"&d="+System.DateTime.Now.Ticks);
+string url1 = Url.Content("~/Home/EditForm?firsttime=True&bid=" + id +
+"&eid=" + eid + "&etype=" + ttype + "&iprop=" + iprop +
+"&nc=" + r.Elements().Count() + "&d=" + System.DateTime.Now.Ticks);
             <td>
                 @*@Ajax.ActionLink("ред", "EditForm", new { firsttime = true, bid = id, eid = eid, etype = ttype, iprop = iprop, nc = r.Elements().Count(), d = System.DateTime.Now.Ticks }, new AjaxOptions()
         {
