@@ -12,18 +12,21 @@ namespace CassetteData
         private DbAdapter _adapter;
         private DbAdapter Adapter { get { return _adapter; } }
         private CassetteDataRequester requester;
+        // Видимо временное решение
+        public string DaraSrc {  get { return requester?.DataSrc; } }
+
         public CassetteIntegration(XElement xconfig, bool networking)
         {
             storage = new DStorage();
             storage.Init(xconfig);
             _adapter = new XmlDbAdapter();
             storage.InitAdapter(_adapter);
-            storage.LoadFromCassettesExpress();
-            if (networking)
+            XElement net = xconfig.Element("Net");
+            if (networking && net != null)
             {
                 try
                 {
-                    requester = new CassetteDataRequester();
+                    requester = new CassetteDataRequester(net.Attribute("src")?.Value);
                     var res = requester.Ping();
                     if (res != "Pong") requester = null;
                 }
@@ -31,6 +34,11 @@ namespace CassetteData
                 {
                     requester = null;
                 }
+            }
+            else
+            {
+                storage.LoadFromCassettesExpress();
+
             }
         }
         // ============== API ==============

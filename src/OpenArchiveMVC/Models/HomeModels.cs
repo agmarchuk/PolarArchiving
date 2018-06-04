@@ -481,6 +481,9 @@ namespace OpenArchiveMVC.Models
         public string id, typeid, name, description, date, doccontent, uri, contenttype;
         public IEnumerable<XElement> parts, reflections, authors, recipients, geoplaces, collections;
         public XElement infosource, descr_infosource;
+        public Dictionary<string, string> docContentSources;
+        // Временное решение - единственный сетевой источник данных или null 
+        public string docSrc = null;
         public PortraitDocumentModel(string id)
         {
             this.id = id;
@@ -553,6 +556,11 @@ namespace OpenArchiveMVC.Models
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/collection-item")
                 .Select(inv => inv.Element("record")?.Element("direct")?.Element("record"));
 
+            // Это пока не нужно
+            docContentSources = new Dictionary<string, string>();
+            // Будем использовать это
+            docSrc = StaticObjects.Engine.DaraSrc;
+            
         }
         private static XElement format = new XElement("record", new XAttribute("type", "http://fogid.net/o/document"),
             // Части документа

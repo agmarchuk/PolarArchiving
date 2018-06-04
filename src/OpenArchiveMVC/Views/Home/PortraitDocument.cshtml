@@ -24,7 +24,8 @@
 
     @if (!string.IsNullOrEmpty(m.uri) && m.contenttype == "image/jpeg")
     {
-        <img src="~/Docs/GetPhoto?s=medium&u=@m.uri" />
+        string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=medium&u=" + m.uri;
+        <img src="@Url.Content(sr)" />
     }
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-document">
@@ -46,7 +47,7 @@
     {
 	<tr>
 		<td class="doc-show-small">&nbsp;</td>
-		<td class="doc-show-small">
+        <td class="doc-show-small">
             @foreach (var doc in m.parts)
             {
                 if (doc == null) { continue; }
@@ -59,14 +60,17 @@
                 string uri = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
                 string eid = doc.Attribute("id").Value;
 
-			<div class="show-small">
-				<a href="~/Home/DocumentImage?id=@m.id&eid=@eid"><img src="~/Docs/GetPhoto?s=small&u=@uri" border="0" vspace="10" hspace="10" alt="" /></a>
-                <br />
-                @nm
-			</div>
-			}					
-								
-		</td>
+                string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=small&u=" + uri;
+
+
+                <div class="show-small">
+                    <a href="~/Home/DocumentImage?id=@m.id&eid=@eid"><img src="@Url.Content(sr)" border="0" vspace="10" hspace="10" alt="" /></a>
+                    <br />
+                    @nm
+                </div>
+            }
+
+        </td>
 	</tr>
     }
     @if (!string.IsNullOrEmpty(m.doccontent))

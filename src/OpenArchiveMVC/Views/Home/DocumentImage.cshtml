@@ -49,7 +49,10 @@
 </div>
 
 <br />
-<div><img src="~/Docs/GetPhoto?s=normal&u=@m.uri" border="0" /></div>
+@{
+    string sr = (StaticObjects.Engine.DaraSrc == null ? "~" : StaticObjects.Engine.DaraSrc) + "/Docs/GetPhoto?s=normal&u=" + m.uri;
+    <div><img src="@Url.Content(sr)" border="0" /></div>
+ }
 
 <div>
     <a href="~/Home/Portrait?id=@m.id">К документу</a>

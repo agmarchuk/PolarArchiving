@@ -127,27 +127,27 @@ namespace OpenArchive
             return sum;
         }
 
-        private static int Traverse0(string coll)
-        {
-            XElement xt = _engine.GetItemById(coll, formattochildfromcollection);
-            var query = xt.Elements("inverse")
-                .Where(xi => xi.Attribute("prop").Value == "http://fogid.net/o/in-collection")
-                .Select(xi => xi.Element("record").Element("direct").Element("record"));
-            int sum = 0;
-            foreach (var item in query)
-            {
-                if (item.Attribute("type").Value == "http://fogid.net/o/document")
-                {
-                    sum++;
-                }
-                else if (item.Attribute("type").Value == "http://fogid.net/o/collection")
-                {
-                    sum += Traverse0(item.Attribute("id").Value);
-                }
+        //private static int Traverse0(string coll)
+        //{
+        //    XElement xt = _engine.GetItemById(coll, formattochildfromcollection);
+        //    var query = xt.Elements("inverse")
+        //        .Where(xi => xi.Attribute("prop").Value == "http://fogid.net/o/in-collection")
+        //        .Select(xi => xi.Element("record").Element("direct").Element("record"));
+        //    int sum = 0;
+        //    foreach (var item in query)
+        //    {
+        //        if (item.Attribute("type").Value == "http://fogid.net/o/document")
+        //        {
+        //            sum++;
+        //        }
+        //        else if (item.Attribute("type").Value == "http://fogid.net/o/collection")
+        //        {
+        //            sum += Traverse0(item.Attribute("id").Value);
+        //        }
 
-            }
-            return sum;
-        }
+        //    }
+        //    return sum;
+        //}
         private static IEnumerable<XElement> CollectChilds(string id)
         {
             XElement xt = _engine.GetItemById(id, formattochildfromcollection);

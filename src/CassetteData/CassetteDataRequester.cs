@@ -10,7 +10,15 @@ namespace CassetteData
 {
     public class CassetteDataRequester : Polar.Cassettes.DocumentStorage.DbAdapter
     {
+        // Источник данных или null 
+        public string DataSrc { get { return _dataSrc; } }
+        private string _dataSrc;
         private string host_port_contr = "http://localhost:52018/Serv/";
+        public CassetteDataRequester(string src)
+        {
+            _dataSrc = src;
+            if (src != null) host_port_contr = src + (src[src.Length - 1] != '/' ? "/" : "") + "Serv/"; 
+        }
         public string Ping()
         {
             WebRequest request = WebRequest.Create(host_port_contr + "Ping");
