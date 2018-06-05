@@ -110,12 +110,16 @@ namespace Turgunda7.Models
         public string typelabel;
         public string name;
         public string uri = null;
-        public string[] doclist = null; // Это для размещение списка идентификаторов документов по некоторой "оси"
+        //public string[] doclist = null; // Это для размещение списка идентификаторов документов по некоторой "оси"
         public XElement xresult;
         // Для всяких дел:
         public XElement look;
         public string message;
         public XElement xtree;
+        // Предыдущий и следующий в сборном документе, если есть
+        public string prev = null;
+        public string next = null;
+        
         public PortraitModel(string id) : this(id, null) { }
         // По идентификатору мы получаем 1) откорректированный идентификатор; 2) тип записи; 3) формат (раскрытия) записи
         // Эту информацию дополняем меткой типа, пытаемся прочитать и зафиксировать имя записи и uri документного контента
@@ -156,6 +160,42 @@ namespace Turgunda7.Models
                 if (uri_el != null) uri = uri_el.Value;
             }
 
+            // ============================== Вычисления частей вышестоящего документа ============================ 
+            if (type_id == "http://fogid.net/o/document" || type_id == "http://fogid.net/o/photo-doc" || type_id == "http://fogid.net/o/video-doc" || type_id == "http://fogid.net/o/audio-doc")
+            {
+                string mpDocId = xtree.Elements("inverse").FirstOrDefault(i => i.Attribute("prop").Value == "http://fogid.net/o/partItem")?
+                    .Element("record")?
+                    .Elements("direct").FirstOrDefault(i => i.Attribute("prop").Value == "http://fogid.net/o/inDocument")?
+                    .Element("record")?
+                    .Attribute("id")?.Value;
+                XElement formatfordoc = new XElement("record", new XAttribute("type", "http://fogid.net/o/document"),
+                // Части документа
+                new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/inDocument"),
+                    new XElement("record",
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/pageNumbers")),
+                        new XElement("direct", new XAttribute("prop", "http://fogid.net/o/partItem"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
+                if (mpDocId != null)
+                {
+                    string[] doclist =             // Части документа
+                    SObjects.Engine.GetItemById(mpDocId, formatfordoc).Elements("inverse")
+                        .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/inDocument")
+                        .Select(inv => inv.Element("record"))
+                        .Select(rec => new
+                        {
+                            docpart = rec.Element("direct")?.Element("record"),
+                            page = rec.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/pageNumbers")?.Value
+                        })
+                        .OrderBy(pair => pair.page)
+                        .ThenBy(pair => pair.docpart.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value)
+                        .Select(pair => pair.docpart.Attribute("id").Value)
+                        .ToArray();
+                    int ind = Array.IndexOf(doclist, id);
+                    if (ind > 0) prev = doclist[ind - 1];
+                    if (ind < doclist.Length - 1) next = doclist[ind + 1];
+                }
+            }
             this.xresult = ConvertToResultStructure(rec_format, xtree);
             //this.look = xtree;
 
