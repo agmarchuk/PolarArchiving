@@ -17,6 +17,8 @@
     string at = Context.Request.Query["at"];
     if (at != null) { astable = true; }
 
+    bool toload = (new Turgunda7.Models.UserModel(Context.Request)).Uuser != null
+        && Model.type_id == "http://fogid.net/o/cassette";
 }
 
 
@@ -58,6 +60,18 @@
 <!-- ================= Начало построения ================= -->
 <div>@Model.typelabel</div>
 
+<!-- ================= Загрузка файлов ================= -->
+@if (toload)
+{
+<form method="post" enctype="multipart/form-data" asp-controller="UploadFiles" asp-action="Index">
+    <p>Upload one or more files using this form:</p>
+    <input type="file" name="files" multiple />
+    <input type="hidden" name="id" value="@id" />
+    <input type="submit" value="Upload" />
+</form>
+
+}
+
 @if (Model.uri == null)
 {
     @*<h2 style="color: #5c87b2;">@Model.name : uri not found!</h2>*@
@@ -66,12 +80,16 @@ else
 {
     if (Model.prev != null || Model.next != null)
     {
-    <div>
-        @if (Model.prev != null)        {<a href='@Url.Content("~/Home/Portrait?id=" + Model.prev)'>пред.</a> }
-        else        { <span>пред.</span>}
-        @if (Model.next != null)        {<a href='@Url.Content("~/Home/Portrait?id=" + Model.next)'>след.</a> }
-        else        { <span>след.</span>}
-    </div>
+        <div>
+            @if (Model.prev != null)
+            {<a href='@Url.Content("~/Home/Portrait?id=" + Model.prev)'>пред.</a> }
+            else
+            { <span>пред.</span>}
+            @if (Model.next != null)
+            {<a href='@Url.Content("~/Home/Portrait?id=" + Model.next)'>след.</a> }
+            else
+            { <span>след.</span>}
+        </div>
     }
 
     if (Model.type_id == "http://fogid.net/o/photo-doc")
@@ -547,4 +565,3 @@ else
 {
 <pre>@Model.look.ToString()</pre>
 }
-

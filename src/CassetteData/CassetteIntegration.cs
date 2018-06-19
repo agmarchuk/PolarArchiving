@@ -8,7 +8,7 @@ namespace CassetteData
 {
     public class CassetteIntegration : DbAdapter
     {
-        public DStorage storage = null;
+        public DStorage localstorage = null;
         private DbAdapter _adapter;
         private DbAdapter Adapter { get { return _adapter; } }
         private CassetteDataRequester requester;
@@ -17,10 +17,10 @@ namespace CassetteData
 
         public CassetteIntegration(XElement xconfig, bool networking)
         {
-            storage = new DStorage();
-            storage.Init(xconfig);
+            localstorage = new DStorage();
+            localstorage.Init(xconfig);
             _adapter = new XmlDbAdapter();
-            storage.InitAdapter(_adapter);
+            localstorage.InitAdapter(_adapter);
             XElement net = xconfig.Element("Net");
             if (networking && net != null)
             {
@@ -37,7 +37,7 @@ namespace CassetteData
             }
             else
             {
-                storage.LoadFromCassettesExpress();
+                localstorage.LoadFromCassettesExpress();
 
             }
         }

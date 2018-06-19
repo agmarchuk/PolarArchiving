@@ -15,7 +15,7 @@ namespace Polar.Cassettes.DocumentStorage
     {
         private string connectionstring = "";
         private string cs_prefix = "";
-        private CassettesConnection connection = new CassettesConnection();
+        public CassettesConnection connection = new CassettesConnection();
         // Возможно, надо будет отказаться от следующего конструктора
         public DStorage() { }
         // Загрузка config.xml

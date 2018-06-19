@@ -13,7 +13,7 @@ namespace Turgunda7.Controllers
         public ActionResult GetPhoto(string u, string s)
         {
             string filename = "/question.jpg";
-            filename = SObjects.Engine.storage.GetPhotoFileName(u, s) + ".jpg";
+            filename = SObjects.Engine.localstorage.GetPhotoFileName(u, s) + ".jpg";
             //return new FilePathResult(filename, "image/jpeg");
             return new PhysicalFileResult(filename, "image/jpeg");
 

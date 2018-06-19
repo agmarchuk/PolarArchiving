@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 //using Fogid.Cassettes;
 using Polar.Cassettes;
+using FreeImageAPI;
+using ExifLib;
 
 namespace Turgunda7.Controllers
 {
@@ -63,6 +67,156 @@ namespace Turgunda7.Controllers
             Models.PortraitSpecialModel pmodel = new Models.PortraitSpecialModel(id);
             return View(pmodel);
         }
+
+        // ==================== Загрузка данных =====================
+        [HttpPost]
+        public ActionResult Load(string cassetteId, IFormFile file)
+        {
+            string filename = file.FileName;
+            string fpath = @"D:\Home\data\savedfile";
+            using (System.IO.FileStream fs = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+            {
+                file.CopyTo(fs);
+            }
+            return View("Portrait", new Models.PortraitModel(cassetteId));
+        }
+        [HttpPost("UploadFiles")]
+        public async System.Threading.Tasks.Task<IActionResult> Post(string id, List<IFormFile> files)
+        {
+            // Короткое имя кассеты, если есть
+            if (!id.EndsWith("_cassetteId")) { return new EmptyResult(); }
+            string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
+            string fid = "iiss://" + sid + "@iis.nsk.su";
+            // Определяем кассету
+            var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
+            if (!cassetteExists) { return new EmptyResult(); }
+            var cassetteInfo = SObjects.Engine.localstorage.connection.cassettesInfo[fid];
+            Cassette cassette = cassetteInfo.cassette;
+            string dirpath = cassetteInfo.url;
+
+            // Определяем важные параметры
+            //var a =cassette.
+
+            //List<Task> tasklist = new List<Task>();
+            foreach (var formFile in files)
+            {
+                var foldernumb = cassette._folderNumber;
+                var docnumb = cassette._documentNumber;
+                string ext = formFile.FileName.Substring(formFile.FileName.LastIndexOf('.'));
+
+                //// Для конвертации картинок попробую воспользоваться NuGet пакетом FreeImage-dotnet-core
+                //using (var original = FreeImageBitmap.FromStream(formFile.OpenReadStream()))
+                //{
+
+                //    Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {original.ToString()}");
+                //    foreach (var m in original.Metadata)
+                //    {
+                //        Console.WriteLine($"{m}");
+                //    }
+                //    original.Save(dirpath + "originals/" + foldernumb + "/" + docnumb + ext, FREE_IMAGE_FORMAT.FIF_JPEG,
+                //        FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
+                //        FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
+
+                //    int x = original.Width, y = original.Height;
+                //    //int maxbase = 150;
+                //    //double factor = ((double)maxbase) / (x > y ? (double)x : (double)y);
+                //    //int width = (int)(factor * x);
+                //    //int height = (int)(factor * y);
+                //    //var resized = new FreeImageBitmap(original, width, height);
+                //    //// JPEG_QUALITYGOOD is 75 JPEG.
+                //    //// JPEG_BASELINE strips metadata (EXIF, etc.)
+                //    //resized.Save(path + "out.jpg", FREE_IMAGE_FORMAT.FIF_JPEG,
+                //    //    FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
+                //    //    FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
+                //}
+
+                //using (var stream = new System.IO.FileStream(dirpath + "originals/" + foldernumb + "/" + docnumb + ext, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+                //{
+                //    await formFile.CopyToAsync(stream);
+                //}
+                //await BuildImageFile(formFile, dirpath + "originals/" + foldernumb + "/" + docnumb + ext);
+
+                string fpath = dirpath + "originals/" + foldernumb + "/" + docnumb + ext;
+                using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+                {
+                    //MemoryStream mstream = new MemoryStream();
+                    formFile.CopyTo(stream);
+                }
+
+                using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                using (var original = FreeImageBitmap.FromStream(stream))
+                {
+                    stream.Position = 0L;
+                    // Использую ExifLib.Standard
+                    DateTime datePictureTaken;
+                    using (ExifReader reader = new ExifReader(stream))
+                    {
+                        // Extract the tag data using the ExifTags enumeration
+                        if (reader.GetTagValue<DateTime>(ExifTags.DateTimeDigitized,
+                                                        out datePictureTaken))
+                        {
+                        }
+                    }
+
+
+                    var fi = new FileInfo(fpath);
+                    var md = fi.CreationTimeUtc;
+                    //original.Save(fpath);
+                    Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {datePictureTaken} ");
+                    
+                    //string previewpath = dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg";
+                    Sizing(original, 150, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
+                    Sizing(original, 600, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
+                    Sizing(original, 1200, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
+                    //FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
+                    //FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
+                }
+
+                //tasklist.Add(BuildImageFile(formFile, dirpath + "originals/" + foldernumb + "/" + docnumb + ext));
+                // Следующий документ
+                cassette.IncrementDocumentNumber();
+            }
+            //Task.WaitAll(tasklist.ToArray());
+
+            // process uploaded files
+            // Don't rely on or trust the FileName property without validation.
+
+            //return Ok(new { count = files.Count, size, filePath });
+            return View("Portrait", new Models.PortraitModel(id));
+        }
+
+        private static void Sizing(FreeImageBitmap original, int maxbase, string previewpath)
+        {
+            int x = original.Width, y = original.Height;
+            double factor = ((double)maxbase) / (x > y ? (double)x : (double)y);
+            int width = (int)(factor * x);
+            int height = (int)(factor * y);
+            var resized = new FreeImageBitmap(original, width, height);
+            // JPEG_QUALITYGOOD is 75 JPEG.
+            // JPEG_BASELINE strips metadata (EXIF, etc.)
+            resized.Save(previewpath);//, FREE_IMAGE_FORMAT.FIF_JPEG,
+        }
+
+        private async Task BuildImageFile(IFormFile formFile, string fpath)
+        {
+            using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+            {
+                MemoryStream mstream = new MemoryStream();
+                formFile.CopyToAsync(mstream);
+                using (var original = FreeImageBitmap.FromStream(mstream))
+                {
+                    original.Save(fpath);
+                }
+            }
+        }
+        private async Task BuildImageFile0(IFormFile formFile, string fpath)
+        {
+            using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+            {
+                await formFile.CopyToAsync(stream);
+            }
+        }
+
 
         //
         // ==================== Редактирование данных =====================

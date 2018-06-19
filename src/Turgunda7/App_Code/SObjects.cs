@@ -126,7 +126,7 @@ namespace Turgunda7
             item_corrected.Add(new XAttribute("owner", username), new XAttribute("mT", DateTime.Now.ToUniversalTime().ToString("u")));
             lock (saveInDb)
             {
-                item_corrected = _engine.storage.EditCommand(item_corrected);
+                item_corrected = _engine.localstorage.EditCommand(item_corrected);
             }
             //Log("PutItemToDb ok?");
             return item_corrected;

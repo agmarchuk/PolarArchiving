@@ -19,7 +19,7 @@ namespace Turgunda7
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
+                .UseStartup<Startup>().UseKestrel(options => { options.Limits.MaxRequestBodySize = null; })
                 .Build();
     }
 }
