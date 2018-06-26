@@ -228,28 +228,49 @@ namespace Polar.Cassettes
                 // Дополнительная обработка для фотографий
                 if(docTag == ONames.TagPhotodoc)
                 {
-                    // Делаем разные копии
-                    //Uri _source = cassette.MakePhotoPreviews(iisstore, "smn");
-                    //if (_source != null)
-                    //{
-                    //    //TODO:
-                    //    //try
-                    //    //{
-                    //    //    // Берем exif-данные
-                    //    //    Exif.ExifMetadata emeta = new Exif.ExifMetadata(_source);
-                    //    //    var dit = emeta.DateImageTaken;
-                    //    //    if(dit.HasValue)
-                    //    //    {
-                    //    //        DateTime dt = dit.Value;
-                    //    //        doc.Add(
-                    //    //            new XElement(ONames.TagFromdate, dt.ToString("s")));
-                    //    //    }
-                    //    //}
-                    //    //catch(Exception exep) { Fogid.Cassettes.LOG.WriteLine(exep.Message +  " Не удалось зафиксировать Exif информацию по документу " + iisstore.ToString()); }
-                    //}
+                    using (var stream = new System.IO.FileStream(file.FullName, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                    using (var original = FreeImageAPI.FreeImageBitmap.FromStream(stream))
+                    {
+                        stream.Position = 0L;
+                        DateTime datePictureTaken = DateTime.Now;
+                        bool exifok = false;
+                        // Использую ExifLib.Standard
+                        if (ext == ".jpg")
+                        {
+                            try
+                            {
+                                using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
+                                {
+                                    // Extract the tag data using the ExifTags enumeration
+                                    if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized,
+                                                                    out datePictureTaken))
+                                    {
+                                        exifok = true;
+                                    }
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+
+
+                        var fi = file;
+                        var md = fi.CreationTimeUtc;
+                        //original.Save(fpath);
+                        Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {datePictureTaken} ");
+
+                        string dirpath = cassette.Dir.FullName + "/";
+                        string foldernumb = cassette._folderNumber;
+                        string docnumb = cassette._documentNumber;
+                        //string previewpath = dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg";
+                        Sizing(original, 150, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, 600, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, 1200, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
+                        //FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
+                        //FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
+                    }
                 }
                 // Дополнительная обработка для видео
-                if(docTag == ONames.TagVideo)
+                if (docTag == ONames.TagVideo)
                 {
                     int o_width = 640; // Это значения "от фонаря"
                     int o_height = 480;
@@ -368,6 +389,17 @@ namespace Polar.Cassettes
                 cassette.db.Add(collectionmember);
             }
             return addedElements;
+        }
+        private static void Sizing(FreeImageAPI.FreeImageBitmap original, int maxbase, string previewpath)
+        {
+            int x = original.Width, y = original.Height;
+            double factor = ((double)maxbase) / (x > y ? (double)x : (double)y);
+            int width = (int)(factor * x);
+            int height = (int)(factor * y);
+            var resized = new FreeImageAPI.FreeImageBitmap(original, width, height);
+            // JPEG_QUALITYGOOD is 75 JPEG.
+            // JPEG_BASELINE strips metadata (EXIF, etc.)
+            resized.Save(previewpath);//, FREE_IMAGE_FORMAT.FIF_JPEG,
         }
 
         public static IEnumerable<XElement> AddVideoFile(this Cassette cassette, FileInfo file, string collectionId, out string executeLine)

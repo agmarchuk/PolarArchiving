@@ -83,6 +83,8 @@ namespace Turgunda7.Controllers
         [HttpPost("UploadFiles")]
         public IActionResult Post(string id, List<IFormFile> files)
         {
+            // Пользователь
+            string user = (new Turgunda7.Models.UserModel(Request)).Uuser;
             // Короткое имя кассеты, если есть
             if (!id.EndsWith("_cassetteId")) { return new EmptyResult(); }
             string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
@@ -96,17 +98,24 @@ namespace Turgunda7.Controllers
             foreach (var formFile in files)
             {
                 // Сохраним документ в промежуточном месте
-                string fpath = dirpath + formFile.FileName;
-                using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+                string tmpfilepath = dirpath + formFile.FileName;
+                using (var stream = new System.IO.FileStream(tmpfilepath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
                 {
                     formFile.CopyTo(stream);
                 }
-                FileInfo fi = new FileInfo(fpath);
+                FileInfo fi = new FileInfo(tmpfilepath);
 
                 // Воспользуемся "стандартной" записью файла
                 var elements = CassetteExtension.AddFile(cassette, fi, id).ToArray();
-                cassette.Save();
+                foreach (var item in elements)
+                {
+                    SObjects.PutItemToDb(item, false, user);
+                }
+                Console.WriteLine("QQQQQQQQQQQQQQQQQQQQQQQ" + elements.Length);
+                // Уничтожение времянки
+                System.IO.File.Delete(tmpfilepath);
             }
+            cassette.Save();
 
             return View("Portrait", new Models.PortraitModel(id));
         }
@@ -191,17 +200,17 @@ namespace Turgunda7.Controllers
         //    return View("Portrait", new Models.PortraitModel(id));
         //}
 
-        private static void Sizing(FreeImageBitmap original, int maxbase, string previewpath)
-        {
-            int x = original.Width, y = original.Height;
-            double factor = ((double)maxbase) / (x > y ? (double)x : (double)y);
-            int width = (int)(factor * x);
-            int height = (int)(factor * y);
-            var resized = new FreeImageBitmap(original, width, height);
-            // JPEG_QUALITYGOOD is 75 JPEG.
-            // JPEG_BASELINE strips metadata (EXIF, etc.)
-            resized.Save(previewpath);//, FREE_IMAGE_FORMAT.FIF_JPEG,
-        }
+        //private static void Sizing(FreeImageBitmap original, int maxbase, string previewpath)
+        //{
+        //    int x = original.Width, y = original.Height;
+        //    double factor = ((double)maxbase) / (x > y ? (double)x : (double)y);
+        //    int width = (int)(factor * x);
+        //    int height = (int)(factor * y);
+        //    var resized = new FreeImageBitmap(original, width, height);
+        //    // JPEG_QUALITYGOOD is 75 JPEG.
+        //    // JPEG_BASELINE strips metadata (EXIF, etc.)
+        //    resized.Save(previewpath);//, FREE_IMAGE_FORMAT.FIF_JPEG,
+        //}
 
         private async Task BuildImageFile(IFormFile formFile, string fpath)
         {
