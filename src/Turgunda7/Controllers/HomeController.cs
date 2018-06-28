@@ -95,6 +95,16 @@ namespace Turgunda7.Controllers
             var cassetteInfo = SObjects.Engine.localstorage.connection.cassettesInfo[fid];
             Cassette cassette = cassetteInfo.cassette;
             string dirpath = cassetteInfo.url;
+            // Ищем подколлекцию upload и если нет - создаем
+            //var c_item = SObjects.Engine.GetItemById(id,
+            //    new XElement("record",
+            //        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+            //            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
+            //                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+            //                    new XElement("record", new XAttribute("prop", "http://fogid.net/o/collection"),
+            //                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))))));
+
+
             foreach (var formFile in files)
             {
                 // Сохраним документ в промежуточном месте
