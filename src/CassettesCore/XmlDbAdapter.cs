@@ -171,6 +171,8 @@ namespace Polar.Cassettes.DocumentStorage
             XElement xel = node.xel;
             if (xel == null) return null;
             string type = xel.Name.NamespaceName + xel.Name.LocalName;
+            //var ft = format.Attribute("type")?.Value;
+            //if (ft != null && type != ft) return null;
             return new XElement("record", 
                 new XAttribute("id", xel.Attribute(Cassettes.ONames.rdfabout).Value),
                 new XAttribute("type", type),

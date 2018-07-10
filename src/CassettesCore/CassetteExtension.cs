@@ -390,6 +390,266 @@ namespace Polar.Cassettes
             }
             return addedElements;
         }
+
+
+
+
+
+        /// <summary>
+        /// Добавляет файл, возвращает добавленные в базу данных элементы ============ Новый вариант =============
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="collectionId"></param>
+        /// <returns></returns>
+        public static IEnumerable<XElement> AddFile1(this Cassette cassette, FileInfo file, string collectionId)
+        {
+            List<XElement> addedElements = new List<XElement>(); // string smallImageFullName = null;
+            string fname = file.FullName;
+            XElement doc = null;
+            // Первая задача - выделить тождественный документ, он помещается в doc
+            // Проверка на существование документа в архиве, удовлетворяющего условиям: размер совпадает,
+            // расширитель совпадает и байтовая последовательность также совпадает
+            string fileSize = file.Length.ToString();
+            string fileExt = Path.GetExtension(fname).ToLower();//fname.Substring(fname.LastIndexOf('.')).ToLower(); // расширение вместе с точкой
+            doc =
+                cassette.db.Elements()
+                    .FirstOrDefault(
+                        (XElement e) =>
+                        {
+                            XElement iisstore = e.Element(ONames.TagIisstore);
+                            if (iisstore == null) return false;
+                            XAttribute on = iisstore.Attribute(ONames.AttOriginalname);
+                            XAttribute sz = iisstore.Attribute(ONames.AttSize);
+                            if (on == null || sz == null) return false;
+                            string uri = iisstore.Attribute(ONames.AttUri).Value;
+                            if (!on.Value.ToLower().EndsWith(fileExt) || sz.Value != fileSize) return false;
+                            if (File.ReadAllBytes(fname)
+                                .SequenceEqual(
+                                    File.ReadAllBytes(cassette.Dir.FullName + "/" + cassette.GetOriginalDocumentPath(uri)))) return true;
+                            return false;
+                        });
+            bool docIsNew = (doc == null);
+            if (docIsNew)
+            {
+                // Включение файла в архив
+                string pure_fname = fname.Split(Cassette.slashes).Last();
+                //int p = pure_fname.LastIndexOf('.');
+                string ext = Path.GetExtension(pure_fname).ToLower();//(p != -1 ? pure_fname.Substring(p).ToLower() : "");
+                // копируем оригинал под имеющимся расширением 
+                var filepath = cassette.Dir.FullName + "/originals/" + cassette._folderNumber + "/" + cassette._documentNumber + ext;
+                try
+                {
+                    File.Copy(fname, filepath);
+                }
+                catch (Exception exc)
+                {
+                    LOG.WriteLine("ошибка добавления документа, не послучилось скопировать  в " + filepath +
+                    Environment.NewLine +
+                    exc.Message +
+                    Environment.NewLine +
+                    exc.StackTrace
+                        );
+                    return null;
+                } // Надо бы эту нештатную ситуацию зафиксировать в каком-нибудь логе
+
+                // Создаем запись и привязываем ее к коллекции
+                DocType triple = Cassette.docTypes.Where(doct => doct.ext == ext || doct.ext == "unknown").First();
+                var ex = triple.ext;
+                var documenttype = triple.content_type;
+                var docTag = triple.tag;
+
+                XName docId = XName.Get(cassette.Name + "_" + cassette._folderNumber + "_" + cassette._documentNumber);
+                var iisstore = new XElement(ONames.TagIisstore,
+                            new XAttribute(ONames.AttUri, "iiss://" + cassette.Name + "@iis.nsk.su/0001/" + cassette._folderNumber + "/" + cassette._documentNumber),
+                            new XAttribute(ONames.AttOriginalname, fname),
+                            new XAttribute(ONames.AttSize, file.Length.ToString()),
+                            new XAttribute(ONames.AttDocumenttype, documenttype),
+                            new XAttribute(ONames.AttDocumentcreation, file.CreationTimeUtc.ToString("s")),
+                            new XAttribute(ONames.AttDocumentfirstuploaded, System.DateTime.Now.ToString("s")),
+                            new XAttribute(ONames.AttDocumentmodification, file.LastWriteTimeUtc.ToString("s")),
+                            new XAttribute(ONames.AttChecksum, "qwerty"));
+                //string documentname = cassette.Name + " " + cassette._folderNumber + " " + cassette._documentNumber;
+                //TODO: поменял концепцию формирования имени документа
+                int lastpoint = fname.LastIndexOf('.');
+                int afterlastslash = Math.Max(fname.LastIndexOf('/'), fname.LastIndexOf('\\')) + 1;
+                string documentname = cassette.DocNamePrefix +
+                    fname.Substring(afterlastslash, lastpoint > afterlastslash ? lastpoint - afterlastslash : fname.Length - afterlastslash);
+                doc = new XElement(docTag,
+                        new XAttribute(ONames.rdfabout, docId),
+                        new XElement(ONames.TagName, documentname),
+                        new XElement(ONames.TagComment, fname),
+                        iisstore);
+                // Дополнительная обработка для фотографий
+                if (docTag == ONames.TagPhotodoc)
+                {
+                    using (var stream = new System.IO.FileStream(file.FullName, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                    using (var original = FreeImageAPI.FreeImageBitmap.FromStream(stream))
+                    {
+                        stream.Position = 0L;
+                        DateTime datePictureTaken = DateTime.Now;
+                        bool exifok = false;
+                        // Использую ExifLib.Standard
+                        if (ext == ".jpg")
+                        {
+                            try
+                            {
+                                using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
+                                {
+                                    // Extract the tag data using the ExifTags enumeration
+                                    if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized,
+                                                                    out datePictureTaken))
+                                    {
+                                        exifok = true;
+                                    }
+                                }
+                            }
+                            catch (Exception) { }
+                        }
+
+
+                        var fi = file;
+                        var md = fi.CreationTimeUtc;
+                        //original.Save(fpath);
+                        Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {datePictureTaken} ");
+
+                        string dirpath = cassette.Dir.FullName + "/";
+                        string foldernumb = cassette._folderNumber;
+                        string docnumb = cassette._documentNumber;
+                        //string previewpath = dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg";
+                        Sizing(original, 150, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, 600, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, 1200, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
+                        //FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
+                        //FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
+                    }
+                }
+                // Дополнительная обработка для видео
+                if (docTag == ONames.TagVideo)
+                {
+                    int o_width = 640; // Это значения "от фонаря"
+                    int o_height = 480;
+                    // Сначала, почитаем метаинформацию. Используется программа MediaInfo
+                    string output = "";
+                    try
+                    {
+                        var proc = new System.Diagnostics.Process();
+                        // Redirect the output stream of the child process.
+                        proc.StartInfo.UseShellExecute = false;
+                        proc.StartInfo.RedirectStandardOutput = true;
+                        proc.StartInfo.FileName = App_Bin_Path + "MediaInfo.exe";
+                        proc.StartInfo.Arguments = " --Output=XML " +
+                            cassette.Dir.FullName + "/originals/" + cassette._folderNumber + "/" + cassette._documentNumber + ext;
+                        proc.Start();
+                        // Do not wait for the child process to exit before
+                        // reading to the end of its redirected stream.
+                        // proc.WaitForExit();
+                        // Read the output stream first and then wait.
+                        output = proc.StandardOutput.ReadToEnd();
+                        proc.WaitForExit();
+                        var xoutput = XElement.Parse(output).Element("File");
+                        string o_width_s = xoutput.Elements("track").First(tr => tr.Attribute("type").Value == "Video").Element("Width").Value;
+                        string o_height_s = xoutput.Elements("track").First(tr => tr.Attribute("type").Value == "Video").Element("Height").Value;
+                        o_width = Int32.Parse(new string(o_width_s.Where(c => c >= '0' && c <= '9').ToArray()));
+                        o_height = Int32.Parse(new string(o_height_s.Where(c => c >= '0' && c <= '9').ToArray()));
+                        // Display_aspect_ratio
+                        string o_aspect_s = xoutput.Elements("track").First(tr => tr.Attribute("type").Value == "Video").Element("Display_aspect_ratio").Value;
+                        iisstore.Add(
+                            new XAttribute("width", "" + o_width),
+                            new XAttribute("height", "" + o_height),
+                            new XAttribute("duration",
+                                xoutput.Elements("track").First(tr => tr.Attribute("type").Value == "Video").Element("Duration").Value),
+                            new XAttribute("framerate",
+                                xoutput.Elements("track").First(tr => tr.Attribute("type").Value == "Video").Element("Frame_rate").Value),
+                            o_aspect_s == "4:3" || o_aspect_s == "16:9" ?
+                            new XAttribute("aspect", o_aspect_s) : null,
+                            null);
+                    }
+                    catch (Exception exc)
+                    {
+                        LOG.WriteLine(" ошибка добавления документа, не получилось обработать видео " + output +
+                        Environment.NewLine +
+                        exc.Message +
+                        Environment.NewLine +
+                        exc.StackTrace
+                        );
+                    }
+
+                    string sz = cassette.GetPreviewParameter(iisstore, "medium", "framesize");
+                    string[] w_h = sz.Split(new char[] { 'x' });
+                    int m_width = Int32.Parse(w_h[0]);
+                    int m_height = Int32.Parse(w_h[1]);
+                    int m_width_corrected = m_height * o_width / o_height;
+                    // Если кадр меньше запланированного, оставляем "родной" размер
+                    string output_size = m_height < o_height ? m_width_corrected + "x" + m_height : o_width + "x" + o_height;
+                    // Зафиксируем размер в iisstore
+                    if (output_size != cassette.finfo.Element("video").Element("medium").Attribute("framesize").Value)
+                    {
+                        var framesize_att = iisstore.Attribute("video.medium.framesize");
+                        if (framesize_att == null)
+                        {
+                            iisstore.Add(new XAttribute("video.medium.framesize", "" + output_size));
+                        }
+                        else
+                        {
+                            framesize_att.Value = "" + output_size;
+                        }
+                    }
+                    // Сформируем команду на вычисление превьюшки 
+                    cassette.MakeVideoPreview(iisstore);
+                    // Зафиксируем дату съемки по LastWriteTime
+                    DateTime dt =
+                        cassette.Dir.GetFiles("originals/" + cassette._folderNumber + "/" + cassette._documentNumber + ext)[0].LastWriteTime;
+                    doc.Add(new XElement(ONames.TagFromdate, dt.ToString("s")));
+                }
+                // дополнительная обработка аудио
+                if (docTag == ONames.TagAudio)
+                {
+                    cassette.MakeAudioPreview(iisstore);
+                }
+
+                cassette.IncrementDocumentNumber();
+                addedElements.Add(doc);
+                //cassette.db.Add(doc);
+                // попытка добавить принадлежность к архиву
+                XElement archMember = cassette.CreateArchiveMember(docId.ToString());
+                if (archMember != null)
+                {
+                    addedElements.Add(archMember);
+                    //cassette.db.Add(archMember);
+                }
+            }
+            else { doc = XElement.Parse(doc.ToString()); doc.Add(new XAttribute("itIsCopy", "true")); addedElements.Add(doc); }
+            string dId = doc.Attribute(ONames.rdfabout).Value;
+            // Проверим наличие связи
+            bool membershipExists =
+            (!docIsNew) &&
+
+                    //var collmem = 
+                    cassette.db.Elements(ONames.TagCollectionmember)
+                    .Any(cm =>
+                        cm.Element(ONames.TagCollectionitem).Attribute(ONames.rdfresource).Value == dId &&
+                        cm.Element(ONames.TagIncollection).Attribute(ONames.rdfresource).Value == collectionId);
+            //  if (collmem != null) membershipExists = true;
+
+            // А теперь, наконец, добавим членство в коллекции
+            if (!membershipExists)
+            {
+                XElement collectionmember =
+                    new XElement(ONames.TagCollectionmember,
+                        new XAttribute(ONames.rdfabout, cassette.Name + "_" + collectionId + "_" + dId),
+                        new XElement(ONames.TagIncollection, new XAttribute(ONames.rdfresource, collectionId)),
+                        new XElement(ONames.TagCollectionitem, new XAttribute(ONames.rdfresource, dId)));
+                addedElements.Add(collectionmember);
+                //cassette.db.Add(collectionmember);
+            }
+            return addedElements;
+        }
+
+
+
+
+
+
         private static void Sizing(FreeImageAPI.FreeImageBitmap original, int maxbase, string previewpath)
         {
             int x = original.Width, y = original.Height;

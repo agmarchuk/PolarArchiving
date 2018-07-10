@@ -96,19 +96,49 @@ namespace Turgunda7.Controllers
             Cassette cassette = cassetteInfo.cassette;
             string dirpath = cassetteInfo.url;
             // Ищем подколлекцию upload и если нет - создаем
-            //var c_item = SObjects.Engine.GetItemById(id,
-            //    new XElement("record",
-            //        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
-            //            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
-            //                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
-            //                    new XElement("record", new XAttribute("prop", "http://fogid.net/o/collection"),
-            //                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))))));
+            var c_item = SObjects.Engine.GetItemById(id,
+                new XElement("record",
+                    new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+                        new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
+                            new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                                new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+                                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))))));
+            var up = c_item.Elements("inverse")
+                .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-collection")
+                .Select(i => i.Element("record")?.Element("direct"))
+                .Where(d => d != null)
+                .Select(d => d.Element("record"))
+                .FirstOrDefault(r => r.Attribute("type").Value == "http://fogid.net/o/collection" &&
+                    r.Elements("field").Select(f => f.Value).FirstOrDefault() == "upload");
+            string upload_id;
+            if (up == null)
+            {
+                // коллекция
+                string cid = cassette.GenerateNewId();
+                XElement el1 = new XElement("{http://fogid.net/o/}collection", new XAttribute(ONames.rdfabout, cid),
+                    new XElement("{http://fogid.net/o/}name", "upload"));
+                // членство в коллекции
+                string mid = cassette.GenerateNewId();
+                XElement el2 = new XElement("{http://fogid.net/o/}collection-member", new XAttribute(ONames.rdfabout, mid),
+                    new XElement("{http://fogid.net/o/}in-collection", new XAttribute(ONames.rdfresource, id)),
+                    new XElement("{http://fogid.net/o/}collection-item", new XAttribute(ONames.rdfresource, cid)));
 
+                cassette.db.Add(el1);
+                SObjects.PutItemToDb(el1, false, user);
+                cassette.db.Add(el2);
+                SObjects.PutItemToDb(el2, false, user);
+
+                upload_id = cid;
+            }
+            else upload_id = up.Attribute("id").Value;
 
             foreach (var formFile in files)
             {
                 // Сохраним документ в промежуточном месте
-                string tmpfilepath = dirpath + formFile.FileName;
+                string fullname = formFile.FileName;
+                int pos = fullname.LastIndexOfAny(new char[] { '/', '\\' });
+                string localname = pos == -1 ? fullname : fullname.Substring(pos + 1);  
+                string tmpfilepath = dirpath + localname;
                 using (var stream = new System.IO.FileStream(tmpfilepath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
                 {
                     formFile.CopyTo(stream);
@@ -116,18 +146,21 @@ namespace Turgunda7.Controllers
                 FileInfo fi = new FileInfo(tmpfilepath);
 
                 // Воспользуемся "стандартной" записью файла
-                var elements = CassetteExtension.AddFile(cassette, fi, id).ToArray();
+                //var elements = CassetteExtension.AddFile1(cassette, fi, id).ToArray();
+                var elements = CassetteExtension.AddFile1(cassette, fi, upload_id);
                 foreach (var item in elements)
                 {
-                    SObjects.PutItemToDb(item, false, user);
+                    var item_corrected = Polar.Cassettes.DocumentStorage.DbAdapter.ConvertXElement(item);
+                    SObjects.PutItemToDb(item_corrected, false, user);
+                    cassette.db.Add(item_corrected);
                 }
-                Console.WriteLine("QQQQQQQQQQQQQQQQQQQQQQQ" + elements.Length);
+                //Console.WriteLine("QQQQQQQQQQQQQQQQQQQQQQQ" + elements.Length);
                 // Уничтожение времянки
                 System.IO.File.Delete(tmpfilepath);
             }
             cassette.Save();
 
-            return View("Portrait", new Models.PortraitModel(id));
+            return View("Portrait", new Models.PortraitModel(upload_id));
         }
         //[HttpPost("UploadFiles0")]
         //public async System.Threading.Tasks.Task<IActionResult> Post(string id, List<IFormFile> files)
@@ -222,7 +255,7 @@ namespace Turgunda7.Controllers
         //    resized.Save(previewpath);//, FREE_IMAGE_FORMAT.FIF_JPEG,
         //}
 
-        private async Task BuildImageFile(IFormFile formFile, string fpath)
+        private void BuildImageFile(IFormFile formFile, string fpath)
         {
             using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
             {

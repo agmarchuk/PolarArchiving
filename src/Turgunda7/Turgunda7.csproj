@@ -5,7 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\ApplicationProfile.xml" />
     <Content Remove="wwwroot\log.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="config.xml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,6 +33,22 @@ namespace Turgunda7
                 //storage.InitAdapter(engine);
                 _engine = new CassetteData.CassetteIntegration(xconfig, false);
 
+                // Это было тестирование...
+                //var c_item = SObjects.Engine.GetItemById("TestCassette20180628_cassetteId",
+                //    new XElement("record",
+                //        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+                //            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
+                //                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                //                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+                //                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))))));
+                //var up = c_item.Elements("inverse")
+                //    .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-collection")
+                //    .Select(i => i.Element("record")?.Element("direct"))
+                //    .Where(d => d != null)
+                //    .Select(d => d.Element("record"))
+                //    .FirstOrDefault(r => r.Attribute("type").Value == "http://fogid.net/o/collection" &&
+                //        r.Elements("field").Select(f => f.Value).FirstOrDefault() == "upload");
+
                 // Загрузка профиля и онтологии
                 appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
                 XElement ontology = XElement.Load(path + "wwwroot/ontology_iis-v12-doc_ruen.xml");
