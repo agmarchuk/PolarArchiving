@@ -400,6 +400,7 @@ namespace Polar.Cassettes
 
         /// <summary>
         /// Добавляет файл, возвращает добавленные в базу данных элементы ============ Новый вариант =============
+        /// Если файл уже был, что проверяется, возвращает пустую последовательность.
         /// </summary>
         /// <param name="file"></param>
         /// <param name="collectionId"></param>
@@ -419,16 +420,49 @@ namespace Polar.Cassettes
                     .FirstOrDefault(
                         (XElement e) =>
                         {
-                            XElement iisstore = e.Element(ONames.TagIisstore);
-                            if (iisstore == null) return false;
-                            XAttribute on = iisstore.Attribute(ONames.AttOriginalname);
-                            XAttribute sz = iisstore.Attribute(ONames.AttSize);
-                            if (on == null || sz == null) return false;
-                            string uri = iisstore.Attribute(ONames.AttUri).Value;
-                            if (!on.Value.ToLower().EndsWith(fileExt) || sz.Value != fileSize) return false;
+                            string ssize = null;
+                            string uri = null;
+                            string originalname = null;
+                            XElement iisstore = null;
+                            XElement docmetainfo = null;
+                            iisstore = e.Element(ONames.TagIisstore);
+                            if (iisstore == null) docmetainfo = e.Element("{http://fogid.net/o/}docmetainfo");
+                            if (iisstore == null && docmetainfo == null) return false;
+                            //XAttribute on = iisstore.Attribute(ONames.AttOriginalname);
+                            //XAttribute sz = iisstore.Attribute(ONames.AttSize);
+                            //if (on == null || sz == null) return false;
+                            //string uri = iisstore.Attribute(ONames.AttUri).Value;
+                            //if (!on.Value.ToLower().EndsWith(fileExt) || sz.Value != fileSize) return false;
+                            if (iisstore != null)
+                            {
+                                ssize = iisstore.Attribute(ONames.AttSize)?.Value;
+                                uri = iisstore.Attribute(ONames.AttUri)?.Value;
+                                originalname = iisstore.Attribute(ONames.AttOriginalname)?.Value;
+                            }
+                            else
+                            {
+                                string[] parts = docmetainfo.Value.Split(';');
+                                var sizepart = parts 
+                                    .FirstOrDefault(p => p.StartsWith("size:"));
+                                if (sizepart != null) ssize = sizepart.Substring(5);
+                                uri = e.Element("{http://fogid.net/o/}uri")?.Value;
+                                string opart = parts
+                                    .FirstOrDefault(p => p.StartsWith("originalname:"));
+                                if (opart != null) originalname = opart.Substring("originalname:".Length);
+                            }
+                            //if (ssize == null) return false;
+                            if (ssize != fileSize) return false;
+                            string[] uriparts = uri.Split('/');
+                            // Учитываю только uri данной кассеты
+                            string uricassname = uriparts[2].Substring(0, uriparts[2].Length - 11);
+                            if (uricassname != cassette.Name) return false;
+                            int n = uriparts.Length;
+                            string ext = originalname.Split('.').Last();
+                            string fileincass = cassette.Dir.FullName +
+                                        "/originals/" + uriparts[n-2] + "/" + uriparts[n-1] + "." + ext;
                             if (File.ReadAllBytes(fname)
-                                .SequenceEqual(
-                                    File.ReadAllBytes(cassette.Dir.FullName + "/" + cassette.GetOriginalDocumentPath(uri)))) return true;
+                                .SequenceEqual(File.ReadAllBytes(fileincass)))
+                                return true;
                             return false;
                         });
             bool docIsNew = (doc == null);
@@ -461,7 +495,8 @@ namespace Polar.Cassettes
                 var documenttype = triple.content_type;
                 var docTag = triple.tag;
 
-                XName docId = XName.Get(cassette.Name + "_" + cassette._folderNumber + "_" + cassette._documentNumber);
+                //XName docId = XName.Get(cassette.Name + "_" + cassette._folderNumber + "_" + cassette._documentNumber);
+                string docId = cassette.GenerateNewId();// cassette.Name + "_" + cassette._folderNumber + "_" + cassette._documentNumber);
                 var iisstore = new XElement(ONames.TagIisstore,
                             new XAttribute(ONames.AttUri, "iiss://" + cassette.Name + "@iis.nsk.su/0001/" + cassette._folderNumber + "/" + cassette._documentNumber),
                             new XAttribute(ONames.AttOriginalname, fname),
@@ -614,31 +649,32 @@ namespace Polar.Cassettes
                     addedElements.Add(archMember);
                     //cassette.db.Add(archMember);
                 }
-            }
-            else { doc = XElement.Parse(doc.ToString()); doc.Add(new XAttribute("itIsCopy", "true")); addedElements.Add(doc); }
-            string dId = doc.Attribute(ONames.rdfabout).Value;
-            // Проверим наличие связи
-            bool membershipExists =
-            (!docIsNew) &&
-
-                    //var collmem = 
-                    cassette.db.Elements(ONames.TagCollectionmember)
-                    .Any(cm =>
-                        cm.Element(ONames.TagCollectionitem).Attribute(ONames.rdfresource).Value == dId &&
-                        cm.Element(ONames.TagIncollection).Attribute(ONames.rdfresource).Value == collectionId);
-            //  if (collmem != null) membershipExists = true;
-
-            // А теперь, наконец, добавим членство в коллекции
-            if (!membershipExists)
-            {
+                // А теперь, наконец, добавим членство в коллекции
                 XElement collectionmember =
                     new XElement(ONames.TagCollectionmember,
-                        new XAttribute(ONames.rdfabout, cassette.Name + "_" + collectionId + "_" + dId),
+                        new XAttribute(ONames.rdfabout, cassette.GenerateNewId()),
                         new XElement(ONames.TagIncollection, new XAttribute(ONames.rdfresource, collectionId)),
-                        new XElement(ONames.TagCollectionitem, new XAttribute(ONames.rdfresource, dId)));
+                        new XElement(ONames.TagCollectionitem, new XAttribute(ONames.rdfresource, docId)));
                 addedElements.Add(collectionmember);
-                //cassette.db.Add(collectionmember);
             }
+            //else { doc = XElement.Parse(doc.ToString()); doc.Add(new XAttribute("itIsCopy", "true")); addedElements.Add(doc); }
+            //string dId = doc.Attribute(ONames.rdfabout).Value;
+            //// Проверим наличие связи
+            //bool membershipExists =
+            //(!docIsNew) &&
+
+            //        //var collmem = 
+            //        cassette.db.Elements(ONames.TagCollectionmember)
+            //        .Any(cm =>
+            //            cm.Element(ONames.TagCollectionitem).Attribute(ONames.rdfresource).Value == dId &&
+            //            cm.Element(ONames.TagIncollection).Attribute(ONames.rdfresource).Value == collectionId);
+            ////  if (collmem != null) membershipExists = true;
+
+            //// А теперь, наконец, добавим членство в коллекции
+            //if (!membershipExists)
+            //{
+            //    //cassette.db.Add(collectionmember);
+            //}
             return addedElements;
         }
 

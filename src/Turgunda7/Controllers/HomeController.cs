@@ -132,6 +132,7 @@ namespace Turgunda7.Controllers
             }
             else upload_id = up.Attribute("id").Value;
 
+            bool dbupdated = false;
             foreach (var formFile in files)
             {
                 // Сохраним документ в промежуточном месте
@@ -145,6 +146,7 @@ namespace Turgunda7.Controllers
                 }
                 FileInfo fi = new FileInfo(tmpfilepath);
 
+                CassetteExtension.App_Bin_Path = SObjects.path + "wwwroot/bin/";
                 // Воспользуемся "стандартной" записью файла
                 //var elements = CassetteExtension.AddFile1(cassette, fi, id).ToArray();
                 var elements = CassetteExtension.AddFile1(cassette, fi, upload_id);
@@ -153,12 +155,13 @@ namespace Turgunda7.Controllers
                     var item_corrected = Polar.Cassettes.DocumentStorage.DbAdapter.ConvertXElement(item);
                     SObjects.PutItemToDb(item_corrected, false, user);
                     cassette.db.Add(item_corrected);
+                    dbupdated = true;
                 }
                 //Console.WriteLine("QQQQQQQQQQQQQQQQQQQQQQQ" + elements.Length);
                 // Уничтожение времянки
                 System.IO.File.Delete(tmpfilepath);
             }
-            cassette.Save();
+            if (dbupdated) cassette.Save();
 
             return View("Portrait", new Models.PortraitModel(upload_id));
         }

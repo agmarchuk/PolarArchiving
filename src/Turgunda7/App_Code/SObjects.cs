@@ -11,7 +11,7 @@ namespace Turgunda7
     public class SObjects
     {
         public static XElement accounts = null;
-        private static string path = null;
+        public static string path = null;
         //internal static DStorage storage = null;
         //private static DbAdapter engine = null;
         private static CassetteData.CassetteIntegration _engine;
