@@ -237,19 +237,22 @@ namespace Polar.Cassettes
                         // Использую ExifLib.Standard
                         if (ext == ".jpg")
                         {
-                            try
+                        }
+                        try
+                        {
+                            using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
                             {
-                                using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
+                                // Extract the tag data using the ExifTags enumeration
+                                if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized,
+                                                                out datePictureTaken))
                                 {
-                                    // Extract the tag data using the ExifTags enumeration
-                                    if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized,
-                                                                    out datePictureTaken))
-                                    {
-                                        exifok = true;
-                                    }
+                                    exifok = true;
                                 }
                             }
-                            catch (Exception) { }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Cant make EXIF object");
                         }
 
 
@@ -464,10 +467,8 @@ namespace Polar.Cassettes
                             new XAttribute(ONames.AttOriginalname, fname),
                             new XAttribute(ONames.AttSize, file.Length.ToString()),
                             new XAttribute(ONames.AttDocumenttype, documenttype),
-                            new XAttribute(ONames.AttDocumentcreation, file.CreationTimeUtc.ToString("s")),
-                            new XAttribute(ONames.AttDocumentfirstuploaded, System.DateTime.Now.ToString("s")),
-                            new XAttribute(ONames.AttDocumentmodification, file.LastWriteTimeUtc.ToString("s")),
-                            new XAttribute(ONames.AttChecksum, "qwerty"));
+                            null);
+                DateTime dateDocumentCreated = file.CreationTimeUtc;
                 //string documentname = cassette.Name + " " + cassette._folderNumber + " " + cassette._documentNumber;
                 //TODO: поменял концепцию формирования имени документа
                 int lastpoint = fname.LastIndexOf('.');
@@ -486,31 +487,24 @@ namespace Polar.Cassettes
                     using (var original = FreeImageAPI.FreeImageBitmap.FromStream(stream))
                     {
                         stream.Position = 0L;
-                        DateTime datePictureTaken = DateTime.Now;
-                        bool exifok = false;
                         // Использую ExifLib.Standard
-                        if (ext == ".jpg")
+                        try
                         {
-                            try
+                            using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
                             {
-                                using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
-                                {
-                                    // Extract the tag data using the ExifTags enumeration
-                                    if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized,
-                                                                    out datePictureTaken))
-                                    {
-                                        exifok = true;
-                                    }
-                                }
+                                // Extract the tag data using the ExifTags enumeration
+                                if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized, out dateDocumentCreated)) {  }
                             }
-                            catch (Exception) { }
                         }
-
+                        catch (Exception) { Console.WriteLine("Can't create EXIF!!!!!"); }
 
                         var fi = file;
-                        var md = fi.CreationTimeUtc;
-                        //original.Save(fpath);
-                        Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {datePictureTaken} ");
+                        Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {dateDocumentCreated} ");
+                        iisstore.Add(
+                            new XAttribute("width", "" + original.Width),
+                            new XAttribute("height", "" + original.Height),
+                            null);
+
 
                         string dirpath = cassette.Dir.FullName + "/";
                         string foldernumb = cassette._folderNumber;
@@ -606,6 +600,9 @@ namespace Polar.Cassettes
                 {
                     cassette.MakeAudioPreview(iisstore);
                 }
+                iisstore.Add(
+                    new XAttribute(ONames.AttDocumentcreation, dateDocumentCreated.ToString("s")),
+                    null);
 
                 cassette.IncrementDocumentNumber();
                 addedElements.Add(doc);
