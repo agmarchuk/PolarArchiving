@@ -753,8 +753,12 @@ namespace Polar.Cassettes
             //sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_flv);
 
             // Преобразование в mp4
-            string file_pars_mp4 = " -vcodec libx264 \"" + cassette.Dir.FullName + "/documents/medium/" + docPath + ".mp4\"";
+            string file_pars_mp4 = " -vcodec libvpx -acodec libvorbis \"" + cassette.Dir.FullName + "/documents/medium/" + docPath + ".webm\"";
             sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_mp4);
+
+            // Преобразование в webm
+            string file_pars_webm = "-f webm -vcodec libx264 \"" + cassette.Dir.FullName + "/documents/medium/" + docPath + ".mp4\"";
+            sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_webm);
 
             // Преобразование в ogg
             //string[] framesize = cassette.GetPreviewParameter(iisstore, "medium", "framesize").Split(new char[] { 'x' });

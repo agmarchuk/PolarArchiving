@@ -146,7 +146,7 @@ namespace Turgunda7.Controllers
                 }
                 FileInfo fi = new FileInfo(tmpfilepath);
 
-                CassetteExtension.App_Bin_Path = SObjects.path + "wwwroot/bin/";
+                CassetteExtension.App_Bin_Path = "C:\\home\\bin\\";
                 // Воспользуемся "стандартной" записью файла
                 //var elements = CassetteExtension.AddFile1(cassette, fi, id).ToArray();
                 var elements = CassetteExtension.AddFile1(cassette, fi, upload_id);
