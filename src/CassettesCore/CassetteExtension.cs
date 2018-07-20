@@ -149,6 +149,7 @@ namespace Polar.Cassettes
         /// <returns></returns>
         public static IEnumerable<XElement> AddFile(this Cassette cassette, FileInfo file, string collectionId)
         {
+            // Эта реализация используется (только) в CManager'е
             List<XElement> addedElements = new List<XElement>(); // string smallImageFullName = null;
             string fname = file.FullName;
             XElement doc = null;
@@ -260,16 +261,17 @@ namespace Polar.Cassettes
                         var md = fi.CreationTimeUtc;
                         //original.Save(fpath);
                         Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {datePictureTaken} ");
-
+                        
                         string dirpath = cassette.Dir.FullName + "/";
                         string foldernumb = cassette._folderNumber;
                         string docnumb = cassette._documentNumber;
-                        //string previewpath = dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg";
-                        Sizing(original, 150, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
-                        Sizing(original, 600, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
-                        Sizing(original, 1200, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
-                        //FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
-                        //FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
+                        int ns = 150, nm = 600, nl = 1200;
+                        Int32.TryParse(cassette.finfo.Element("image")?.Element("small")?.Attribute("previewBase")?.Value, out ns);
+                        Int32.TryParse(cassette.finfo.Element("image")?.Element("medium")?.Attribute("previewBase")?.Value, out nm);
+                        Int32.TryParse(cassette.finfo.Element("image")?.Element("normal")?.Attribute("previewBase")?.Value, out nl);
+                        Sizing(original, ns, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, nm, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, nl, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
                     }
                 }
                 // Дополнительная обработка для видео
@@ -407,6 +409,7 @@ namespace Polar.Cassettes
         /// <returns></returns>
         public static IEnumerable<XElement> AddFile1(this Cassette cassette, FileInfo file, string collectionId)
         {
+            // А это - используется в Web-приложениях под Core!!!
             List<XElement> addedElements = new List<XElement>(); // string smallImageFullName = null;
             string fname = file.FullName;
             XElement doc = null;
@@ -544,12 +547,13 @@ namespace Polar.Cassettes
                         string dirpath = cassette.Dir.FullName + "/";
                         string foldernumb = cassette._folderNumber;
                         string docnumb = cassette._documentNumber;
-                        //string previewpath = dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg";
-                        Sizing(original, 150, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
-                        Sizing(original, 600, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
-                        Sizing(original, 1200, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
-                        //FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
-                        //FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
+                        int ns = 150, nm = 600, nl = 1200;
+                        Int32.TryParse(cassette.finfo.Element("image")?.Element("small")?.Attribute("previewBase")?.Value, out ns);
+                        Int32.TryParse(cassette.finfo.Element("image")?.Element("medium")?.Attribute("previewBase")?.Value, out nm);
+                        Int32.TryParse(cassette.finfo.Element("image")?.Element("normal")?.Attribute("previewBase")?.Value, out nl);
+                        Sizing(original, ns, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, nm, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
+                        Sizing(original, nl, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
                     }
                 }
                 // Дополнительная обработка для видео
@@ -753,12 +757,12 @@ namespace Polar.Cassettes
             //sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_flv);
 
             // Преобразование в mp4
-            string file_pars_mp4 = " -vcodec libvpx -acodec libvorbis \"" + cassette.Dir.FullName + "/documents/medium/" + docPath + ".webm\"";
-            sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_mp4);
+            string file_pars_webm = " -f webm -vcodec libvpx -acodec libvorbis \"" + cassette.Dir.FullName + "/documents/medium/" + docPath + ".webm\"";
+            sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_webm);
 
             // Преобразование в webm
-            string file_pars_webm = "-f webm -vcodec libx264 \"" + cassette.Dir.FullName + "/documents/medium/" + docPath + ".mp4\"";
-            sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_webm);
+            string file_pars_mp4 = " -vcodec libx264 \"" + cassette.Dir.FullName + "/documents/medium/" + docPath + ".mp4\"";
+            sw.WriteLine(App_Bin_Path + "ffmpeg.exe " + executeLine + file_pars_mp4);
 
             // Преобразование в ogg
             //string[] framesize = cassette.GetPreviewParameter(iisstore, "medium", "framesize").Split(new char[] { 'x' });

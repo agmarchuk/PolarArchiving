@@ -100,7 +100,7 @@ else
     else if (Model.type_id == "http://fogid.net/o/video-doc")
     {
         string url = Url.Content("~/Docs/GetVideo?u=" + Model.uri);
-        <video height="300" controls>
+        <video controls>
             <source type="video/webm" src='@(url + "&ext=webm")' />
             <source type="video/mp4" src='@(url + "&ext=mp4")' />
             Your browser does not support the video tag.

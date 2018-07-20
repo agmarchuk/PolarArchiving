@@ -32,14 +32,14 @@ namespace Polar.Cassettes
         public static XElement finfo_default = new XElement(XName.Get("finfo"),
             new XElement("image",
                 new XElement("small", new XAttribute("previewBase", "120"), new XAttribute("qualityLevel", "90")),
-                new XElement("medium", new XAttribute("previewBase", "480"), new XAttribute("qualityLevel", "90")),
-                new XElement("normal", new XAttribute("previewBase", "800"), new XAttribute("qualityLevel", "90"))),
+                new XElement("medium", new XAttribute("previewBase", "640"), new XAttribute("qualityLevel", "90")),
+                new XElement("normal", new XAttribute("previewBase", "1280"), new XAttribute("qualityLevel", "90"))),
             new XElement("video",
                 new XElement("medium",
                     new XAttribute("videoBitrate", "400K"),
                     new XAttribute("audioBitrate", "22050"),
                     new XAttribute("rate", "10"),
-                    new XAttribute("framesize", "384x288")))
+                    new XAttribute("framesize", "480x360")))
             );
 
         private string docnameprefix = "";

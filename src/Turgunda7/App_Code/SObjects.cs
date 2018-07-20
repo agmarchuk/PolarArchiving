@@ -12,6 +12,9 @@ namespace Turgunda7
     {
         public static XElement accounts = null;
         public static string path = null;
+        public static string extappbinpath = null;
+        public static string newcassettesdirpath = null;
+        public static XElement finfo_configdefault = null;
         //internal static DStorage storage = null;
         //private static DbAdapter engine = null;
         private static CassetteData.CassetteIntegration _engine;
@@ -27,6 +30,15 @@ namespace Turgunda7
             try
             {
                 XElement xconfig = XElement.Load(path + "config.xml");
+                // Работа с параметрами конфигурации
+                extappbinpath = xconfig.Element("Parameters")?.Attribute("extappbinpath")?.Value;
+                newcassettesdirpath = xconfig.Element("Parameters")?.Attribute("newcassettesdirpath")?.Value;
+                if (extappbinpath == null || newcassettesdirpath == null)
+                    throw new Exception("Error in config.xml: no parameters extappbinpath or newcassettesdirpath");
+                finfo_configdefault = xconfig.Element("finfo");
+                // WARNING! Это опасно передавать параметры через статические переменные класса!!!
+                if (finfo_configdefault != null) Cassette.finfo_default = finfo_configdefault;
+
                 //storage = new DStorage();
                 //storage.Init(xconfig);
                 //engine = new XmlDbAdapter();

@@ -18,8 +18,10 @@ namespace Polar.Cassettes
 
             foreach (XElement lc in LoadCassette_elements)
             {
-                bool loaddata = false;
-                if (lc.Attribute("write")?.Value == "write") loaddata = true;
+                //bool loaddata = false;
+                //if (lc.Attribute("write")?.Value == "write") loaddata = true;
+                bool loaddata = true;
+                if (lc.Attribute("regime")?.Value == "nodata") loaddata = false;
                 string cassettePath = lc.Value;
 
                 Cassettes.CassetteInfo ci = null;
