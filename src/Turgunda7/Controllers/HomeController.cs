@@ -285,7 +285,22 @@ namespace Turgunda7.Controllers
         public ActionResult NewRecord(string searchstring, string type)
         {
             if (type == null) type = "http://fogid.net/o/person";
-            string nid = SObjects.CreateNewItem(searchstring, type, (new Turgunda7.Models.UserModel(Request)).Uuser);
+            string nid = null;
+            if (type == "http://fogid.net/o/cassette")
+            {
+                Cassette ncass = Cassette.Create(SObjects.newcassettesdirpath + searchstring, (new Turgunda7.Models.UserModel(Request)).Uuser);
+                SObjects.xconfig.Add(
+                    new XElement("LoadCassette", 
+                        new XAttribute("write", "yes"), 
+                        SObjects.newcassettesdirpath + ncass.Name));
+                SObjects.SaveConfig();
+                SObjects.Init();
+                nid = ncass.Name + "_cassetteId";
+            }
+            else
+            {
+                nid = SObjects.CreateNewItem(searchstring, type, (new Turgunda7.Models.UserModel(Request)).Uuser);
+            }
             return RedirectToAction("Portrait", "Home", new { id = nid });
         }
         public ActionResult AddInvRelation(string bid, string prop, string rtype)

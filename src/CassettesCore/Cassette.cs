@@ -110,7 +110,7 @@ namespace Polar.Cassettes
         /// </summary>
         /// <param name="cassPath"></param>
         /// <returns></returns>
-        static public Cassette Create(string cassPath)
+        static public Cassette Create(string cassPath, string owner)
         {
             string cass_name = cassPath.Split(Cassette.slashes).Last();
             if (Directory.Exists(cassPath) && File.Exists(cassPath + "/cassette.finfo"))
@@ -135,7 +135,7 @@ namespace Polar.Cassettes
                             new XElement(ONames.TagFoldername, "0001"),
                             new XElement(ONames.TagDocumentNumber, "0001")));
                 xconfig.Save(meta.FullName + "/" + cass_name + "_config.fog");
-                string owner = "mag_9347";
+                //string owner = "mag_9347";
                 string uri = "iiss://" + cass_name + "@iis.nsk.su/meta";
                 XElement xmetadb =
                     Cassette.RDFdb(cass_name + "_current",

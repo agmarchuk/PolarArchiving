@@ -23,13 +23,16 @@ namespace Turgunda7
         public static bool Initiated = true;
         private static System.Text.StringBuilder _errors = new System.Text.StringBuilder();
         public static string Errors { get { return _errors.ToString(); } }
+        public static XElement xconfig = null;
+        public static void SaveConfig() { xconfig.Save(path + "config.xml"); }
+
         public static void Init() { Init(path); }
         public static void Init(string pth)
         {
             path = pth + "/";
             try
             {
-                XElement xconfig = XElement.Load(path + "config.xml");
+                xconfig = XElement.Load(path + "config.xml");
                 // Работа с параметрами конфигурации
                 extappbinpath = xconfig.Element("Parameters")?.Attribute("extappbinpath")?.Value;
                 newcassettesdirpath = xconfig.Element("Parameters")?.Attribute("newcassettesdirpath")?.Value;
