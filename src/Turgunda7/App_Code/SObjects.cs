@@ -122,7 +122,7 @@ namespace Turgunda7
                 new XElement("{http://fogid.net/o/}name", new XAttribute(ONames.xmllang, "ru"), name)),
                 true, username);
 
-            return xrecord.Attribute(ONames.rdfabout).Value;
+            return xrecord?.Attribute(ONames.rdfabout).Value;
         }
         public static void DeleteItem(string id, string username)
         {

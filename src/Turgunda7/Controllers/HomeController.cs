@@ -91,9 +91,10 @@ namespace Turgunda7.Controllers
             string fid = "iiss://" + sid + "@iis.nsk.su";
             // Определяем кассету
             var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
-            if (!cassetteExists) { return new EmptyResult(); }
+            if (!cassetteExists) { return Error($"Developer error: no cassette [{fid}] in localstorage"); }
             var cassetteInfo = SObjects.Engine.localstorage.connection.cassettesInfo[fid];
             Cassette cassette = cassetteInfo.cassette;
+            if (cassette.Owner != new Turgunda7.Models.UserModel(Request).Uuser) return Error("Вам не разрешено добавлять файлы в эту кассету"); //new EmptyResult();
             string dirpath = cassetteInfo.url;
             // Ищем подколлекцию upload и если нет - создаем
             var c_item = SObjects.Engine.GetItemById(id,
@@ -165,98 +166,6 @@ namespace Turgunda7.Controllers
 
             return View("Portrait", new Models.PortraitModel(upload_id));
         }
-        //[HttpPost("UploadFiles0")]
-        //public async System.Threading.Tasks.Task<IActionResult> Post(string id, List<IFormFile> files)
-        //{
-        //    // Короткое имя кассеты, если есть
-        //    if (!id.EndsWith("_cassetteId")) { return new EmptyResult(); }
-        //    string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
-        //    string fid = "iiss://" + sid + "@iis.nsk.su";
-        //    // Определяем кассету
-        //    var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
-        //    if (!cassetteExists) { return new EmptyResult(); }
-        //    var cassetteInfo = SObjects.Engine.localstorage.connection.cassettesInfo[fid];
-        //    Cassette cassette = cassetteInfo.cassette;
-        //    string dirpath = cassetteInfo.url;
-
-        //    // Определяем важные параметры
-
-        //    //List<Task> tasklist = new List<Task>();
-        //    foreach (var formFile in files)
-        //    {
-        //        var foldernumb = cassette._folderNumber;
-        //        var docnumb = cassette._documentNumber;
-        //        string ext = formFile.FileName.Substring(formFile.FileName.LastIndexOf('.')).ToLower();
-
-        //        string fpath = dirpath + "originals/" + foldernumb + "/" + docnumb + ext;
-        //        using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
-        //        {
-        //            //MemoryStream mstream = new MemoryStream();
-        //            formFile.CopyTo(stream);
-        //        }
-
-        //        using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
-        //        using (var original = FreeImageBitmap.FromStream(stream))
-        //        {
-        //            stream.Position = 0L;
-        //            DateTime datePictureTaken = DateTime.Now;
-        //            bool exifok = false;
-        //            // Использую ExifLib.Standard
-        //            if (ext == ".jpg")
-        //            {
-        //                try
-        //                {
-        //                    using (ExifReader reader = new ExifReader(stream))
-        //                    {
-        //                        // Extract the tag data using the ExifTags enumeration
-        //                        if (reader.GetTagValue<DateTime>(ExifTags.DateTimeDigitized,
-        //                                                        out datePictureTaken))
-        //                        {
-        //                            exifok = true;
-        //                        }
-        //                    }
-        //                }
-        //                catch (Exception) { }
-        //            }
-
-
-        //            var fi = new FileInfo(fpath);
-        //            var md = fi.CreationTimeUtc;
-        //            //original.Save(fpath);
-        //            Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {datePictureTaken} ");
-                    
-        //            //string previewpath = dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg";
-        //            Sizing(original, 150, dirpath + "documents/small/" + foldernumb + "/" + docnumb + ".jpg");
-        //            Sizing(original, 600, dirpath + "documents/medium/" + foldernumb + "/" + docnumb + ".jpg");
-        //            Sizing(original, 1200, dirpath + "documents/normal/" + foldernumb + "/" + docnumb + ".jpg");
-        //            //FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD |
-        //            //FREE_IMAGE_SAVE_FLAGS.JPEG_BASELINE);
-        //        }
-
-        //        //tasklist.Add(BuildImageFile(formFile, dirpath + "originals/" + foldernumb + "/" + docnumb + ext));
-        //        // Следующий документ
-        //        cassette.IncrementDocumentNumber();
-        //    }
-        //    //Task.WaitAll(tasklist.ToArray());
-
-        //    // process uploaded files
-        //    // Don't rely on or trust the FileName property without validation.
-
-        //    //return Ok(new { count = files.Count, size, filePath });
-        //    return View("Portrait", new Models.PortraitModel(id));
-        //}
-
-        //private static void Sizing(FreeImageBitmap original, int maxbase, string previewpath)
-        //{
-        //    int x = original.Width, y = original.Height;
-        //    double factor = ((double)maxbase) / (x > y ? (double)x : (double)y);
-        //    int width = (int)(factor * x);
-        //    int height = (int)(factor * y);
-        //    var resized = new FreeImageBitmap(original, width, height);
-        //    // JPEG_QUALITYGOOD is 75 JPEG.
-        //    // JPEG_BASELINE strips metadata (EXIF, etc.)
-        //    resized.Save(previewpath);//, FREE_IMAGE_FORMAT.FIF_JPEG,
-        //}
 
         private void BuildImageFile(IFormFile formFile, string fpath)
         {
@@ -301,6 +210,7 @@ namespace Turgunda7.Controllers
             {
                 nid = SObjects.CreateNewItem(searchstring, type, (new Turgunda7.Models.UserModel(Request)).Uuser);
             }
+            if (nid == null) return Error("На создан элемент, возможно, у Вас нет полномочий");
             return RedirectToAction("Portrait", "Home", new { id = nid });
         }
         public ActionResult AddInvRelation(string bid, string prop, string rtype)
