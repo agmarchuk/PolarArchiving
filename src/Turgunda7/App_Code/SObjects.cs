@@ -97,6 +97,18 @@ namespace Turgunda7
 
         public static void LoadFromCassettesExpress() { throw new NotImplementedException(); }
 
+        public static CassetteInfo GetCassetteInfoById(string id)
+        {
+            // Короткое имя кассеты, если есть
+            if (!id.EndsWith("_cassetteId")) { return null; }
+            string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
+            string fid = "iiss://" + sid + "@iis.nsk.su";
+            // Определяем кассету
+            var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
+            if (!cassetteExists) { return null; }
+            return SObjects.Engine.localstorage.connection.cassettesInfo[fid];
+        }
+
         //public static IEnumerable<XElement> SearchByName(string searchstring) { return _engine.SearchByName(searchstring); }
         //public static XElement GetItemById(string id, XElement format) { return _engine.GetItemById(id, format); }
         //public static XElement GetItemByIdSpecial(string id) { return _engine.GetItemByIdBasic(id, true); }

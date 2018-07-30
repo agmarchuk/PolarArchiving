@@ -21,19 +21,24 @@ namespace Polar.Cassettes
                 //bool loaddata = false;
                 //if (lc.Attribute("write")?.Value == "write") loaddata = true;
                 bool loaddata = true;
+                bool iseditable = false;
                 if (lc.Attribute("regime")?.Value == "nodata") loaddata = false;
+                if (lc.Attribute("write")?.Value == "yes") iseditable = true;
                 string cassettePath = lc.Value;
 
                 Cassettes.CassetteInfo ci = null;
                 try
                 {
-                    ci = Cassettes.Cassette.LoadCassette(cassettePath, loaddata);
+                    ci = Cassettes.Cassette.LoadCassette(cassettePath, loaddata, iseditable);
                 }
                 catch (Exception ex)
                 {
                     protocol("Ошибка при загрузке кассеты [" + cassettePath + "]: " + ex.Message);
                 }
                 if (ci == null || cassettesInfo.ContainsKey(ci.fullName.ToSpecialCase())) continue;
+                ci.loaddata = loaddata;
+                ci.iseditable = iseditable;
+
                 cassettesInfo.Add(ci.fullName.ToSpecialCase(), ci);
                 if (ci.docsInfo != null) foreach (var docInfo in ci.docsInfo)
                     {
@@ -62,15 +67,60 @@ namespace Polar.Cassettes
                 var toload = ci.loaddata;
                 Cassettes.RDFDocumentInfo di0 = new Cassettes.RDFDocumentInfo(ci.cassette, true);
                 yield return di0;
-                var qu = di0.GetRoot().Elements("document").Where(doc => doc.Element("iisstore").Attribute("documenttype").Value == "application/fog");
+                var qu = di0.GetRoot()
+                    .Elements()
+                    .Where(e =>
+                    {
+                        if (e.Name == "document")
+                        {
+                            if (e.Element("iisstore")?.Attribute("documenttype")?.Value == "application/fog") return true;
+                        }
+                        else if (e.Name == "{http://fogid.net/o/}document")
+                        {
+                            string dmi = e.Element("{http://fogid.net/o/}docmetainfo")?.Value;
+                            if (dmi != null && dmi.Contains("documenttype:application/fog;")) return true;
+                        }
+                        return false; 
+                    });
                 foreach (var docnode in qu)
                 {
                     var di = new Cassettes.RDFDocumentInfo(docnode, ci.cassette.Dir.FullName, toload);
-                    if (toload) di.ClearRoot();
+                    //if (toload) di.ClearRoot();
                     yield return di;
                 }
-                di0.ClearRoot();
+                //di0.ClearRoot(); // Возможно, нехороший побочный эффект
             }
+        }
+        public IEnumerable<Cassettes.RDFDocumentInfo> GetFogFiles1()
+        {
+            // loaddata или toload - признак того, что нужно загружать внутренние fog-документы, если они есть 
+            // isEditable или write - признак того, что позволено изменять элементы кассеты (файлы, фог-документы) 
+            List<Cassettes.RDFDocumentInfo> docs = new List<RDFDocumentInfo>();
+            foreach (var cpair in cassettesInfo)
+            {
+                var ci = cpair.Value;
+                var toload = ci.loaddata;
+                Cassettes.RDFDocumentInfo di0 = new Cassettes.RDFDocumentInfo(ci.cassette, toload);
+                docs.Add(di0);
+                //if (!toload) continue;
+                var qu = di0.GetRoot()
+                    .Elements()
+                    .Where(e =>
+                    {
+                        if (e.Name == "document")
+                        {
+                            if (e.Element("iisstore")?.Attribute("documenttype")?.Value == "application/fog") return true;
+                        }
+                        else if (e.Name == "{http://fogid.net/o/}document")
+                        {
+                            string dmi = e.Element("{http://fogid.net/o/}docmetainfo")?.Value;
+                            if (dmi != null && dmi.Contains("documenttype:application/fog;")) return true;
+                        }
+                        return false;
+                    });
+                foreach (var docnode in qu) docs.Add(new Cassettes.RDFDocumentInfo(docnode, ci.cassette.Dir.FullName, toload));
+            }
+            return docs;
         }
     }
 }

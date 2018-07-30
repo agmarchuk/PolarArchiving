@@ -802,7 +802,7 @@ namespace Polar.Cassettes
                 new XAttribute(ONames.AttCounter, "1001"));
             string filepath = cassette.Dir.FullName + "/" + dbid + ".fog";
             emptyRdfDoc.Save(filepath);
-            var seq = cassette.AddFile(new FileInfo(filepath), cassette.CollectionId).ToList();
+            var seq = cassette.AddFile1(new FileInfo(filepath), cassette.CollectionId).ToList();
             // Надо добавить владельца в iisstore документа и хорошо бы проставить uri (это надо делать в файле)
             XElement rdfdoc = seq.First(xe => xe.Name == ONames.TagDocument);
             XElement iisstore = rdfdoc.Element(ONames.TagIisstore);

@@ -6,7 +6,8 @@
 @model Turgunda7.Models.PortraitModel
 @{
     if (Model == null || Model.xresult == null) { return; }
-    bool edit = (new Turgunda7.Models.UserModel(Context.Request)).Uuser != null; //User.IsInRole("user");
+    string user = (new Turgunda7.Models.UserModel(Context.Request)).Uuser;
+    bool edit = user != null; //User.IsInRole("user");
     string id = Model.id;
     bool candelete = true;
     //string page_url = Context.Request.QueryString.Value;
@@ -17,8 +18,9 @@
     string at = Context.Request.Query["at"];
     if (at != null) { astable = true; }
 
-    bool toload = (new Turgunda7.Models.UserModel(Context.Request)).Uuser != null
-        && Model.type_id == "http://fogid.net/o/cassette";
+    bool canchangecassette = user != null
+        && Model.type_id == "http://fogid.net/o/cassette"
+        && SObjects.GetCassetteInfoById(id).cassette.Owner == user;
 
 }
 
@@ -62,14 +64,23 @@
 <div>@Model.typelabel</div>
 
 <!-- ================= Загрузка файлов ================= -->
-@if (toload)
+@if (canchangecassette)
 {
-<form method="post" enctype="multipart/form-data" asp-controller="UploadFiles" asp-action="Index">
-    <p>Upload one or more files using this form:</p>
-    <input type="file" name="files" multiple />
-    <input type="hidden" name="id" value="@id" />
-    <input type="submit" value="Upload" />
-</form>
+    <form method="post" enctype="multipart/form-data" asp-controller="UploadFiles" asp-action="Index">
+        <p>Upload one or more files using this form:</p>
+        <input type="file" name="files" multiple />
+        <input type="hidden" name="id" value="@id" />
+        <input type="submit" value="Upload" />
+    </form>
+    <br />
+    <br />
+    <form method="get" action='@Url.Content("~/Home/ConnectUser")'>
+        <p>Allow user to edit cassette:</p>
+        <input type="text" name="userlogin" />
+        <input type="hidden" name="id" value="@id" />
+        <input type="submit" value="разрешить" />
+    </form>
+
 
 }
 

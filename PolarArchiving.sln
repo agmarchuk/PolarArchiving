@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassettesCore", "src\CassettesCore\CassettesCore.csproj", "{0352E9F4-2E09-4E33-802E-790849078FB5}"
 EndProject
@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBConsoleApp", "src\DBConso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassetteData", "src\CassetteData\CassetteData.csproj", "{1CF594A8-A49C-466E-ABFB-58BC32988E4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertVideo", "old\ConvertVideo\ConvertVideo.csproj", "{17855F92-605F-4B6C-886A-586872CBC80F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertVideo", "old\ConvertVideo\ConvertVideo.csproj", "{17855F92-605F-4B6C-886A-586872CBC80F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

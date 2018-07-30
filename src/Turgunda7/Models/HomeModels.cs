@@ -102,6 +102,22 @@ namespace Turgunda7.Models
 
     }
     public class ErrorModel { public string mess; }
+    public class InfoModel { public string mess; }
+    public class Conf
+    {
+        public Cassette Cass { get; set; }
+        public string CName { get; set; }
+        public string Owner { get; set; }
+    }
+    public class ConfigurationModel
+    {
+        public Conf[] Confs { get; set; }
+        //public Conf[] tuple;
+        //public ConfigurationModel(IEnumerable<RDFDocumentInfo> fogs)
+        //{
+        //    tuple = fogs.Select(fog => new Conf() { Cass = fog.cassette, CName = fog.cassette.Name, Owner = fog.owner }).ToArray();
+        //}
+    }
     public class PortraitModel
     {
         public bool ok = true;

@@ -29,6 +29,10 @@ namespace Turgunda7.Controllers
         {
             return View("Error", new Turgunda7.Models.ErrorModel() { mess = mess });
         }
+        public ActionResult Info(string mess)
+        {
+            return View("Info", new Turgunda7.Models.InfoModel() { mess = mess });
+        }
         public ActionResult LoadDB()
         {
             Turgunda7.SObjects.Init();
@@ -85,16 +89,19 @@ namespace Turgunda7.Controllers
         {
             // Пользователь
             string user = (new Turgunda7.Models.UserModel(Request)).Uuser;
-            // Короткое имя кассеты, если есть
-            if (!id.EndsWith("_cassetteId")) { return new EmptyResult(); }
-            string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
-            string fid = "iiss://" + sid + "@iis.nsk.su";
-            // Определяем кассету
-            var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
-            if (!cassetteExists) { return Error($"Developer error: no cassette [{fid}] in localstorage"); }
-            var cassetteInfo = SObjects.Engine.localstorage.connection.cassettesInfo[fid];
+            //// Короткое имя кассеты, если есть
+            //if (!id.EndsWith("_cassetteId")) { return new EmptyResult(); }
+            //string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
+            //string fid = "iiss://" + sid + "@iis.nsk.su";
+            //// Определяем кассету
+            //var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
+            //if (!cassetteExists) { return Error($"Developer error: no cassette [{fid}] in localstorage"); }
+            //var cassetteInfo = SObjects.Engine.localstorage.connection.cassettesInfo[fid];
+            //Cassette cassette = cassetteInfo.cassette;
+            var cassetteInfo = SObjects.GetCassetteInfoById(id);
             Cassette cassette = cassetteInfo.cassette;
-            if (cassette.Owner != new Turgunda7.Models.UserModel(Request).Uuser) return Error("Вам не разрешено добавлять файлы в эту кассету"); //new EmptyResult();
+            if (cassetteInfo == null) return Error("Developers error 287344");
+            if (cassetteInfo.cassette.Owner != new Turgunda7.Models.UserModel(Request).Uuser) return Error("Вам не разрешено добавлять файлы в эту кассету"); //new EmptyResult();
             string dirpath = cassetteInfo.url;
             // Ищем подколлекцию upload и если нет - создаем
             var c_item = SObjects.Engine.GetItemById(id,
@@ -187,7 +194,6 @@ namespace Turgunda7.Controllers
             }
         }
 
-
         //
         // ==================== Редактирование данных =====================
         //
@@ -210,8 +216,24 @@ namespace Turgunda7.Controllers
             {
                 nid = SObjects.CreateNewItem(searchstring, type, (new Turgunda7.Models.UserModel(Request)).Uuser);
             }
-            if (nid == null) return Error("На создан элемент, возможно, у Вас нет полномочий");
+            if (nid == null) return Error("Не создан элемент, возможно, у Вас нет полномочий");
             return RedirectToAction("Portrait", "Home", new { id = nid });
+        }
+        [HttpGet]
+        public IActionResult ConnectUser(string userlogin, string id)
+        {
+            Cassette cassette = SObjects.GetCassetteInfoById(id).cassette;
+            var elements = cassette.AddNewRdf(userlogin);
+            foreach (var item in elements)
+            {
+                var item_corrected = Polar.Cassettes.DocumentStorage.DbAdapter.ConvertXElement(item);
+                SObjects.PutItemToDb(item_corrected, false, (new Turgunda7.Models.UserModel(Request)).Uuser);
+                cassette.db.Add(item_corrected);
+            }
+            cassette.Save();
+            SObjects.Init();
+            //return View("Info", $"Пользователь {userlogin} подключен к кассете {cass.Name}");
+            return Redirect("~/Home/Index");
         }
         public ActionResult AddInvRelation(string bid, string prop, string rtype)
         {
@@ -382,6 +404,21 @@ namespace Turgunda7.Controllers
             SObjects.DeleteItem(eid, (new Turgunda7.Models.UserModel(Request)).Uuser);
             return PartialView();
         }
+
+        // ========================= Конфигурирование ========================
+        public IActionResult Configuration()
+        {
+            //RDFDocumentInfo[] fogs = SObjects.Engine.localstorage.connection.GetFogFiles().ToArray();
+            //var tuple = fogs.Select(fog => new Turgunda7.Models.Conf() { Cass = fog.cassette, CName = fog.cassette.Name, Owner = fog.owner }).ToArray();
+            List<Models.Conf> list = new List<Models.Conf>();
+            foreach (var c in SObjects.Engine.localstorage.connection.GetFogFiles1())
+            {
+                list.Add(new Models.Conf() { Cass = c.cassette, CName = "nnaammee", Owner = c.owner });
+            }
+
+            //Turgunda7.Models.ConfigurationModel cmodel = new Models.ConfigurationModel(fogs);
+            return View("Configuration", new Models.ConfigurationModel() { Confs = list.ToArray() });
+        } 
 
     }
 }

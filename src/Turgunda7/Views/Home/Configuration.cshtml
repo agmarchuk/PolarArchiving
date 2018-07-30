@@ -1,0 +1,14 @@
+﻿
+@model ConfigurationModel
+@{
+}
+
+<h3>Где будем редактировать?</h3>
+
+@foreach (var t in Model.Confs)
+{
+    <div>
+        @t.CName @t.Owner
+    </div>
+}
+

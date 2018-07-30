@@ -164,7 +164,7 @@ namespace Polar.Cassettes.DocumentStorage
             turlog("Начало загрузки данных");
             dbadapter.StartFillDb(turlog);
 
-            var fogfilearr = connection.GetFogFiles().Select(d => d.filePath).ToArray();
+            var fogfilearr = connection.GetFogFiles1().Select(d => d.filePath).ToArray();
             turlog("Загрузка кассет");
             dbadapter.LoadFromCassettesExpress(fogfilearr, turlog, convertlog);
             turlog("Конец загрузки кассет");
@@ -238,7 +238,8 @@ namespace Polar.Cassettes.DocumentStorage
             // Определение активного fog-документа
             XAttribute owner_att = comm.Attribute("owner");
             if (owner_att == null) return null;
-            Cassettes.RDFDocumentInfo active_fog = connection.GetFogFiles()
+            //var af = connection.GetFogFiles().ToArray();
+            Cassettes.RDFDocumentInfo active_fog = connection.GetFogFiles1()
                 .Where(fg => fg.owner == owner_att.Value && fg.isEditable)
                 .FirstOrDefault();
             if (active_fog == null) return null;

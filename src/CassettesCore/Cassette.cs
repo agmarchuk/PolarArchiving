@@ -19,8 +19,8 @@ namespace Polar.Cassettes
         public string _documentNumber;
         //public string dbId { get { return db==null?null : (db.Attribute("dbid") != null ? db.Attribute("dbid").Value : null); } }
         public string DbId => db?.Attribute("dbid")?.Value;
-        //public string owner { get { return db==null?null : db.Attribute("owner").Value; } }
-        public string Owner { get { return db?.Attribute("owner")?.Value; } }
+        public string owner; // { set { } get { return db?.Attribute("owner")?.Value; } }
+        public string Owner { get { return owner; } }
         public XElement db;
         private string wastebasketcollection = "wastebasketcollection";
         public string Wastebasket { get { return wastebasketcollection; } }
@@ -68,6 +68,7 @@ namespace Polar.Cassettes
                 this._folderNumber = xconfig.Element(ONames.TagSourcemeta).Element(ONames.TagFoldername).Value;
                 this._documentNumber = xconfig.Element(ONames.TagSourcemeta).Element(ONames.TagDocumentNumber).Value;
                 ActivateIdGenerator();
+                this.owner = db?.Attribute("owner")?.Value;
             }
         }
         public Cassette(string cassPath)
@@ -84,6 +85,7 @@ namespace Polar.Cassettes
                 this._folderNumber = xconfig.Element(ONames.TagSourcemeta).Element(ONames.TagFoldername).Value;
                 this._documentNumber = xconfig.Element(ONames.TagSourcemeta).Element(ONames.TagDocumentNumber).Value;
                 ActivateIdGenerator();
+                this.owner = db?.Attribute("owner")?.Value;
             }
         }
 
@@ -194,8 +196,8 @@ namespace Polar.Cassettes
             counta.SetValue("" + counter);
             return nId;
         }
-        public static CassetteInfo LoadCassette(string cassetteFolder) { return LoadCassette(cassetteFolder, true); }
-        public static CassetteInfo LoadCassette(string cassetteFolder, bool loaddata)
+        //public static CassetteInfo LoadCassette(string cassetteFolder) { return LoadCassette(cassetteFolder, true); }
+        public static CassetteInfo LoadCassette(string cassetteFolder, bool loaddata, bool iseditable)
         {
             //var cassetteFolder = cassettePath.Value;
             //if (!Directory.Exists(cassetteFolder) || (!File.Exists(cassetteFolder + "cassette.finfo"))) return null;
@@ -211,7 +213,7 @@ namespace Polar.Cassettes
                         new RDFDocumentInfo(xDoc, cassetteFolder)); 
                 }
             }
-            
+
             var cassetteInfo =
                 new CassetteInfo
                 {
@@ -219,9 +221,11 @@ namespace Polar.Cassettes
                     cassette = cassette,
                     url = cassette.Dir.FullName + '/',
                     docsInfo = di_list,
-                    loaddata = loaddata
+                    loaddata = loaddata,
+                    iseditable = iseditable,
+                    owner = cassette.Owner
                 };
-            if (loaddata) cassetteInfo.docsInfo.Add(new RDFDocumentInfo(cassette));
+            if (loaddata) cassetteInfo.docsInfo.Add(new RDFDocumentInfo(cassette, true));
             return cassetteInfo;
         }
         
@@ -563,10 +567,11 @@ namespace Polar.Cassettes
         public RDFDocumentInfo(XElement docNode, string cassetteFolder, bool toload)
         {
             dbId = docNode.Attribute(ONames.rdfabout).Value;
-            this.uri = docNode.Element("iisstore").Attribute("uri").Value;
-            owner = docNode.Element("iisstore").Attribute("owner") != null
-                ? docNode.Element("iisstore").Attribute("owner").Value
-                : "admin";
+            uri = docNode.Element("iisstore")?.Attribute("uri")?.Value;
+            if (uri == null) uri = docNode.Element("{http://fogid.net/o/}uri")?.Value;
+            owner = docNode.Element("iisstore")?.Attribute("owner")?.Value;
+            if (owner == null) owner = docNode.Element("{http://fogid.net/o/}docmetainfo")?.Value
+                    .Split(';').FirstOrDefault(part => part.StartsWith("owner:"))?.Substring(6);
             cassetteFolder = cassetteFolder.Replace('\\', '/');
             if (cassetteFolder[cassetteFolder.Length - 1] != '/') cassetteFolder += '/';
             this.filePath = cassetteFolder + "originals/" + uri.Substring(uri.Length - 9) + ".fog";
@@ -589,14 +594,15 @@ namespace Polar.Cassettes
         /// </summary>
         /// <param name="cassette"></param>
         public RDFDocumentInfo(Cassette cassette) : this(cassette, true) {}
-        public RDFDocumentInfo(Cassette cassette, bool toload)
+        public RDFDocumentInfo(Cassette cassette, bool editable)
         {
+            // Это другой toload !!! и означает загрузку фог-документа кассеты и еще префикса и каунтера
             this.cassette = cassette;
             this.uri = "iiss://" + cassette.Name + "@iis.nsk.su/meta";
             filePath = cassette.Dir.FullName + "/meta/" + cassette.Name + "_current.fog";
             dbId = cassette.DbId ?? (cassette.Name + "Id");
             owner = cassette.Owner;
-            if (toload)
+            if (editable)
             {
                 this.root =
                     //File.Exists(filePath+".xml") ?  XElement.Load(filePath+".xml") : 
@@ -690,7 +696,8 @@ namespace Polar.Cassettes
         public string ShortName { get { return fullName.Replace("iiss://", "").Replace("@iis.nsk.su", ""); } }
         public List<RDFDocumentInfo> docsInfo;
         public bool loaddata = true;
-      
+        public bool iseditable = false;
+        public string owner = "nobody";
     }
 
 }
