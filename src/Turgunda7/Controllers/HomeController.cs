@@ -408,12 +408,27 @@ namespace Turgunda7.Controllers
         // ========================= Конфигурирование ========================
         public IActionResult Configuration()
         {
-            //RDFDocumentInfo[] fogs = SObjects.Engine.localstorage.connection.GetFogFiles().ToArray();
-            //var tuple = fogs.Select(fog => new Turgunda7.Models.Conf() { Cass = fog.cassette, CName = fog.cassette.Name, Owner = fog.owner }).ToArray();
+            var usermodel = new Models.UserModel(Request);
+            var pars = Request.Query.ToArray();
+            if (pars.Length > 0)
+            {
+                string acti = null;
+                foreach (var p in pars)
+                {
+                    string pkey = p.Key;
+                    if (pkey == "radio") acti = p.Value;
+                }
+                if (acti != null)
+                {
+                    if (usermodel.SetActiveCassette(acti)) usermodel.Save();
+                }
+            }
             List<Models.Conf> list = new List<Models.Conf>();
             foreach (var c in SObjects.Engine.localstorage.connection.GetFogFiles1())
             {
-                list.Add(new Models.Conf() { Cass = c.cassette, CName = "nnaammee", Owner = c.owner });
+                list.Add(new Models.Conf() { Cass = c.cassette, Editable = c.isEditable, Owner = c.owner,
+                    Active = usermodel.ActiveCassette() });
+                
             }
 
             //Turgunda7.Models.ConfigurationModel cmodel = new Models.ConfigurationModel(fogs);

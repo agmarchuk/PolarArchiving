@@ -44,6 +44,34 @@ namespace Turgunda7.Models
             if (acc == null) return false;
             return acc.Elements("role").Any(r => r.Value == role);
         }
+        public string ActiveCassette()
+        {
+            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("id").Value == Uuser);
+            if (acc == null) return null;
+            return acc.Attribute("active")?.Value;
+        }
+        /// <summary>
+        /// Сохраняет активную кассету в accounts и возращает истину если действительно изменение было
+        /// </summary>
+        /// <param name="active"></param>
+        /// <returns></returns>
+        public bool SetActiveCassette(string active)
+        {
+            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("id").Value == Uuser);
+            if (acc == null) return false;
+            var att = acc.Attribute("active");
+            if (att == null) acc.Add(new System.Xml.Linq.XAttribute("active", active));
+            else
+            {
+                if (att.Value == active) return false;
+                att.Value = active;
+            }
+            return true;
+        }
+        public void Save()
+        {
+            SObjects.SaveAccounts();
+        }
 
     }
 }

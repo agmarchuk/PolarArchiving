@@ -106,8 +106,9 @@ namespace Turgunda7.Models
     public class Conf
     {
         public Cassette Cass { get; set; }
-        public string CName { get; set; }
+        public bool Editable { get; set; }
         public string Owner { get; set; }
+        public string Active { get; set; }
     }
     public class ConfigurationModel
     {

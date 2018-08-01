@@ -25,6 +25,7 @@ namespace Turgunda7
         public static string Errors { get { return _errors.ToString(); } }
         public static XElement xconfig = null;
         public static void SaveConfig() { xconfig.Save(path + "config.xml"); }
+        public static void SaveAccounts() { accounts.Save(path + "wwwroot/accounts.xml"); }
 
         public static void Init() { Init(path); }
         public static void Init(string pth)

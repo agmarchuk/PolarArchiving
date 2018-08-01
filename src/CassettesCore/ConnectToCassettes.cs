@@ -100,7 +100,7 @@ namespace Polar.Cassettes
             {
                 var ci = cpair.Value;
                 var toload = ci.loaddata;
-                Cassettes.RDFDocumentInfo di0 = new Cassettes.RDFDocumentInfo(ci.cassette, toload);
+                Cassettes.RDFDocumentInfo di0 = new Cassettes.RDFDocumentInfo(ci.cassette, ci.iseditable);
                 docs.Add(di0);
                 //if (!toload) continue;
                 var qu = di0.GetRoot()
@@ -118,7 +118,7 @@ namespace Polar.Cassettes
                         }
                         return false;
                     });
-                foreach (var docnode in qu) docs.Add(new Cassettes.RDFDocumentInfo(docnode, ci.cassette.Dir.FullName, toload));
+                foreach (var docnode in qu) docs.Add(new Cassettes.RDFDocumentInfo(docnode, ci.cassette.Dir.FullName, ci.iseditable));
             }
             return docs;
         }

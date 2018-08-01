@@ -596,6 +596,7 @@ namespace Polar.Cassettes
         public RDFDocumentInfo(Cassette cassette) : this(cassette, true) {}
         public RDFDocumentInfo(Cassette cassette, bool editable)
         {
+            isEditable = editable;
             // Это другой toload !!! и означает загрузку фог-документа кассеты и еще префикса и каунтера
             this.cassette = cassette;
             this.uri = "iiss://" + cassette.Name + "@iis.nsk.su/meta";
