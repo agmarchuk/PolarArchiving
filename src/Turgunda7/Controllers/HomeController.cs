@@ -73,31 +73,26 @@ namespace Turgunda7.Controllers
         }
 
         // ==================== Загрузка данных =====================
-        [HttpPost]
-        public ActionResult Load(string cassetteId, IFormFile file)
-        {
-            string filename = file.FileName;
-            string fpath = @"D:\Home\data\savedfile";
-            using (System.IO.FileStream fs = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
-            {
-                file.CopyTo(fs);
-            }
-            return View("Portrait", new Models.PortraitModel(cassetteId));
-        }
+        //[HttpPost]
+        //public ActionResult Load(string cassetteId, IFormFile file)
+        //{  // Этот метод был пробный и сейчас не используется
+        //    string filename = file.FileName;
+        //    string fpath = @"D:\Home\data\savedfile";
+        //    using (System.IO.FileStream fs = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+        //    {
+        //        file.CopyTo(fs);
+        //    }
+        //    return View("Portrait", new Models.PortraitModel(cassetteId));
+        //}
         [HttpPost("UploadFiles")]
         public IActionResult Post(string id, List<IFormFile> files)
         {
             // Пользователь
-            string user = (new Turgunda7.Models.UserModel(Request)).Uuser;
-            //// Короткое имя кассеты, если есть
-            //if (!id.EndsWith("_cassetteId")) { return new EmptyResult(); }
-            //string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
-            //string fid = "iiss://" + sid + "@iis.nsk.su";
-            //// Определяем кассету
-            //var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
-            //if (!cassetteExists) { return Error($"Developer error: no cassette [{fid}] in localstorage"); }
-            //var cassetteInfo = SObjects.Engine.localstorage.connection.cassettesInfo[fid];
-            //Cassette cassette = cassetteInfo.cassette;
+            var umodel = new Turgunda7.Models.UserModel(Request);
+            string user = umodel.Uuser;
+            // Нужно проверить прова
+            if (!umodel.IsInRole("admin")) return Error("Файлы может добавлять только администратор"); 
+                
             var cassetteInfo = SObjects.GetCassetteInfoById(id);
             Cassette cassette = cassetteInfo.cassette;
             if (cassetteInfo == null) return Error("Developers error 287344");
@@ -201,8 +196,12 @@ namespace Turgunda7.Controllers
         {
             if (type == null) type = "http://fogid.net/o/person";
             string nid = null;
+            var umodel = new Turgunda7.Models.UserModel(Request);
+
             if (type == "http://fogid.net/o/cassette")
             {
+                if (!umodel.IsInRole("admin")) return Error("Кассеты может создавать только администратор");
+                if (string.IsNullOrEmpty(searchstring)) return Error("Имя кассеты не должно быть пустым");
                 Cassette ncass = Cassette.Create(SObjects.newcassettesdirpath + searchstring, (new Turgunda7.Models.UserModel(Request)).Uuser);
                 SObjects.xconfig.Add(
                     new XElement("LoadCassette", 
@@ -214,7 +213,7 @@ namespace Turgunda7.Controllers
             }
             else
             {
-                nid = SObjects.CreateNewItem(searchstring, type, (new Turgunda7.Models.UserModel(Request)).Uuser);
+                nid = SObjects.CreateNewItem(searchstring, type, umodel.Uuser);
             }
             if (nid == null) return Error("Не создан элемент, возможно, у Вас нет полномочий");
             return RedirectToAction("Portrait", "Home", new { id = nid });
@@ -222,6 +221,8 @@ namespace Turgunda7.Controllers
         [HttpGet]
         public IActionResult ConnectUser(string userlogin, string id)
         {
+            var umodel = new Turgunda7.Models.UserModel(Request);
+            if (!umodel.IsInRole("admin")) return Error("Кассеты может создавать только администратор");
             Cassette cassette = SObjects.GetCassetteInfoById(id).cassette;
             var elements = cassette.AddNewRdf(userlogin);
             foreach (var item in elements)
