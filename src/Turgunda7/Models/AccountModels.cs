@@ -40,13 +40,13 @@ namespace Turgunda7.Models
         }
         public bool IsInRole(string role)
         {
-            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("id").Value == Uuser);
+            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("login").Value == Uuser);
             if (acc == null) return false;
             return acc.Elements("role").Any(r => r.Value == role);
         }
         public string ActiveCassette()
         {
-            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("id").Value == Uuser);
+            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("login").Value == Uuser);
             if (acc == null) return null;
             return acc.Attribute("active")?.Value;
         }
@@ -57,7 +57,7 @@ namespace Turgunda7.Models
         /// <returns></returns>
         public bool SetActiveCassette(string active)
         {
-            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("id").Value == Uuser);
+            var acc = SObjects.accounts.Elements("account").FirstOrDefault(a => a.Attribute("login").Value == Uuser);
             if (acc == null) return false;
             var att = acc.Attribute("active");
             if (att == null) acc.Add(new System.Xml.Linq.XAttribute("active", active));

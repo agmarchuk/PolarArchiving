@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\ApplicationProfile.xml" />
+    <Content Remove="wwwroot\accounts.xml" />
     <Content Remove="wwwroot\log.txt" />
   </ItemGroup>
 
@@ -26,8 +26,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\config0.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CassetteData\CassetteData.csproj" />
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\extappbinpath\" />
+    <Folder Include="wwwroot\newcassettesdirpath\" />
   </ItemGroup>
 
 </Project>

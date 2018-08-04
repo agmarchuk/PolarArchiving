@@ -33,12 +33,17 @@ namespace Turgunda7
             path = pth + "/";
             try
             {
+                if (!System.IO.File.Exists(path + "config.xml"))
+                {
+                    System.IO.File.Copy(path + "wwwroot/config0.xml", path + "config.xml");
+                }
                 xconfig = XElement.Load(path + "config.xml");
                 // Работа с параметрами конфигурации
                 extappbinpath = xconfig.Element("Parameters")?.Attribute("extappbinpath")?.Value;
+                if (extappbinpath == null) extappbinpath = path + "wwwroot/extappbinpath/";
                 newcassettesdirpath = xconfig.Element("Parameters")?.Attribute("newcassettesdirpath")?.Value;
-                if (extappbinpath == null || newcassettesdirpath == null)
-                    throw new Exception("Error in config.xml: no parameters extappbinpath or newcassettesdirpath");
+                if (newcassettesdirpath == null) newcassettesdirpath = path + "wwwroot/newcassettesdirpath/";
+
                 finfo_configdefault = xconfig.Element("finfo");
                 // WARNING! Это опасно передавать параметры через статические переменные класса!!!
                 if (finfo_configdefault != null) Cassette.finfo_default = finfo_configdefault;
@@ -49,21 +54,6 @@ namespace Turgunda7
                 //storage.InitAdapter(engine);
                 _engine = new CassetteData.CassetteIntegration(xconfig, false);
 
-                // Это было тестирование...
-                //var c_item = SObjects.Engine.GetItemById("TestCassette20180628_cassetteId",
-                //    new XElement("record",
-                //        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
-                //            new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
-                //                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
-                //                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
-                //                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))))));
-                //var up = c_item.Elements("inverse")
-                //    .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-collection")
-                //    .Select(i => i.Element("record")?.Element("direct"))
-                //    .Where(d => d != null)
-                //    .Select(d => d.Element("record"))
-                //    .FirstOrDefault(r => r.Attribute("type").Value == "http://fogid.net/o/collection" &&
-                //        r.Elements("field").Select(f => f.Value).FirstOrDefault() == "upload");
 
                 // Загрузка профиля и онтологии
                 appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
@@ -72,7 +62,6 @@ namespace Turgunda7
                 Models.Common.LoadOntNamesFromOntology(ontology);
                 Models.Common.LoadInvOntNamesFromOntology(ontology);
 
-                //storage.LoadFromCassettesExpress(); // Штатно, это выполняется по специальному запросу LoadFromCassettesExpress(), такой вариант годится для динамического формирования базы данных, напр. движком engine = new XmlDbAdapter(); 
             }
             catch (Exception e) { Initiated = false; _errors.Append(e.Message); Log(e.Message); }
                 //storage.SaveDb("C:/Home/syp_db.xml");
@@ -82,8 +71,15 @@ namespace Turgunda7
             } catch (Exception)
             {
                 accounts = new XElement("accounts");
+                AccountsSave();
             }
         }
+
+        public static void AccountsSave()
+        {
+            accounts.Save(path + "wwwroot/accounts.xml");
+        }
+
         public static bool tolog = false;
         public static void Log(string message)
         {
