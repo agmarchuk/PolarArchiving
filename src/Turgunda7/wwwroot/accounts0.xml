@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <accounts>
-  <account login="mag" pass="fetnaggi">
+  <account login="mag" pass="ffffffff">
     <role>user</role>
   </account>
-  <account login="furs" pass="alexey">
+  <account login="furs" pass="aaaaaa">
     <role>user</role>
     <role>admin</role>
   </account>
