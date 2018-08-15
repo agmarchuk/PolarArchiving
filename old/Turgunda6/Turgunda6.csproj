@@ -169,6 +169,7 @@
     <Content Include="wwwroot\ApplicationProfile.xml" />
     <Content Include="wwwroot\ontology_iis-v11-doc_ruen.xml" />
     <Content Include="wwwroot\ontology_iis-v12-doc_ruen.xml" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

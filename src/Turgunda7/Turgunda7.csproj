@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\newcassettesdirpath\**" />
+    <Content Remove="wwwroot\newcassettesdirpath\**" />
+    <EmbeddedResource Remove="wwwroot\newcassettesdirpath\**" />
+    <None Remove="wwwroot\newcassettesdirpath\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\accounts.xml" />
     <Content Remove="wwwroot\log.txt" />
   </ItemGroup>
@@ -37,7 +44,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\extappbinpath\" />
-    <Folder Include="wwwroot\newcassettesdirpath\" />
   </ItemGroup>
 
 </Project>
