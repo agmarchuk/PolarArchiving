@@ -56,6 +56,10 @@ namespace Turgunda7
 
 
                 // Загрузка профиля и онтологии
+                if (!System.IO.File.Exists(path + "wwwroot/ApplicationProfile.xml"))
+                {
+                    System.IO.File.Copy(path + "wwwroot/ApplicationProfile0.xml", path + "wwwroot/ApplicationProfile.xml");
+                }
                 appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
                 XElement ontology = XElement.Load(path + "wwwroot/ontology_iis-v12-doc_ruen.xml");
                 Models.Common.formats = appProfile.Element("formats");
