@@ -110,7 +110,7 @@ namespace Turgunda7.Models
         public string Owner { get; set; }
         public string Active { get; set; }
     }
-    public class ConfigurationModel
+    public class UserConfigurationModel
     {
         public Conf[] Confs { get; set; }
         //public Conf[] tuple;

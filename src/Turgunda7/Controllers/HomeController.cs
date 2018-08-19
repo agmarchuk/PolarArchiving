@@ -169,6 +169,7 @@ namespace Turgunda7.Controllers
             return View("Portrait", new Models.PortraitModel(upload_id));
         }
 
+
         private void BuildImageFile(IFormFile formFile, string fpath)
         {
             using (var stream = new System.IO.FileStream(fpath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
@@ -407,7 +408,7 @@ namespace Turgunda7.Controllers
         }
 
         // ========================= Конфигурирование ========================
-        public IActionResult Configuration()
+        public IActionResult UserConfiguration()
         {
             var usermodel = new Models.UserModel(Request);
             var pars = Request.Query.ToArray();
@@ -433,8 +434,86 @@ namespace Turgunda7.Controllers
             }
 
             //Turgunda7.Models.ConfigurationModel cmodel = new Models.ConfigurationModel(fogs);
-            return View("Configuration", new Models.ConfigurationModel() { Confs = list.ToArray() });
-        } 
+            return View("UserConfiguration", new Models.UserConfigurationModel() { Confs = list.ToArray() });
+        }
+        public IActionResult SystemConfiguration()
+        {
+            var pars = Request.Query.ToArray();
+            XElement[] loadcassetteelements = null;
+            // i-ый элемент соответствует i-му параметру
+            bool[] deletes = null;
+            bool[] towrites = null;
+            string addcassette = null;
+            bool awrite = false;
+            foreach (var p in pars)
+            {
+                if (loadcassetteelements == null)
+                {
+                    loadcassetteelements = SObjects.xconfig.Elements("LoadCassette").ToArray();
+                    deletes = new bool[loadcassetteelements.Length];
+                    towrites = new bool[loadcassetteelements.Length];
+                }
+                var name = p.Key;
+                var val = p.Value.FirstOrDefault();
+                char c = name[0];
+                if (char.IsDigit(c))
+                { // Открепление кассеты
+                    int nom = Int32.Parse(name);
+                    //Console.WriteLine($"============================== deleting cass {nom}");
+                    deletes[nom] = true;
+                }
+                else if (c == 'w')
+                {
+                    int nom = Int32.Parse(name.Substring(1));
+                    //Console.WriteLine($"============================== changing write status cass {nom}");
+                    towrites[nom] = true;
+                }
+                else if (name == "addition")
+                {
+                    addcassette = val;
+                }
+                else if (name == "awrite")
+                {
+                    awrite = true;
+                }
+            }
+            bool changed = false;
+            if (loadcassetteelements != null)
+            { // зафиксировать результат
+                for (int i=0; i<loadcassetteelements.Length; i++)
+                {
+                    // коррекция атрибута write
+                    XElement el = loadcassetteelements[i];
+                    bool towrite = towrites[i];
+                    string wr_value = towrite ? "yes" : "no";
+                    XAttribute wr_att = el.Attribute("write");
+                    if (wr_att == null) { el.Add(new XAttribute("write", wr_value)); changed = true; }
+                    else { changed = wr_att.Value != wr_value; wr_att.Value = wr_value; }
+                    // уничтожение, если заказано
+                    if (deletes[i]) { el.Remove(); changed = true; }
+                }
+            }
+            if (addcassette != null)
+            {
+                if (Directory.Exists(addcassette) && System.IO.File.Exists(addcassette + "/cassette.finfo"))
+                {
+                    SObjects.xconfig.Add(
+                        new XElement("LoadCassette", 
+                            new XAttribute("write", awrite ? "yes" : "no"),
+                            addcassette));
+                    changed = true;
+                }
+            }
+            if (changed)
+            {
+                SObjects.SaveConfig();
+                SObjects.Init();
+            }
+
+            return View("SystemConfiguration");
+        }
+
+
 
     }
 }

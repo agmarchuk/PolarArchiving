@@ -36,14 +36,15 @@
                 <div style="width:200px;">
                     <div><a href="@Url.Content("~/Home/Index")">Начало</a></div>
                     @if (umodel.IsInRole("user"))
-                    {
-                    <div><a href="@Url.Content("~/Home/Index?name=" + umodel.Uuser)">Моё</a></div>
-                    }
+    {
+                <div><a href="@Url.Content("~/Home/Index?name=" + umodel.Uuser)">Моё</a></div>
+}
                     @if (umodel.IsInRole("admin"))
-                    {
-                    <div><a href="@Url.Content("~/Home/LoadDb")">Загрузки</a></div>
-                    <div><a href="@Url.Content("~/Home/Configuration")">Управление пользователями</a></div>
-                    }
+    {
+                @*<div><a href="@Url.Content("~/Home/LoadDb")">Загрузки</a></div>*@
+                <div><a href="@Url.Content("~/Home/SystemConfiguration")">Управление конфигурацией</a></div>
+                <div><a href="@Url.Content("~/Home/UserConfiguration")">Управление пользователями</a></div>
+}
                 </div>
             </td>
             <td width="100%"><h2 style="color:#5c87b2;padding: 0 0 0 0;">Открытый архив СО РАН</h2></td>
