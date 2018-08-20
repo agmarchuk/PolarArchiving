@@ -2,6 +2,7 @@
 <config>
   <!--Parameters extappbinpath="C:/Home/bin/" newcassettesdirpath="C:/Home/FactographProjects/newcassettes/">
   </Parameters-->
+  <params appname="Открытый архив СО РАН (редактирующее приложение)"></params>
   <finfo>
     <image>
       <small previewBase="120" qualityLevel="90" />

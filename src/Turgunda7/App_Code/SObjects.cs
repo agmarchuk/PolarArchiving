@@ -15,6 +15,7 @@ namespace Turgunda7
         public static string extappbinpath = null;
         public static string newcassettesdirpath = null;
         public static XElement finfo_configdefault = null;
+        public static string appname = "Открытый архив СО РАН";
         //internal static DStorage storage = null;
         //private static DbAdapter engine = null;
         private static CassetteData.CassetteIntegration _engine;
@@ -24,7 +25,7 @@ namespace Turgunda7
         private static System.Text.StringBuilder _errors = new System.Text.StringBuilder();
         public static string Errors { get { return _errors.ToString(); } }
         public static XElement xconfig = null;
-        public static void SaveConfig() { xconfig.Save(path + "config.xml"); }
+        public static void SaveConfig() { xconfig.Save(path + "wwwroot/config.xml"); }
         public static void SaveAccounts() { accounts.Save(path + "wwwroot/accounts.xml"); }
 
         public static void Init() { Init(path); }
@@ -33,16 +34,18 @@ namespace Turgunda7
             path = pth + "/";
             try
             {
-                if (!System.IO.File.Exists(path + "config.xml"))
+                if (!System.IO.File.Exists(path + "wwwroot/config.xml"))
                 {
-                    System.IO.File.Copy(path + "wwwroot/config0.xml", path + "config.xml");
+                    System.IO.File.Copy(path + "wwwroot/config0.xml", path + "wwwroot/config.xml");
                 }
-                xconfig = XElement.Load(path + "config.xml");
+                xconfig = XElement.Load(path + "wwwroot/config.xml");
                 // Работа с параметрами конфигурации
                 extappbinpath = xconfig.Element("Parameters")?.Attribute("extappbinpath")?.Value;
                 if (extappbinpath == null) extappbinpath = path + "wwwroot/extappbinpath/";
                 newcassettesdirpath = xconfig.Element("Parameters")?.Attribute("newcassettesdirpath")?.Value;
                 if (newcassettesdirpath == null) newcassettesdirpath = path + "wwwroot/newcassettesdirpath/";
+                string appn = xconfig.Element("params")?.Attribute("appname")?.Value;
+                if (appn != null) appname = appn;
 
                 finfo_configdefault = xconfig.Element("finfo");
                 // WARNING! Это опасно передавать параметры через статические переменные класса!!!
