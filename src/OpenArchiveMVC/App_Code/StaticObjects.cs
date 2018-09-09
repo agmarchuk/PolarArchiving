@@ -23,9 +23,12 @@ namespace OpenArchive
         {
             _path = path;
             if (_path[_path.Length - 1] != '/' && _path[_path.Length - 1] != '\\') _path = _path + "/";
-
-            string configpath = _path + "config.xml";
-            _config = System.IO.File.Exists(configpath) ? XElement.Load(configpath) : new XElement("config");
+            string configpath = _path + "wwwroot/config.xml";
+            if (!System.IO.File.Exists(configpath))
+            {
+                System.IO.File.Copy(_path + "wwwroot/config0.xml", configpath);
+            }
+            _config = XElement.Load(configpath);
             // Инициируем движок
             _engine = new CassetteData.CassetteIntegration(_config, true);
 
@@ -59,14 +62,14 @@ namespace OpenArchive
 
                 try
                 {
-                    xtree = XElement.Load(_path + "logs/xtree.xml");
+                    xtree = XElement.Load(_path + "wwwroot/xtree.xml");
                 }
                 catch (Exception)
                 {
                     xtree = new XElement(rec);
                     // Какая-то ошибка
                     //xtree.Add(CollectChilds(rec.Attribute("id").Value));
-                    //xtree.Save(_path + "logs/xtree.xml");
+                    //xtree.Save(_path + "wwwroot/xtree.xml");
                 }
             }
         }
