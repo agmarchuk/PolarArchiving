@@ -781,11 +781,10 @@
       </inverse>
     </record>
     <!--<add from Alex />-->
-    <record type="http://fogid.net/o/collection-member">
+    <!--<record type="http://fogid.net/o/collection-member">
       <field prop="http://fogid.net/o/name" />
       <field prop="http://fogid.net/o/description"></field>
       <inverse prop="http://fogid.net/o/in-collection">
-        <!--<record type="http://fogid.net/o/collection-member" view="largeicons"><direct prop="http://fogid.net/o/collection-item"><record type="http://fogid.net/o/collection"><field prop="http://fogid.net/o/name" /><field prop="http://fogid.net/o/from-date" /></record><record type="http://fogid.net/o/archive"><field prop="http://fogid.net/o/name" /><field prop="http://fogid.net/o/from-date" />/*<add from Alex />*/</record><record type="http://fogid.net/o/cassette"><field prop="http://fogid.net/o/name" /><field prop="http://fogid.net/o/description" /></record><record type="http://fogid.net/o/document"><field prop="http://fogid.net/o/name" />/*<field prop="http://fogid.net/o/description" />*//*<field prop="http://fogid.net/o/doc-content" />*/<field prop="http://fogid.net/o/from-date" /></record><record type="http://fogid.net/o/photo-doc"><field prop="http://fogid.net/o/name" />/*<field prop="http://fogid.net/o/from-date" />*/<inverse prop="http://fogid.net/o/forDocument" attname="uri"><record type="http://fogid.net/o/FileStore"><field prop="http://fogid.net/o/uri" /></record></inverse></record><record type="http://fogid.net/o/video-doc"><field prop="http://fogid.net/o/name" /><field prop="http://fogid.net/o/from-date" /></record><record type="http://fogid.net/o/audio-doc"><field prop="http://fogid.net/o/name" /><field prop="http://fogid.net/o/from-date" /></record></direct></record>-->
       </inverse>
       <inverse prop="http://fogid.net/o/collection-item">
         <record type="http://fogid.net/o/collection-member">
@@ -800,7 +799,7 @@
           </direct>
         </record>
       </inverse>
-    </record>
+    </record>-->
   </formats>
   <EditRecords>
     <record type="http://fogid.net/o/person" fid="person">
