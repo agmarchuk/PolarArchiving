@@ -234,7 +234,7 @@ else
                             {
                                 XAttribute valueTypeAtt = f.Attribute("valueType");
                                 string value = cr.Value;
-                                if (valueTypeAtt != null) { value = Turgunda7.Models.Common.GetEnumStateLabel(valueTypeAtt.Value, value); }
+                                if (valueTypeAtt != null) { value = TurgundaCommon.ModelCommon.GetEnumStateLabel(valueTypeAtt.Value, value); }
                                 <td class="d">@value</td>
                             }
                             else
@@ -262,7 +262,7 @@ else
                                             var valueTypeAtt = frow[j].Attribute("valueType");
                                             if (valueTypeAtt != null)
                                             {
-                                                val = Turgunda7.Models.Common.GetEnumStateLabel(valueTypeAtt.Value, val);
+                                                val = TurgundaCommon.ModelCommon.GetEnumStateLabel(valueTypeAtt.Value, val);
                                             }
                                         }
                                         if (!string.IsNullOrEmpty(val) && isfirst)
@@ -393,7 +393,7 @@ else
                                 if (src == "")
                                 {
                                     src = Url.Content("~/icons/medium/" +
-                                        (Turgunda7.Models.Common.icons.ContainsKey(rty) ? Turgunda7.Models.Common.icons[rty] : "default_m.jpg"));
+                                        (TurgundaCommon.ModelCommon.icons.ContainsKey(rty) ? TurgundaCommon.ModelCommon.icons[rty] : "default_m.jpg"));
                                 }
                             }
                             <div class="brick">
@@ -470,7 +470,7 @@ else
                                                 {
                                                     XAttribute valueTypeAtt = f.Attribute("valueType");
                                                     string value = cr.Value;
-                                                    if (valueTypeAtt != null) { value = Turgunda7.Models.Common.GetEnumStateLabel(valueTypeAtt.Value, value); }
+                                                    if (valueTypeAtt != null) { value = TurgundaCommon.ModelCommon.GetEnumStateLabel(valueTypeAtt.Value, value); }
                                                     <td class="d">@value</td>
                                                 }
                                                 else
@@ -498,7 +498,7 @@ else
                                                                 var valueTypeAtt = frow[j].Attribute("valueType");
                                                                 if (valueTypeAtt != null)
                                                                 {
-                                                                    val = Turgunda7.Models.Common.GetEnumStateLabel(valueTypeAtt.Value, val);
+                                                                    val = TurgundaCommon.ModelCommon.GetEnumStateLabel(valueTypeAtt.Value, val);
                                                                 }
                                                             }
                                                             if (!string.IsNullOrEmpty(val) && isfirst)

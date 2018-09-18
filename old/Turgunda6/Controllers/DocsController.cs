@@ -60,7 +60,7 @@ namespace Turgunda6.Controllers
         public ActionResult GetPhoto(string u, string s)
         {
             string filename = this.Request.MapPath("..") + "/question.jpg";
-            filename = SObjects.storage.GetPhotoFileName(u, s) + ".jpg";
+            filename = Turgunda7.SObjects.Engine.localstorage.GetPhotoFileName(u, s) + ".jpg";
             return new FilePathResult(filename, "image/jpeg");
         }
         //public FilePathResult GetVideo(string u)
@@ -73,13 +73,13 @@ namespace Turgunda6.Controllers
         {
             string filename = "question.jpg";
             string video_extension = ext;
-            filename = SObjects.storage.GetVideoFileName(u) + "." + ext;
+            filename = Turgunda7.SObjects.Engine.localstorage.GetVideoFileName(u) + "." + ext;
             return new FilePathResult(filename, "video/" + video_extension);
         }
         public FilePathResult GetAudio(string u)
         {
             string audio_extension = "mp3";
-            string filename = SObjects.storage.GetAudioFileName(u);
+            string filename = Turgunda7.SObjects.Engine.localstorage.GetAudioFileName(u);
 
             return new FilePathResult(filename, "audio/" + audio_extension);
         }

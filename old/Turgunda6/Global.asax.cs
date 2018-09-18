@@ -18,7 +18,7 @@ namespace Turgunda6
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             var path = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath; //.MapPath("");
-            SObjects.Init(path);
+            Turgunda7.SObjects.Init(path);
 
         }
     }

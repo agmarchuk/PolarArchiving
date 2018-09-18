@@ -154,7 +154,9 @@
     <Compile Include="SObjects.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="config.xml" />
+    <Content Include="config.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="favicon.ico" />
@@ -223,6 +225,10 @@
     <ProjectReference Include="..\..\src\CassettesCore\CassettesCore.csproj">
       <Project>{5eb2b66e-bd5a-4fc0-bbb2-508ae3b8ffac}</Project>
       <Name>CassettesCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\TurgundaCommon\TurgundaCommon.csproj">
+      <Project>{43b75845-171e-4841-8f2a-0b0648c39356}</Project>
+      <Name>TurgundaCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

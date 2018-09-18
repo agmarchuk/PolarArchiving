@@ -117,7 +117,7 @@ namespace Turgunda6.Models
             this.typelabel = Common.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
             if (this.typelabel == null) this.typelabel = type_id;
             // Получим портретное х-дерево
-            this.xtree = SObjects.GetItemById(id, rec_format);
+            this.xtree = Turgunda7.SObjects.GetItemById(id, rec_format);
             if (this.xtree == null) return;
             // По дереву вычислим и зафиксируем остальные поля
             // поле идентификатора
@@ -151,7 +151,7 @@ namespace Turgunda6.Models
             string type_id;
             // Нам нужен формат.
             XElement f_primitive = new XElement("record");
-            XElement xtree0 = SObjects.GetItemById(id, f_primitive);
+            XElement xtree0 = Turgunda7.SObjects.GetItemById(id, f_primitive);
             //if (xtree0 == null) { return null; }; // Как-то надо поступить с диагностикой ошибок//
             type_id = xtree0.Attribute("type").Value;
             // Теперь установим нужный формат
@@ -343,7 +343,7 @@ namespace Turgunda6.Models
         private XElement _format = null;
         public XElement CalculateFormat()
         {
-            _format = SObjects.GetEditFormat(etype, iprop);
+            _format = Turgunda7.SObjects.GetEditFormat(etype, iprop);
             if (_format == null) _format = new XElement("record", new XAttribute("type", etype));
             return _format;
         }
@@ -353,7 +353,7 @@ namespace Turgunda6.Models
         public void LoadFromDb()
         {
             CalculateFormat();
-            _xtree = SObjects.GetItemById(eid, _format);
+            _xtree = Turgunda7.SObjects.GetItemById(eid, _format);
         }
         public IEnumerable<XElement> GetHeaderFlow()
         {
@@ -765,7 +765,7 @@ namespace Turgunda6.Models
             //type = "http://fogid.net/o/person"; // для отладки
             this.type = type;
             //if (string.IsNullOrEmpty(searchstring)) { _results = new SearchResult[0]; return; }
-            var query = SObjects.SearchByName(searchstring)
+            var query = Turgunda7.SObjects.SearchByName(searchstring)
                 .Select(xres =>
                 {
                     XElement name_el = xres
@@ -810,7 +810,7 @@ namespace Turgunda6.Models
         public PortraitSpecialModel(string id)
         {
             DateTime tt0 = DateTime.Now;
-            XElement record = SObjects.GetItemByIdSpecial(id);
+            XElement record = Turgunda7.SObjects.GetItemByIdSpecial(id);
             if (record == null) return;
             this.id = record.Attribute("id").Value;
             string type_id = record.Attribute("type") == null ? "notype" : record.Attribute("type").Value;

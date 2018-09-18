@@ -14,6 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="App_Code\SObjects.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\accounts.xml" />
     <Content Remove="wwwroot\config.xml" />
     <Content Remove="wwwroot\log.txt" />
@@ -41,8 +45,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CassetteData\CassetteData.csproj" />
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
+    <ProjectReference Include="..\TurgundaCommon\TurgundaCommon.csproj" />
   </ItemGroup>
 
   <ItemGroup>

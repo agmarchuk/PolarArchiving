@@ -39,12 +39,12 @@ namespace Turgunda6.Controllers
         public ActionResult NewRecord(string searchstring, string type)
         {
             if (type == null) type = "http://fogid.net/o/person";
-            string nid = SObjects.CreateNewItem(searchstring, type, (new Turgunda6.Models.UserModel(Request)).Uuser);
+            string nid = Turgunda7.SObjects.CreateNewItem(searchstring, type, (new Turgunda6.Models.UserModel(Request)).Uuser);
             return RedirectToAction("Portrait", "Home", new { id = nid });
         }
         public ActionResult AddInvRelation(string bid, string prop, string rtype)
         {
-            SObjects.AddInvRelation(bid, prop, rtype, (new Turgunda6.Models.UserModel(Request)).Uuser);
+            Turgunda7.SObjects.AddInvRelation(bid, prop, rtype, (new Turgunda6.Models.UserModel(Request)).Uuser);
             //string nid = StaticObjects.CreateNewItem(searchstring, type, User.Identity.Name);
             return RedirectToAction("Portrait", "Home", new { id = bid });
         }
@@ -65,7 +65,7 @@ namespace Turgunda6.Controllers
                 bool replacemode = true;
                 if (rmodel.eid == "create888")
                 {
-                    string eid = SObjects.AddInvRelation(rmodel.bid, rmodel.iprop, rmodel.etype,
+                    string eid = Turgunda7.SObjects.AddInvRelation(rmodel.bid, rmodel.iprop, rmodel.etype,
                         (new Turgunda6.Models.UserModel(Request)).Uuser);
                     rmodel.eid = eid;
                     replacemode = false;
@@ -141,7 +141,7 @@ namespace Turgunda6.Controllers
                             return (XElement)null;
                         }));
                     // Пошлем эту запись на изменение
-                    SObjects.PutItemToDb(record, false, (new Turgunda6.Models.UserModel(Request)).Uuser);
+                    Turgunda7.SObjects.PutItemToDb(record, false, (new Turgunda6.Models.UserModel(Request)).Uuser);
                     // Если эта запись является записью типа "DocumentPart", то фиксируем две величины:
                     // ссылку inDocument и идентификатор, имеющийся "за" этой ссылкой
                     if (record.Name.LocalName == "DocumentPart" && record.Name.NamespaceName == "http://fogid.net/o/")
@@ -184,7 +184,7 @@ namespace Turgunda6.Controllers
                     int ind = Int32.Parse(parts[0]);
                     string p_type = parts[1];
                     string p_name = Server.UrlDecode(parts[2]);
-                    string nid = SObjects.CreateNewItem(p_name, p_type, (new Turgunda6.Models.UserModel(Request)).Uuser);
+                    string nid = Turgunda7.SObjects.CreateNewItem(p_name, p_type, (new Turgunda6.Models.UserModel(Request)).Uuser);
                     rmodel.SetPValue(ind, nid);
                     rmodel.SetVValue(ind, p_name);
                     rmodel.CalculateFormat();
@@ -205,7 +205,7 @@ namespace Turgunda6.Controllers
         }
         public PartialViewResult DeleteRow(string eid)
         {
-            SObjects.DeleteItem(eid, (new Turgunda6.Models.UserModel(Request)).Uuser);
+            Turgunda7.SObjects.DeleteItem(eid, (new Turgunda6.Models.UserModel(Request)).Uuser);
             return PartialView();
         }
 
