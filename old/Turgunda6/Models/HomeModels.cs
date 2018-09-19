@@ -9,88 +9,88 @@ using Polar.Cassettes;
 
 namespace Turgunda6.Models
 {
-    public class Common
-    {
-        public static XElement formats = new XElement("formats"); // хранилище основных форматов, загружаемых напр. из ApplicationProfile.xml 
-        public static string[][] OntPairs = new string[][] {
-            new string[] {"http://fogid.net/o/archive", "архив"},
-            new string[] {"http://fogid.net/o/person", "персона"},
-            new string[] {"http://fogid.net/o/org-sys", "орг. система"},
-            new string[] {"http://fogid.net/o/collection", "коллекция"},
-            new string[] {"http://fogid.net/o/document", "документ"},
-            new string[] {"http://fogid.net/o/photo-doc", "фото документ"},
-            new string[] {"http://fogid.net/o/video-doc", "видео документ"},
-            new string[] {"http://fogid.net/o/name", "имя"},
-            new string[] {"http://fogid.net/o/from-date", "нач.дата"},
-            new string[] {"http://fogid.net/o/to-date", "кон.дата"},
-            new string[] {"http://fogid.net/o/in-doc", "в документе"},
-            new string[] {"http://fogid.net/o/degree", "степень"},
-            new string[] {"http://fogid.net/o/", ""},
-        };
-        public static Dictionary<string, string> OntNames = new Dictionary<string, string>(
-            OntPairs.ToDictionary(pa => pa[0], pa => pa[1]));
-        public static Dictionary<string, string> InvOntNames = new Dictionary<string, string>();
-        private static XElement _ontology;
-        public static void LoadOntNamesFromOntology(XElement ontology)
-        {
-            _ontology = ontology;
-            var ont_names = ontology.Elements()
-                .Where(el => el.Name == "Class" || el.Name == "ObjectProperty" || el.Name == "DatatypeProperty")
-                .Where(el => el.Elements("label").Any())
-                .Select(el => new
-                {
-                    type_id = el.Attribute(ONames.rdfabout).Value,
-                    label = el.Elements("label").First(lab => lab.Attribute(ONames.xmllang).Value == "ru").Value
-                })
-                .ToDictionary(pa => pa.type_id, pa => pa.label);
-            OntNames = ont_names;
-        }
-        public static void LoadInvOntNamesFromOntology(XElement ontology)
-        {
-            _ontology = ontology;
-            var i_ont_names = ontology.Elements("ObjectProperty")
-                //.Where(el => el.Name == "Class" || el.Name == "ObjectProperty" || el.Name == "DatatypeProperty")
-                .Where(el => el.Elements("inverse-label").Any())
-                .Select(el => new
-                {
-                    type_id = el.Attribute(ONames.rdfabout).Value,
-                    label = el.Elements("inverse-label").First(lab => lab.Attribute(ONames.xmllang).Value == "ru").Value
-                })
-                .ToDictionary(pa => pa.type_id, pa => pa.label);
-            InvOntNames = i_ont_names;
-        }
-        public static string GetEnumStateLabel(string enum_type, string state_value)
-        {
-            var et_def = _ontology.Elements("EnumerationType")
-                .FirstOrDefault(et => et.Attribute(ONames.rdfabout).Value == enum_type);
-            if (et_def == null) return "";
-            var et_state = et_def.Elements("state")
-                .FirstOrDefault(st => st.Attribute("value").Value == state_value && st.Attribute(ONames.xmllang).Value == "ru");
-            if (et_state == null) return "";
-            return et_state.Value;
-        }
-        public static IEnumerable<XElement> GetEnumStates(string enum_type)
-        {
-            var et_def = _ontology.Elements("EnumerationType")
-                .FirstOrDefault(et => et.Attribute(ONames.rdfabout).Value == enum_type);
-            if (et_def == null) return null;
-            var et_states = et_def.Elements("state")
-                .Where(st => st.Attribute(ONames.xmllang).Value == "ru");
-            return et_states;
-        }
-        public static bool IsTextField(string property_id)
-        {
-            XElement def_el = _ontology.Elements("DatatypeProperty").FirstOrDefault(p => p.Attribute(ONames.rdfabout).Value == property_id);
-            if (def_el != null)
-            {
-                bool istext = def_el.Elements("range")
-                    .Any(range => range.Attribute(ONames.rdfresource).Value == "http://fogid.net/o/text");
-                return istext;
-            }
-            return false;
-        }
+    //public class Common
+    //{
+    //    public static XElement formats = new XElement("formats"); // хранилище основных форматов, загружаемых напр. из ApplicationProfile.xml 
+    //    public static string[][] OntPairs = new string[][] {
+    //        new string[] {"http://fogid.net/o/archive", "архив"},
+    //        new string[] {"http://fogid.net/o/person", "персона"},
+    //        new string[] {"http://fogid.net/o/org-sys", "орг. система"},
+    //        new string[] {"http://fogid.net/o/collection", "коллекция"},
+    //        new string[] {"http://fogid.net/o/document", "документ"},
+    //        new string[] {"http://fogid.net/o/photo-doc", "фото документ"},
+    //        new string[] {"http://fogid.net/o/video-doc", "видео документ"},
+    //        new string[] {"http://fogid.net/o/name", "имя"},
+    //        new string[] {"http://fogid.net/o/from-date", "нач.дата"},
+    //        new string[] {"http://fogid.net/o/to-date", "кон.дата"},
+    //        new string[] {"http://fogid.net/o/in-doc", "в документе"},
+    //        new string[] {"http://fogid.net/o/degree", "степень"},
+    //        new string[] {"http://fogid.net/o/", ""},
+    //    };
+    //    public static Dictionary<string, string> OntNames = new Dictionary<string, string>(
+    //        OntPairs.ToDictionary(pa => pa[0], pa => pa[1]));
+    //    public static Dictionary<string, string> InvOntNames = new Dictionary<string, string>();
+    //    private static XElement _ontology;
+    //    public static void LoadOntNamesFromOntology(XElement ontology)
+    //    {
+    //        _ontology = ontology;
+    //        var ont_names = ontology.Elements()
+    //            .Where(el => el.Name == "Class" || el.Name == "ObjectProperty" || el.Name == "DatatypeProperty")
+    //            .Where(el => el.Elements("label").Any())
+    //            .Select(el => new
+    //            {
+    //                type_id = el.Attribute(ONames.rdfabout).Value,
+    //                label = el.Elements("label").First(lab => lab.Attribute(ONames.xmllang).Value == "ru").Value
+    //            })
+    //            .ToDictionary(pa => pa.type_id, pa => pa.label);
+    //        OntNames = ont_names;
+    //    }
+    //    public static void LoadInvOntNamesFromOntology(XElement ontology)
+    //    {
+    //        _ontology = ontology;
+    //        var i_ont_names = ontology.Elements("ObjectProperty")
+    //            //.Where(el => el.Name == "Class" || el.Name == "ObjectProperty" || el.Name == "DatatypeProperty")
+    //            .Where(el => el.Elements("inverse-label").Any())
+    //            .Select(el => new
+    //            {
+    //                type_id = el.Attribute(ONames.rdfabout).Value,
+    //                label = el.Elements("inverse-label").First(lab => lab.Attribute(ONames.xmllang).Value == "ru").Value
+    //            })
+    //            .ToDictionary(pa => pa.type_id, pa => pa.label);
+    //        InvOntNames = i_ont_names;
+    //    }
+    //    public static string GetEnumStateLabel(string enum_type, string state_value)
+    //    {
+    //        var et_def = _ontology.Elements("EnumerationType")
+    //            .FirstOrDefault(et => et.Attribute(ONames.rdfabout).Value == enum_type);
+    //        if (et_def == null) return "";
+    //        var et_state = et_def.Elements("state")
+    //            .FirstOrDefault(st => st.Attribute("value").Value == state_value && st.Attribute(ONames.xmllang).Value == "ru");
+    //        if (et_state == null) return "";
+    //        return et_state.Value;
+    //    }
+    //    public static IEnumerable<XElement> GetEnumStates(string enum_type)
+    //    {
+    //        var et_def = _ontology.Elements("EnumerationType")
+    //            .FirstOrDefault(et => et.Attribute(ONames.rdfabout).Value == enum_type);
+    //        if (et_def == null) return null;
+    //        var et_states = et_def.Elements("state")
+    //            .Where(st => st.Attribute(ONames.xmllang).Value == "ru");
+    //        return et_states;
+    //    }
+    //    public static bool IsTextField(string property_id)
+    //    {
+    //        XElement def_el = _ontology.Elements("DatatypeProperty").FirstOrDefault(p => p.Attribute(ONames.rdfabout).Value == property_id);
+    //        if (def_el != null)
+    //        {
+    //            bool istext = def_el.Elements("range")
+    //                .Any(range => range.Attribute(ONames.rdfresource).Value == "http://fogid.net/o/text");
+    //            return istext;
+    //        }
+    //        return false;
+    //    }
 
-    }
+    //}
     public class PortraitModel
     {
         public string id;
@@ -114,7 +114,7 @@ namespace Turgunda6.Models
             if (rec_format == null) this.type_id = GetFormat(id, out rec_format);
             else this.type_id = rec_format.Attribute("type").Value;
 
-            this.typelabel = Common.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
+            this.typelabel = TurgundaCommon.ModelCommon.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
             if (this.typelabel == null) this.typelabel = type_id;
             // Получим портретное х-дерево
             this.xtree = Turgunda7.SObjects.GetItemById(id, rec_format);
@@ -155,7 +155,7 @@ namespace Turgunda6.Models
             //if (xtree0 == null) { return null; }; // Как-то надо поступить с диагностикой ошибок//
             type_id = xtree0.Attribute("type").Value;
             // Теперь установим нужный формат
-            XElement xformat = Common.formats.Elements("record")
+            XElement xformat = TurgundaCommon.ModelCommon.formats.Elements("record")
                 .FirstOrDefault(re => re.Attribute("type") != null && re.Attribute("type").Value == type_id);
             if (xformat == null)
             {
@@ -177,7 +177,7 @@ namespace Turgunda6.Models
                 string prop = f_inv.Attribute("prop").Value;
                 var queryForInverse = xtree.Elements("inverse").Where(el => el.Attribute("prop").Value == prop).ToArray();
                 XElement ip = new XElement("ip", new XAttribute("prop", prop), new XElement("label",
-                    (f_inv.Element("label") != null ? f_inv.Element("label").Value : Common.InvOntNames[prop])));
+                    (f_inv.Element("label") != null ? f_inv.Element("label").Value : TurgundaCommon.ModelCommon.InvOntNames[prop])));
                 foreach (var f_rec in f_inv.Elements("record"))
                 {
                     XAttribute view_att = f_rec.Attribute("view");
@@ -188,7 +188,7 @@ namespace Turgunda6.Models
                         new XAttribute("type", recType),
                         view_att == null ? null : new XAttribute(view_att),
                         new XElement("label",
-                            (f_rec.Element("label") != null ? f_rec.Element("label").Value : Common.OntNames[recType])),
+                            (f_rec.Element("label") != null ? f_rec.Element("label").Value : TurgundaCommon.ModelCommon.OntNames[recType])),
                         new XElement("header", ScanForHeaderFields(f_rec)));
                     ip.Add(ir);
                     foreach (var v_rec in queryForRecords)
@@ -282,7 +282,7 @@ namespace Turgunda6.Models
                 else if (el.Name == "direct")
                 {
                     XElement label_el = el.Elements("label").FirstOrDefault();
-                    string label = label_el == null ? Common.OntNames[el.Attribute("prop").Value] : label_el.Value;
+                    string label = label_el == null ? TurgundaCommon.ModelCommon.OntNames[el.Attribute("prop").Value] : label_el.Value;
                     yield return new XElement("d", new XAttribute("prop", el.Attribute("prop").Value),
                         new XElement("label", label),
                         el.Elements("record").Select(re => new XElement("r", new XAttribute(re.Attribute("type")),
@@ -297,7 +297,7 @@ namespace Turgunda6.Models
             XElement label_el = el.Elements("label").FirstOrDefault();
             string label = "label";
             if (label_el != null) label = label_el.Value;
-            else if (!Common.OntNames.TryGetValue(p.Value, out label))
+            else if (!TurgundaCommon.ModelCommon.OntNames.TryGetValue(p.Value, out label))
             {
                 label = p.Value;
             }
@@ -777,7 +777,7 @@ namespace Turgunda6.Models
                     XAttribute t_att = xres.Attribute("type");
                     if (t_att != null) res.type = t_att.Value;
                     string tname = "";
-                    if (!string.IsNullOrEmpty(res.type)) Common.OntNames.TryGetValue(res.type, out tname);
+                    if (!string.IsNullOrEmpty(res.type)) TurgundaCommon.ModelCommon.OntNames.TryGetValue(res.type, out tname);
                     res.type_name = tname;
                     return res;
                 });
@@ -815,7 +815,7 @@ namespace Turgunda6.Models
             this.id = record.Attribute("id").Value;
             string type_id = record.Attribute("type") == null ? "notype" : record.Attribute("type").Value;
             this.type_id = type_id;
-            this.type = Common.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
+            this.type = TurgundaCommon.ModelCommon.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
             if (this.type == null) this.type = type_id;
             var name_el = record.Elements("field").Where(f => f.Attribute("prop").Value == "http://fogid.net/o/name")
                 .FirstOrDefault();

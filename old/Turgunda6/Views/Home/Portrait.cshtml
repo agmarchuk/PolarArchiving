@@ -63,7 +63,7 @@
         {
             XAttribute valueTypeAtt = f.Attribute("valueType");
             string value = cr.Value;
-            if (valueTypeAtt != null) { value = Turgunda6.Models.Common.GetEnumStateLabel(valueTypeAtt.Value, value); }
+            if (valueTypeAtt != null) { value = TurgundaCommon.ModelCommon.GetEnumStateLabel(valueTypeAtt.Value, value); }
         <td class="d">@value</td> 
         }
         else
@@ -91,7 +91,7 @@
                     var valueTypeAtt = frow[j].Attribute("valueType");
                     if (valueTypeAtt != null)
                     {
-                        val = Turgunda6.Models.Common.GetEnumStateLabel(valueTypeAtt.Value, val);
+                        val = TurgundaCommon.ModelCommon.GetEnumStateLabel(valueTypeAtt.Value, val);
                     }
                 }
                 if (!string.IsNullOrEmpty(val) && isfirst)

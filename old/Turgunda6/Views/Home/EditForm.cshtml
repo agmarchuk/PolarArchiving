@@ -54,7 +54,7 @@ else
                 if (valueTypeAtt != null)
                 {
                     string stvalue = Model.GetFValue(i);
-                    var variants = Turgunda6.Models.Common.GetEnumStates(valueTypeAtt.Value)
+                    var variants = TurgundaCommon.ModelCommon.GetEnumStates(valueTypeAtt.Value)
                         .Select(st => new SelectListItem()
                         {
                             Selected = st.Attribute("value").Value == stvalue ? true : false,
@@ -115,11 +115,11 @@ else
                         @foreach (var str in types)
                         {
                             if (str == t_variant) {
-                            <option selected="selected" value="@str">@Turgunda6.Models.Common.OntNames[str]</option>
+                            <option selected="selected" value="@str">@TurgundaCommon.ModelCommon.OntNames[str]</option>
                             }
                             else
                             {
-                            <option value="@str">@Turgunda6.Models.Common.OntNames[str]</option>
+                            <option value="@str">@TurgundaCommon.ModelCommon.OntNames[str]</option>
                             }
                         } 
                     </select>

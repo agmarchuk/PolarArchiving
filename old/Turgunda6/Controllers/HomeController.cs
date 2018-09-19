@@ -126,7 +126,7 @@ namespace Turgunda6.Controllers
                                 if (true || !string.IsNullOrEmpty(value)) // Эта проверка мешает(ла) уничтожению полей
                                 {
                                     // Надо определить еще нужен ли язык и какой
-                                    bool istext = Turgunda6.Models.Common.IsTextField(fd.Attribute("prop").Value);
+                                    bool istext = TurgundaCommon.ModelCommon.IsTextField(fd.Attribute("prop").Value);
                                     return new XElement(xprop, rmodel.GetFValue(ind),
                                         istext ? new XAttribute(ONames.xmllang, rmodel.lang) : null);
                                 }

@@ -50,11 +50,11 @@
     @Html.TextBox("searchstring", null, new { style = "width:300px;" })
 
 
-    var variants = Turgunda6.Models.Common.formats.Elements("record")
+    var variants = TurgundaCommon.ModelCommon.formats.Elements("record")
         .Select(r => new SelectListItem()
         {
             Value = r.Attribute("type").Value,
-            Text = Turgunda6.Models.Common.OntNames[r.Attribute("type").Value]
+            Text = TurgundaCommon.ModelCommon.OntNames[r.Attribute("type").Value]
         }).ToList();
     variants.Insert(0, new SelectListItem() { Value = "", Text = "" });
     @Html.DropDownList("type", variants, new { style = "font-size:small;" });
