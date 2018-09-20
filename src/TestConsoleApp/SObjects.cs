@@ -24,8 +24,8 @@ namespace Turgunda6
             storage.InitAdapter(engine);
 
             // Загрузка профиля и онтологии
-            //appProfile = XElement.Load(path + "PublicuemCommon/ApplicationProfile.xml");
-            //XElement ontology = XElement.Load(path + "PublicuemCommon/ontology_iis-v11-doc_ruen.xml");
+            //appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
+            //XElement ontology = XElement.Load(path + "wwwroot/ontology_iis-v11-doc_ruen.xml");
             //Models.Common.formats = appProfile.Element("formats");
             //Models.Common.LoadOntNamesFromOntology(ontology);
             //Models.Common.LoadInvOntNamesFromOntology(ontology);
