@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AJAXExp</title>
+
+    <link rel="stylesheet" href="~/lib/jquery/dist/css/jquery.js" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script>
+        function Change(e) { alert("ALERT!"); e.preventDefault(); }
+        function Change2(e) { alert("ALERT1!"); e.click.preventDefault(); alert("ALERT2!"); }
+        function Change1() {
+            $.ajax({
+                method: "POST",
+                url: "Home/Operate",
+                data: { name: "John", location: "Boston" }
+            })
+                .done(function (msg) {
+                    alert("Data Saved: " + msg);
+                });
+        }
+    </script>
+    <script>
+        $("a").click(function (event) {
+            event.preventDefault();
+            $("<div>")
+                .append("default " + event.type + " prevented")
+                .appendTo("#log");
+        });
+    </script>
+</head>
+<body>
+    <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Home" asp-action="About">About</a></li>
+            <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+        </ul>
+    </div>
+
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2018 - AJAXExp</p>
+        </footer>
+    </div>
+
+
+</body>
+</html>

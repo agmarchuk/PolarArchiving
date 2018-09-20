@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassetteData", "src\Cassett
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertVideo", "old\ConvertVideo\ConvertVideo.csproj", "{17855F92-605F-4B6C-886A-586872CBC80F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurgundaCommon", "src\TurgundaCommon\TurgundaCommon.csproj", "{43B75845-171E-4841-8F2A-0B0648C39356}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TurgundaCommon", "src\TurgundaCommon\TurgundaCommon.csproj", "{43B75845-171E-4841-8F2A-0B0648C39356}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AJAXExp", "src\AJAXExp\AJAXExp.csproj", "{DC755767-FE02-410E-948F-052B463E758A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{43B75845-171E-4841-8F2A-0B0648C39356}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43B75845-171E-4841-8F2A-0B0648C39356}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43B75845-171E-4841-8F2A-0B0648C39356}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC755767-FE02-410E-948F-052B463E758A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC755767-FE02-410E-948F-052B463E758A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC755767-FE02-410E-948F-052B463E758A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC755767-FE02-410E-948F-052B463E758A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

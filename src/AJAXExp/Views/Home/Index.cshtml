@@ -1,0 +1,49 @@
+﻿
+@{
+    string mess = (string)ViewData["Title"];
+}
+
+<h2>@mess</h2>
+<div>
+    <a href="" onclick="event.preventDefault(); Change(this)">Нажми!</a>
+</div>
+<div>
+    @Html.ActionLink("link text", "Update")
+</div>
+
+<div>
+    <a href="">Вторая попытка</a>
+</div>
+<div id="log"></div>
+
+
+<script>
+    function stopDefAction(evt) {
+        evt.preventDefault();
+    }
+
+    document.getElementById('my-checkbox').addEventListener(
+        'click', stopDefAction, false
+    );
+</script>
+
+
+
+<p>Пожалуйста, щёлкните по флажку.</p>
+
+<form>
+    <input type="checkbox" id="my-checkbox" />
+    <label for="my-checkbox">Checkbox</label>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("a").click(function (event) {
+            event.preventDefault();
+        });
+    });
+</script>
+
+    <a href="https://w3schools.com/">Go to W3Schools.com</a>
+
+    <p>The preventDefault() method will prevent the link above from following the URL.</p>
