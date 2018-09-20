@@ -27,7 +27,7 @@
     if (fd.Name == "field")
     {
         XAttribute valueTypeAtt = fd.Attribute("type");
-        if (valueTypeAtt != null) { value = Turgunda7.Models.Common.GetEnumStateLabel(valueTypeAtt.Value, value); }
+        if (valueTypeAtt != null) { value = TurgundaCommon.ModelCommon.GetEnumStateLabel(valueTypeAtt.Value, value); }
         <td class="d" style="background-color:Yellow;">@value</td>
     }
     else if (fd.Name == "direct")
