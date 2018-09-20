@@ -36,7 +36,9 @@ namespace Turgunda7
             {
                 if (!System.IO.File.Exists(path + "wwwroot/config.xml"))
                 {
-                    System.IO.File.Copy(path + "wwwroot/config0.xml", path + "wwwroot/config.xml");
+                    if (System.IO.File.Exists(path + "wwwroot/config0.xml"))
+                        System.IO.File.Copy(path + "wwwroot/config0.xml", path + "wwwroot/config.xml");
+                    else (new XElement("config")).Save(path + "wwwroot/config.xml");
                 }
                 xconfig = XElement.Load(path + "wwwroot/config.xml");
                 // Работа с параметрами конфигурации
