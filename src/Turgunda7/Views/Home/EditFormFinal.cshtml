@@ -48,26 +48,30 @@
 
 @if (edit)
 {
+    var parss = "firsttime=True&bid=" + Model.bid + "&eid=" + Model.eid + "&etype=" + Model.etype +
+        "&iprop=" + Model.iprop +
+        "&nc=" + Model.nc + "&d=" + (new System.Random()).Next();
             <td>
                 @*@Ajax.ActionLink("ред", "EditForm", new { firsttime=true, bid = Model.bid, eid = Model.eid,
-                etype=Model.etype, iprop=Model.iprop, nc=Model.nc, d = System.DateTime.Now.Ticks }, new AjaxOptions()
-                 {
-                     HttpMethod = "Post",
-                     InsertionMode = InsertionMode.Replace,
-                     UpdateTargetId = Model.eid
-                 })*@
-<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@Model.eid" 
-    href="~/Home/EditForm?firsttime=True&amp;bid=@Model.bid&amp;eid=@Model.eid&amp;etype=@Model.etype&amp;iprop=@Model.iprop&amp;nc=@Model.nc&amp;d=@System.DateTime.Now.Ticks">ред</a>
+        etype=Model.etype, iprop=Model.iprop, nc=Model.nc, d = System.DateTime.Now.Ticks }, new AjaxOptions()
+         {
+             HttpMethod = "Post",
+             InsertionMode = InsertionMode.Replace,
+             UpdateTargetId = Model.eid
+         })*@
+                @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@Model.eid"
+                   href="~/Home/EditForm?firsttime=True&amp;bid=@Model.bid&amp;eid=@Model.eid&amp;etype=@Model.etype&amp;iprop=@Model.iprop&amp;nc=@Model.nc&amp;d=@System.DateTime.Now.Ticks">ред</a>*@
+                <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@Model.eid', 'replace')">ред</a>
 
-                 @*@Ajax.ActionLink("x", "DeleteRow", new { eid = Model.eid, d = DateTime.Now.Ticks }, new AjaxOptions()
-                    {
-                        HttpMethod = "Get",
-                        InsertionMode = InsertionMode.Replace,
-                        UpdateTargetId = Model.eid,
-                        Confirm = "Уничтожить?"
-                    })*@
+                @*@Ajax.ActionLink("x", "DeleteRow", new { eid = Model.eid, d = DateTime.Now.Ticks }, new AjaxOptions()
+        {
+            HttpMethod = "Get",
+            InsertionMode = InsertionMode.Replace,
+            UpdateTargetId = Model.eid,
+            Confirm = "Уничтожить?"
+        })*@
 
-<a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@Model.eid" 
-   href="~/Home/DeleteRow?eid=@Model.eid&amp;d=@System.DateTime.Now.Ticks">x</a>
+                <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@Model.eid"
+                   href="~/Home/DeleteRow?eid=@Model.eid&amp;d=@System.DateTime.Now.Ticks">x</a>
             </td>
 }

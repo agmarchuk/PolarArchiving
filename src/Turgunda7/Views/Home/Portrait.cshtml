@@ -26,14 +26,7 @@
 
 
 
-<script type="text/jscript">
-    function Test() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("POST", "/Home/EditForm", false);
-        xhttp.send("dataforeditform");
-        alert("Alert");
-        return false;
-    }
+@*<script type="text/jscript">
     function SubmitForm(u, eid, comm) {
         var data = comm + $('#frm_' + eid).serialize();
         //alert(data);
@@ -51,14 +44,14 @@
     }
     function KeyP(u, key, eid, comm) {
         //alert('code=' + key);
-        if (key == 13) {
+        if (key === 13) {
             SubmitForm(u, eid, comm);
             return false;
         } else {
             return true;
         }
     }
-</script>
+</script>*@
 
 <!-- ================= Начало построения ================= -->
 <div>@Model.typelabel</div>
@@ -282,6 +275,10 @@ else
                         }
                         if (edit)
                         {
+                            //var pars = "firsttime=True&amp;bid=" + id + "&amp;eid=" + eid + "&amp;etype=" + ttype +
+                            //    "&amp;nc=" + r.Elements().Count() + "&amp;d=" + System.DateTime.Now.Ticks;
+                            var parss = "firsttime=True&bid=" + id + "&eid=" + eid + "&etype=" + ttype +
+                                "&nc=" + r.Elements().Count() + "&d=" + (new System.Random()).Next();
                             <td>
                                 @*@Ajax.ActionLink("ред", "EditForm", new { firsttime = true, bid = id, eid = eid, etype = ttype, iprop = iprop, nc = r.Elements().Count(), d = System.DateTime.Now.Ticks }, new AjaxOptions()
                                     {
@@ -289,8 +286,10 @@ else
                                         InsertionMode = InsertionMode.Replace,
                                         UpdateTargetId = eid
                                     })*@
-                                <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                   href="~/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=@eid&amp;etype=@ttype&amp;nc=@r.Elements().Count()&amp;d=@System.DateTime.Now.Ticks">ред</a>
+                                @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
+                                   href="~/Home/EditForm?@pars">ред</a>*@
+
+                                <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@eid', 'replace')">ред</a>
 
                                 @if (candelete)
                                 {
@@ -336,6 +335,8 @@ else
                             @if (edit)
                             {
                                 string targetId = "_" + iprop.Substring(iprop.LastIndexOf('/') + 1) + "_" + type_id.Substring(iprop.LastIndexOf('/') + 1);
+                                string parss = "firsttime=True&bid=" + @id + "&eid=create888&etype=" + @type_id + "&iprop=" + @iprop +
+                                    "&nc=" + @ir.Element("header").Elements().Count() + "&d=" + (new System.Random()).Next();
                                 <span>
                                     [
                                     @*@Ajax.ActionLink("нов", "EditForm", new { firsttime = true, bid = id, eid = "create888", etype = type_id, iprop = iprop, nc = ir.Element("header").Elements().Count(), d = System.DateTime.Now.Ticks }, new AjaxOptions()
@@ -345,8 +346,9 @@ else
                                         UpdateTargetId = "_" + iprop.Substring(iprop.LastIndexOf('/') + 1) +
                                         "_" + type_id.Substring(iprop.LastIndexOf('/') + 1)
                                         })*@
-                                    <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="before" data-ajax-update="#@targetId"
-                                       href="~/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=create888&amp;etype=@type_id&amp;iprop=@iprop&amp;nc=@ir.Element("header").Elements().Count()&amp;d=@System.DateTime.Now.Ticks">нов</a>
+                                    @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="before" data-ajax-update="#@targetId"
+                                       href="~/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=create888&amp;etype=@type_id&amp;iprop=@iprop&amp;nc=@ir.Element("header").Elements().Count()&amp;d=@System.DateTime.Now.Ticks">нов</a>*@
+                                    <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@targetId', 'before')">нов</a>
                                     ]
                                 </span>
                             }
@@ -521,29 +523,33 @@ else
                                                 string url1 = Url.Content("~/Home/EditForm?firsttime=True&bid=" + id +
                                                 "&eid=" + eid + "&etype=" + ttype + "&iprop=" + iprop +
                                                 "&nc=" + r.Elements().Count() + "&d=" + System.DateTime.Now.Ticks);
-                                                <td>
-                                                    @*@Ajax.ActionLink("ред", "EditForm", new { firsttime = true, bid = id, eid = eid, etype = ttype, iprop = iprop, nc = r.Elements().Count(), d = System.DateTime.Now.Ticks }, new AjaxOptions()
-                                                        {
-                                                            HttpMethod = "Post",
-                                                            InsertionMode = InsertionMode.Replace,
-                                                            UpdateTargetId = eid
-                                                        })*@
-                                                    <a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                                       href="@url1">ред</a>
+                                                var parss = "firsttime=True&bid=" + id + "&eid=" + eid + "&etype=" + ttype +
+                "&iprop=" + iprop + "&nc=" + r.Elements().Count() + "&d=" + (new System.Random()).Next();
 
-                                                    @if (candelete)
-                                                    {
-                                                        @*@Ajax.ActionLink("x", "DeleteRow", new { eid = eid, d = DateTime.Now.Ticks }, new AjaxOptions()
-                                                            {
-                                                                HttpMethod = "Get",
-                                                                InsertionMode = InsertionMode.Replace,
-                                                                UpdateTargetId = eid,
-                                                                Confirm = "Уничтожить?"
-                                                            })*@
-                                                        <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                                           href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
-                                                    }
-                                                </td>
+                                                    <td>
+                                                        @*@Ajax.ActionLink("ред", "EditForm", new { firsttime = true, bid = id, eid = eid, etype = ttype, iprop = iprop, nc = r.Elements().Count(), d = System.DateTime.Now.Ticks }, new AjaxOptions()
+        {
+            HttpMethod = "Post",
+            InsertionMode = InsertionMode.Replace,
+            UpdateTargetId = eid
+        })*@
+                                                        @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
+                                                           href="@url1">ред</a>*@
+                                                        <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@eid', 'replace')">ред</a>
+
+                                                        @if (candelete)
+                                                        {
+                                                            @*@Ajax.ActionLink("x", "DeleteRow", new { eid = eid, d = DateTime.Now.Ticks }, new AjaxOptions()
+            {
+                HttpMethod = "Get",
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = eid,
+                Confirm = "Уничтожить?"
+            })*@
+                                                            <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
+                                                               href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
+                                                        }
+                                                    </td>
                                             }
                                         }
                                     </tr>

@@ -19,6 +19,10 @@ namespace AJAXExp.Controllers
             ViewData["Title"] = "data updated";
             return View("Index");
         }
+        public IActionResult Construct()
+        {
+            return PartialView("Construct");
+        }
 
         public IActionResult About()
         {

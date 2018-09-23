@@ -14,7 +14,7 @@
         function Change1() {
             $.ajax({
                 method: "POST",
-                url: "Home/Operate",
+                url: "Home/EditForm",
                 data: { name: "John", location: "Boston" }
             })
                 .done(function (msg) {
@@ -23,12 +23,28 @@
         }
     </script>
     <script>
-        $("a").click(function (event) {
-            event.preventDefault();
-            $("<div>")
-                .append("default " + event.type + " prevented")
-                .appendTo("#log");
-        });
+        // 1. Создаём новый объект XMLHttpRequest
+        var xhr = new XMLHttpRequest();
+
+        function HttpAsk(method, url, data, target) {
+            //alert('start');
+            xhr.open(method, url, false);
+
+            // 3. Отсылаем запрос
+            xhr.send(data);
+
+            // 4. Если код ответа сервера не 200, то это ошибка
+            if (xhr.status !== 200) {
+                // обработать ошибку
+                alert(xhr.status + ': ' + xhr.statusText); // пример вывода: 404: Not Found
+            } else {
+                // вывести результат
+                //alert(xhr.responseText); // responseText -- текст ответа.
+                //$('.result').html(xhr.responseText);
+                //$('.result').add.html("Hello");
+                document.getElementById(target).innerHTML = xhr.responseText;
+            }
+        }
     </script>
 </head>
 <body>

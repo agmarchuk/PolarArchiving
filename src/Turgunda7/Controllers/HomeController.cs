@@ -19,7 +19,7 @@ namespace Turgunda7.Controllers
         public static string Params(this Microsoft.AspNetCore.Http.HttpRequest requ, string name)
         {
             string res = requ.Query[name];
-            if (res == null) res = requ.Form[name];
+            if (res == null && requ.HasFormContentType) res = requ.Form[name];
             return res;
         }
     }
@@ -244,7 +244,7 @@ namespace Turgunda7.Controllers
             return RedirectToAction("Portrait", "Home", new { id = bid });
         }
 
-        //[HttpPost]
+        [HttpGet]
         public PartialViewResult EditForm(Turgunda7.Models.RecordModel rmodel)
         {
             //string chk = Request.Params["chk"]; // проверка ОДНОЙ введенной связи
