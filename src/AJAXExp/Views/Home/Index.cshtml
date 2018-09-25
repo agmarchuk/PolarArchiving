@@ -16,7 +16,8 @@
             url: 'Construct',
             success: function (data) {
                 alert('receiver message');
-                $('results').html(data);
+                //$('.results').html(data);
+                document.getElementById('results').innerHTML = "<b>Hi!</b>";
             }
         });
     }

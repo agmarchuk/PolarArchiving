@@ -300,8 +300,9 @@ else
                                             UpdateTargetId = eid,
                                             Confirm = "Уничтожить?"
                                         })*@
-                                    <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                       href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
+                                    @*<a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
+                                       href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>*@
+                                    <a href="" onclick="event.preventDefault(); HttpAskConfirm('get', '/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks', null, '@eid', 'replace', 'уничтожить?');">x</a>
                                 }
                             </td>
                         }
@@ -534,7 +535,7 @@ else
             UpdateTargetId = eid
         })*@
                                                         @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                                           href="@url1">ред</a>*@
+        href="@url1">ред</a>*@
                                                         <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@eid', 'replace')">ред</a>
 
                                                         @if (candelete)
@@ -546,8 +547,9 @@ else
                 UpdateTargetId = eid,
                 Confirm = "Уничтожить?"
             })*@
-                                                            <a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
-                                                               href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>
+                                                            @*<a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
+                                                               href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>*@
+                                                            <a href="" onclick="event.preventDefault(); HttpAskConfirm('get', '/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks', null, '@eid', 'replace', 'уничтожить?');">x</a>
                                                         }
                                                     </td>
                                             }
