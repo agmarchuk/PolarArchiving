@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\accounts.xml" />
+    <Content Remove="wwwroot\accounts0.xml" />
+    <Content Remove="wwwroot\ApplicationProfile.xml" />
     <Content Remove="wwwroot\config.xml" />
     <Content Remove="wwwroot\log.txt" />
   </ItemGroup>
