@@ -5,7 +5,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] - Turgunda7</title>
+    <title>@ViewData["Title"] - OA</title>
     <link rel="shortcut icon" href="@Url.Content("~/favicon.ico")" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -21,11 +21,11 @@
         // вставки - replace/before, conf_mess - confirm message - если null, то не запрашивает 
         function HttpAsk(method, url, data, target, position, conf_mess) {
             //alert('url='+url+' data=' + data);
-            if (conf_mess != null && !confirm(conf_mess)) return;
+            if (conf_mess !== null && !confirm(conf_mess)) return;
             var xhr = new XMLHttpRequest();
-            var url1 = method == 'get' ? url + '?' + data : url;
+            var url1 = method === 'get' ? url + '?' + data : url;
             xhr.open(method, url1, false);
-            if (method == 'get') data = null;
+            if (method === 'get') data = null;
             xhr.send(data);
             if (xhr.status !== 200) {
                 alert(xhr.status + ': ' + xhr.statusText); // пример вывода: 404: Not Found

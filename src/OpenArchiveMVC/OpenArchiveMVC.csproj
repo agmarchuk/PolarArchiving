@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CassetteData\CassetteData.csproj" />
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
   </ItemGroup>
 
