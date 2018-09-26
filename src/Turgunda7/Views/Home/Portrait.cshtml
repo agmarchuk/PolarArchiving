@@ -279,6 +279,7 @@ else
                             //    "&amp;nc=" + r.Elements().Count() + "&amp;d=" + System.DateTime.Now.Ticks;
                             var parss = "firsttime=True&bid=" + id + "&eid=" + eid + "&etype=" + ttype +
                                 "&nc=" + r.Elements().Count() + "&d=" + (new System.Random()).Next();
+                            var uc = @Url.Content("~/Home/EditForm?" + parss);
                             <td>
                                 @*@Ajax.ActionLink("ред", "EditForm", new { firsttime = true, bid = id, eid = eid, etype = ttype, iprop = iprop, nc = r.Elements().Count(), d = System.DateTime.Now.Ticks }, new AjaxOptions()
                                     {
@@ -289,7 +290,7 @@ else
                                 @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
                                    href="~/Home/EditForm?@pars">ред</a>*@
 
-                                <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@eid', 'replace')">ред</a>
+                                <a href="" onclick="event.preventDefault(); HttpAsk('get', '@Url.Content("~/Home/EditForm")', '@parss', '@eid', 'replace', null)">ред</a>
 
                                 @if (candelete)
                                 {
@@ -302,7 +303,7 @@ else
                                         })*@
                                     @*<a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
                                        href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>*@
-                                    <a href="" onclick="event.preventDefault(); HttpAskConfirm('get', '/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks', null, '@eid', 'replace', 'уничтожить?');">x</a>
+                                    <a href="" onclick="event.preventDefault(); HttpAsk('get', '@Url.Content("~/Home/DeleteRow")', 'eid=@eid&amp;d=@System.DateTime.Now.Ticks', '@eid', 'replace', 'уничтожить?');">x</a>
                                 }
                             </td>
                         }
@@ -349,7 +350,7 @@ else
                                         })*@
                                     @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="before" data-ajax-update="#@targetId"
                                        href="~/Home/EditForm?firsttime=True&amp;bid=@id&amp;eid=create888&amp;etype=@type_id&amp;iprop=@iprop&amp;nc=@ir.Element("header").Elements().Count()&amp;d=@System.DateTime.Now.Ticks">нов</a>*@
-                                    <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@targetId', 'before')">нов</a>
+                                    <a href="" onclick="event.preventDefault(); HttpAsk('get', '@Url.Content("~/Home/EditForm")', '@parss', '@targetId', 'before', null)">нов</a>
                                     ]
                                 </span>
                             }
@@ -536,7 +537,7 @@ else
         })*@
                                                         @*<a data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace" data-ajax-update="#@eid"
         href="@url1">ред</a>*@
-                                                        <a href="" onclick="event.preventDefault(); HttpAsk('get', '/Home/EditForm?@parss', null, '@eid', 'replace')">ред</a>
+                                                        <a href="" onclick="event.preventDefault(); HttpAsk('get', '@Url.Content("~/Home/EditForm")', '@parss', '@eid', 'replace', null)">ред</a>
 
                                                         @if (candelete)
                                                         {
@@ -549,7 +550,7 @@ else
             })*@
                                                             @*<a data-ajax="true" data-ajax-confirm="Уничтожить?" data-ajax-method="Get" data-ajax-mode="replace" data-ajax-update="#@eid"
                                                                href="~/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks">x</a>*@
-                                                            <a href="" onclick="event.preventDefault(); HttpAskConfirm('get', '/Home/DeleteRow?eid=@eid&amp;d=@System.DateTime.Now.Ticks', null, '@eid', 'replace', 'уничтожить?');">x</a>
+                                                            <a href="" onclick="event.preventDefault(); HttpAsk('get', '@Url.Content("~/Home/DeleteRow")', 'eid=@eid&amp;d=@System.DateTime.Now.Ticks', '@eid', 'replace', 'уничтожить?');">x</a>
                                                         }
                                                     </td>
                                             }

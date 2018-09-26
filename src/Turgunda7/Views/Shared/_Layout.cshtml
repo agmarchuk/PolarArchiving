@@ -9,18 +9,23 @@
     <link rel="shortcut icon" href="@Url.Content("~/favicon.ico")" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script type="text/javascript" src="~/lib/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/jquery/dist/jquery.js")"></script>
     @*<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />*@
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="@Url.Content("~/css/site.css")" />
 
     <script>
         // Создаём новый объект XMLHttpRequest, формируем запрос, дожидаемся ответа, размещаем ответ в элементе цели
         // Надо бы использовать encodeURIComponent(текст)
-
-        function HttpAsk(method, url, data, target, position) {
+        // method - get/post, url - команда (action), data - тело запроса - либо присоединяется к команде для get, либо 
+        // идет через данные для post, data - urlencoded, target - id элемента куда вставлять ответ, position - позиция 
+        // вставки - replace/before, conf_mess - confirm message - если null, то не запрашивает 
+        function HttpAsk(method, url, data, target, position, conf_mess) {
             //alert('url='+url+' data=' + data);
+            if (conf_mess != null && !confirm(conf_mess)) return;
             var xhr = new XMLHttpRequest();
-            xhr.open(method, url, false);
+            var url1 = method == 'get' ? url + '?' + data : url;
+            xhr.open(method, url1, false);
+            if (method == 'get') data = null;
             xhr.send(data);
             if (xhr.status !== 200) {
                 alert(xhr.status + ': ' + xhr.statusText); // пример вывода: 404: Not Found
@@ -33,49 +38,35 @@
                 } else {
                     document.getElementById(target).innerHTML = xhr.responseText;
                 }
-
             }
         }
-        function HttpAskConfirm(method, url, data, target, position, conf_mess) {
-            //alert('url='+url+' data=' + data);
-            if (!confirm(conf_mess)) return;
-            var xhr = new XMLHttpRequest();
-            xhr.open(method, url, false);
-            xhr.send(data);
-            if (xhr.status !== 200) {
-                alert(xhr.status + ': ' + xhr.statusText); // пример вывода: 404: Not Found
-            } else {
-                if (position === "before") {
-                    var el = document.getElementById(target);
-                    //$(el).before(xhr.responseText);
-                    if (el.childNodes.length === 0) { el.appendChild(xhr.responseText); }
-                    else { el.insertBefore(xhr.responseText, el.childNodes[0]); }
-                } else {
-                    document.getElementById(target).innerHTML = xhr.responseText;
-                }
-
-            }
-        }
+        //function HttpAskConfirm(method, url, data, target, position, conf_mess) {
+        //    alert('url='+url+' data=' + data);
+        //    if (!confirm(conf_mess)) return;
+        //    var xhr = new XMLHttpRequest();
+        //    xhr.open(method, url, false);
+        //    xhr.send(data);
+        //    if (xhr.status !== 200) {
+        //        alert(xhr.status + ': ' + xhr.statusText); // пример вывода: 404: Not Found
+        //    } else {
+        //        if (position === "before") {
+        //            var el = document.getElementById(target);
+        //            //$(el).before(xhr.responseText);
+        //            if (el.childNodes.length === 0) { el.appendChild(xhr.responseText); }
+        //            else { el.insertBefore(xhr.responseText, el.childNodes[0]); }
+        //        } else {
+        //            document.getElementById(target).innerHTML = xhr.responseText;
+        //        }
+        //    }
+        //}
     </script>
     <script type="text/jscript">
         function SubmitForm(u, eid, comm) {
-            var data = u + '?' + comm + '&' + $('#frm_' + eid).serialize();
-            //alert(data);
-            //var html = $.ajax({
-            //    //url: '~/Home/EditForm',
-            //    //url: 'EditForm',
-            //    url: u,
-            //    async: false,
-            //    type: 'POST',
-            //    dataType: 'html',
-            //    data: data
-            //}).responseText;
-            //$('#' + eid).html(html);
-            HttpAsk('get', data, null, eid, 'replace');
+            var data = comm + '&' + $('#frm_' + eid).serialize();
+            HttpAsk('get', u, data, eid, 'replace', null);
             return false;
         }
         function KeyP(u, key, eid, comm) {
-            //alert('code=' + key);
             if (key === 13) {
                 SubmitForm(u, eid, comm);
                 return false;
