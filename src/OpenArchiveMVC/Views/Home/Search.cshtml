@@ -4,10 +4,10 @@
     string sv = Context.Request.Form["searchvariant"];
     string ss = Context.Request.Form["searchstring"];
     if (string.IsNullOrEmpty(ss)) { return; }
-    var searchresults = OpenArchive.StaticObjects.Engine.SearchByName(ss)
+    var searchresults = Turgunda7.SObjects.Engine.SearchByName(ss)
         .Where(ite => string.IsNullOrEmpty(sv) || ite.Attribute("type").Value == "http://fogid.net/o/" + sv)
-        .Select(ite => OpenArchive.StaticObjects.Engine.GetItemByIdBasic(ite.Attribute("id").Value, false));
-    IComparer<string> comparedates = new OpenArchive.SCompare();
+        .Select(ite => Turgunda7.SObjects.Engine.GetItemByIdBasic(ite.Attribute("id").Value, false));
+    IComparer<string> comparedates = new Turgunda7.SCompare();
 }
 <p class="grad">
 	<a href="~/Home/Index" class="nov"><img src="~/images/ico-home.gif" class="ico-home" alt="" />Открытый архив</a>
@@ -19,14 +19,14 @@
 {
 <ul class="links">
     @foreach (XElement ite in searchresults
-       .OrderBy(it => OpenArchive.StaticObjects.GetField(it, "http://fogid.net/o/name"))
-       .ThenBy(it => OpenArchive.StaticObjects.GetDates(it), comparedates)
+       .OrderBy(it => Turgunda7.SObjects.GetField(it, "http://fogid.net/o/name"))
+       .ThenBy(it => Turgunda7.SObjects.GetDates(it), comparedates)
        //.Take(40)
        )
     {
-        string nm = OpenArchive.StaticObjects.GetField(ite, "http://fogid.net/o/name");
-        string dt = OpenArchive.StaticObjects.GetDates(ite);
-        string descr = OpenArchive.StaticObjects.GetField(ite, "http://fogid.net/o/description");
+        string nm = Turgunda7.SObjects.GetField(ite, "http://fogid.net/o/name");
+        string dt = Turgunda7.SObjects.GetDates(ite);
+        string descr = Turgunda7.SObjects.GetField(ite, "http://fogid.net/o/description");
         <li>
             <a href='~/Home/Portrait?id=@ite.Attribute("id").Value'>@nm</a>
             @if (!string.IsNullOrEmpty(dt))

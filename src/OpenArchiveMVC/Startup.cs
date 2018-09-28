@@ -39,7 +39,8 @@ namespace OpenArchiveMVC
 
             app.UseStaticFiles();
 
-            OpenArchive.StaticObjects.Init(env.ContentRootPath);
+            //OpenArchive.StaticObjects.Init(env.ContentRootPath);
+            Turgunda7.SObjects.Init(env.ContentRootPath);
 
             app.UseMvc(routes =>
             {

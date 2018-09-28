@@ -119,7 +119,7 @@ namespace Polar.Cassettes.DocumentStorage
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            string ss = searchstring.ToLower();
+            string ss = searchstring==null? "" : searchstring.ToLower();
             var query = db.Elements()
                 .SelectMany(xel => xel.Elements().Where(el => el.Name == "{http://fogid.net/o/}name"))
                 .Where(el => el.Value.ToLower().StartsWith(ss))

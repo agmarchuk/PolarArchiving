@@ -1,5 +1,5 @@
 ﻿@using System.Xml.Linq
-@using OpenArchive
+@*using OpenArchive*@
 @{
     PortraitCollectionModel m = (PortraitCollectionModel)Model;
     // Глубина коллекции 1 - это фонд
@@ -11,10 +11,10 @@
     &raquo;
     <a href="~/Home/Index">Фонды</a>
     &raquo;
-    @foreach (XElement cnode in StaticObjects.GetCollectionPath(m.id))
+    @foreach (XElement cnode in Turgunda7.SObjects.GetCollectionPath(m.id))
     {
         collection_depth++;
-        string nm = StaticObjects.GetField(cnode, "http://fogid.net/o/name");
+        string nm = Turgunda7.SObjects.GetField(cnode, "http://fogid.net/o/name");
         <a href='~/Home/Portrait?id=@cnode.Attribute("id").Value'>@nm</a>
         <span>&raquo;</span>
     }
@@ -64,7 +64,7 @@
             <th width="60%" class="th-document-name"><a href="sort">Название документа<img src="~/images/ico-sort-down.gif" alt="" /></a></th>
             <th width="25%"><a href="sort">Автор&nbsp;&nbsp;=>&nbsp;&nbsp;Адресат</a></th>
         </tr>
-        @foreach (XElement ite in m.documents.OrderBy(it => StaticObjects.GetDates(it), SCompare.comparer))
+        @foreach (XElement ite in m.documents.OrderBy(it => Turgunda7.SObjects.GetDates(it), Turgunda7.SCompare.comparer))
         {
 
             var ite_name_el = ite.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -89,8 +89,8 @@
             // Дополнение от Фурсенко: Добавлены Исх.организация в Авторы и Вх. организация в Адресаты
 
             var authors = auth_receps
-                .Where(rec => ((StaticObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "author")
-                || (StaticObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "out-org")))
+                .Where(rec => ((Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "author")
+                || (Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "out-org")))
                             .Select(re =>
                            {
                                var di = re.Element("direct");
@@ -164,8 +164,8 @@
     <ul class="coll-tree">
         @foreach (XElement doc in m.multimedia)
         {
-            string nm = StaticObjects.GetField(doc, "http://fogid.net/o/name");
-            string uri = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
+            string nm = Turgunda7.SObjects.GetField(doc, "http://fogid.net/o/name");
+            string uri = Turgunda7.SObjects.GetField(doc, "http://fogid.net/o/uri");
             <div class="show-small">
                 <a href="~/Home/Portrait?id=@doc.Attribute("id").Value">
                     <img src="~/Docs/GetPhoto?s=small&u=@uri" border="0" vspace="10" hspace="10" alt="" /><br />

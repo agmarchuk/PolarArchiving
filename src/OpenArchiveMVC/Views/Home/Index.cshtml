@@ -21,7 +21,7 @@
     var qq = r.Elements("inverse").FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/reflected");
     if (qq != null)
     {
-        img_src = (OpenArchive.StaticObjects.Engine.DaraSrc==null?"~": OpenArchive.StaticObjects.Engine.DaraSrc) + 
+        img_src = (Turgunda7.SObjects.Engine.DaraSrc==null?"~": Turgunda7.SObjects.Engine.DaraSrc) + 
             "/Docs/GetPhoto?s=small&u=" + qq.Value;
     }
     string id = r.Attribute("id").Value;

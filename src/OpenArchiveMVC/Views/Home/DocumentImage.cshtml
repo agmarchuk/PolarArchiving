@@ -1,5 +1,5 @@
 ﻿@using System.Xml.Linq
-@using OpenArchive
+@*using OpenArchive*@
 @model DocumentImageModel
 @{ 
     DocumentImageModel m = Model;
@@ -11,9 +11,9 @@
     &raquo;
     <a href="~/Home/Index">Фонды</a>
     &raquo;
-    @foreach (XElement cnode in StaticObjects.GetCollectionPath(m.id))
+    @foreach (XElement cnode in Turgunda7.SObjects.GetCollectionPath(m.id))
     {
-        string nm = StaticObjects.GetField(cnode, "http://fogid.net/o/name");
+        string nm = Turgunda7.SObjects.GetField(cnode, "http://fogid.net/o/name");
         <a href='~/Home/Portrait?id=@cnode.Attribute("id").Value'>@nm</a>
         <span>&raquo;</span>
     }
@@ -50,7 +50,7 @@
 
 <br />
 @{
-    string sr = (StaticObjects.Engine.DaraSrc == null ? "~" : StaticObjects.Engine.DaraSrc) + "/Docs/GetPhoto?s=normal&u=" + m.uri;
+    string sr = (Turgunda7.SObjects.Engine.DaraSrc == null ? "~" : Turgunda7.SObjects.Engine.DaraSrc) + "/Docs/GetPhoto?s=normal&u=" + m.uri;
     <div><img src="@Url.Content(sr)" border="0" /></div>
  }
 

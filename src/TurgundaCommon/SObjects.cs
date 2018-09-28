@@ -28,6 +28,9 @@ namespace Turgunda7
         public static void SaveConfig() { xconfig.Save(path + "wwwroot/config.xml"); }
         public static void SaveAccounts() { accounts.Save(path + "wwwroot/accounts.xml"); }
 
+        // Выделенный объект, это надо будет сделать как-то подругому
+        public static string funds_id = null;
+
         public static void Init() { Init(path); }
         public static void Init(string pth)
         {
@@ -57,7 +60,7 @@ namespace Turgunda7
                 //storage.Init(xconfig);
                 //engine = new XmlDbAdapter();
                 //storage.InitAdapter(engine);
-                _engine = new CassetteData.CassetteIntegration(xconfig, false);
+                _engine = new CassetteData.CassetteIntegration(xconfig);
 
 
                 // Загрузка профиля и онтологии
@@ -82,6 +85,22 @@ namespace Turgunda7
                 accounts = new XElement("accounts");
                 AccountsSave();
             }
+
+            // Тест
+            var items = Turgunda7.SObjects.Engine.SearchByName("").ToArray();
+
+            // Заплата вычисления выделенного объекта
+            string funds_name = "Фонды";
+            funds_id = Turgunda7.SObjects.Engine.SearchByName(funds_name)
+                .FirstOrDefault(r =>
+                {
+                    if (r.Attribute("type").Value != "http://fogid.net/o/collection") return false;
+                    var na = r.Elements("field")
+                        .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name" && f.Value == funds_name);
+                    if (na == null) return false;
+                    return true;
+                })?.Attribute("id").Value;
+
         }
 
         public static void AccountsSave()
@@ -180,5 +199,73 @@ namespace Turgunda7
             //Log("PutItemToDb ok?");
             return item_corrected;
         }
+
+        public static string GetField(XElement item, string prop)
+        {
+            XElement el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == prop);
+            return el == null ? "" : el.Value;
+        }
+        public static string GetDates(XElement item)
+        {
+            var fd_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/from-date");
+            var td_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/to-date");
+            string res = (fd_el == null ? "" : fd_el.Value) + (td_el == null || string.IsNullOrEmpty(td_el.Value) ? "" : "—" + td_el.Value);
+            return res;
+        }
+        public static IEnumerable<XElement> GetCollectionPath(string id)
+        {
+            //return _getCollectionPath(id);
+            System.Collections.Generic.Stack<XElement> stack = new Stack<XElement>();
+            XElement node = Engine.GetItemByIdBasic(id, false);
+            if (node == null) return Enumerable.Empty<XElement>();
+            stack.Push(node);
+            bool ok = GetCP(id, stack);
+            if (!ok) return Enumerable.Empty<XElement>();
+            int n = stack.Count();
+            // Уберем первый и последний
+            var query = stack.Skip(1).Take(n - 2).ToArray();
+            return query;
+        }
+        // В стеке накоплены элементы пути, следующие за id. Последним является узел с id
+        private static bool GetCP(string id, Stack<XElement> stack)
+        {
+            if (id == funds_id) return true;
+            XElement tree = Engine.GetItemById(id, formattoparentcollection);
+            if (tree == null) return false;
+            foreach (var n1 in tree.Elements("inverse"))
+            {
+                var n2 = n1.Element("record"); if (n2 == null) return false;
+                var n3 = n2.Element("direct"); if (n3 == null) return false;
+                var node = n3.Element("record"); if (node == null) return false;
+                string nid = node.Attribute("id").Value;
+                stack.Push(node);
+                bool ok = GetCP(nid, stack);
+                if (ok) return true;
+                stack.Pop();
+            }
+            return false;
+        }
+        private static XElement formattoparentcollection =
+    new XElement("record",
+        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+            new XElement("record",
+                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
+
+
     }
+
+    public class SCompare : IComparer<string>
+    {
+        public int Compare(string s1, string s2)
+        {
+            if (string.IsNullOrEmpty(s1) && string.IsNullOrEmpty(s2)) return 0;
+            if (string.IsNullOrEmpty(s1)) return 1;
+            if (string.IsNullOrEmpty(s2)) return -1;
+            return s1.CompareTo(s2);
+        }
+        public static SCompare comparer = new SCompare();
+    }
+
 }

@@ -1,5 +1,5 @@
 ﻿@using System.Xml.Linq
-@using OpenArchive
+@*using OpenArchive*@
 @{
     if (Model == null) { return; }
     PortraitOrgModel m = (PortraitOrgModel)Model;
@@ -29,13 +29,13 @@
 	<tr valign="top">
 		<td width="25%" class="line-name">@word:</td>
 		<td width="75%" class="line-info">
-            @foreach (XElement participant in m.participants.Where(pa => StaticObjects.GetField(pa, "http://fogid.net/o/role-classification") == "director")
-                .OrderBy(pa => StaticObjects.GetField(pa, "http://fogid.net/o/from-date")))
+            @foreach (XElement participant in m.participants.Where(pa => Turgunda7.SObjects.GetField(pa, "http://fogid.net/o/role-classification") == "director")
+                .OrderBy(pa => Turgunda7.SObjects.GetField(pa, "http://fogid.net/o/from-date")))
             {
                 XElement personage = participant.Element("direct").Element("record");
-                string dts = StaticObjects.GetDates(participant);
-                string role = StaticObjects.GetField(participant, "http://fogid.net/o/role");
-			    <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@StaticObjects.GetField(personage, "http://fogid.net/o/name")</a>
+                string dts = Turgunda7.SObjects.GetDates(participant);
+                string role = Turgunda7.SObjects.GetField(participant, "http://fogid.net/o/role");
+			    <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@Turgunda7.SObjects.GetField(personage, "http://fogid.net/o/name")</a>
                 <span>@role</span>
                 if (!string.IsNullOrEmpty(dts))
                 {
@@ -44,14 +44,14 @@
                 <br />
             }
 
-            @foreach (XElement participant in m.participants.Where(pa => StaticObjects.GetField(pa, "http://fogid.net/o/role-classification") != "director")
-              .OrderBy(pa => StaticObjects.GetField(pa, "http://fogid.net/o/name")))
+            @foreach (XElement participant in m.participants.Where(pa => Turgunda7.SObjects.GetField(pa, "http://fogid.net/o/role-classification") != "director")
+              .OrderBy(pa => Turgunda7.SObjects.GetField(pa, "http://fogid.net/o/name")))
             {
                 XElement personage = participant.Element("direct")?.Element("record");
                 if (personage == null) { continue; }
-                string dts = StaticObjects.GetDates(participant);
-                string role = StaticObjects.GetField(participant, "http://fogid.net/o/role");
-			    <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@StaticObjects.GetField(personage, "http://fogid.net/o/name")</a>
+                string dts = Turgunda7.SObjects.GetDates(participant);
+                string role = Turgunda7.SObjects.GetField(participant, "http://fogid.net/o/role");
+			    <a href='~/Home/Portrait?id=@personage.Attribute("id").Value'>@Turgunda7.SObjects.GetField(personage, "http://fogid.net/o/name")</a>
                 <span>@role</span>
                 if (!string.IsNullOrEmpty(dts))
                 {
@@ -69,7 +69,7 @@
 		<td width="75%" class="line-info">
             @foreach (var location in m.locations)
             {
-			    <a href='~/Home/Portrait?id=@location.Attribute("id").Value'>@StaticObjects.GetField(location, "http://fogid.net/o/name")</a>
+			    <a href='~/Home/Portrait?id=@location.Attribute("id").Value'>@Turgunda7.SObjects.GetField(location, "http://fogid.net/o/name")</a>
                 <br />
             }
 		</td>
@@ -85,7 +85,7 @@
 		<td width="75%" class="line-info">
             @foreach (var au in m.auth)
             {
-			    <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>
+			    <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@Turgunda7.SObjects.GetField(au, "http://fogid.net/o/name")</a>
                 <br />
             }
 		</td>
@@ -109,11 +109,11 @@
                @foreach (var au in m.auth)
                {
 
-                   string dt = StaticObjects.GetDates(au);
-                   string nm = StaticObjects.GetField(au, "http://fogid.net/o/name");
-                   string ds = StaticObjects.GetField(au, "http://fogid.net/o/description");
+                   string dt = Turgunda7.SObjects.GetDates(au);
+                   string nm = Turgunda7.SObjects.GetField(au, "http://fogid.net/o/name");
+                   string ds = Turgunda7.SObjects.GetField(au, "http://fogid.net/o/description");
 
-                   var auth_spec = StaticObjects.GetField(au.Parent.Parent, "http://fogid.net/o/authority-specificator");
+                   var auth_spec = Turgunda7.SObjects.GetField(au.Parent.Parent, "http://fogid.net/o/authority-specificator");
                    string au_s = auth_spec == "out-org" ? "Исх. организация" :
                        (auth_spec == "in-org" ? "Вх. организация" : auth_spec);
 
@@ -121,7 +121,7 @@
         <tr valign="top">
 		<td width="15%">@dt</td>
 		<td width="70%">
-			 <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>
+			 <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@Turgunda7.SObjects.GetField(au, "http://fogid.net/o/name")</a>
              <span class="small">@ds</span>
 		</td>
 		<td width="15%">@au_s</td>
@@ -151,13 +151,13 @@
     @foreach (var refl in m.reflections)
     {
         if (refl == null) { continue; }
-        string dt = StaticObjects.GetDates(refl);
-        string ds = StaticObjects.GetField(refl, "http://fogid.net/o/description");
+        string dt = Turgunda7.SObjects.GetDates(refl);
+        string ds = Turgunda7.SObjects.GetField(refl, "http://fogid.net/o/description");
 
         <tr valign="top">
 		<td>@dt</td>
 		<td width="75%">
-			 <a href='~/Home/Portrait?id=@refl.Attribute("id").Value'>@StaticObjects.GetField(refl, "http://fogid.net/o/name")</a>
+			 <a href='~/Home/Portrait?id=@refl.Attribute("id").Value'>@Turgunda7.SObjects.GetField(refl, "http://fogid.net/o/name")</a>
              <span class="small">@ds</span>
 		
 		</td>

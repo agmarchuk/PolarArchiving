@@ -37,7 +37,7 @@ namespace OpenArchiveMVC.Controllers
             //string id = Request.Query["id"];//.Params["id"];
             if (string.IsNullOrEmpty(id)) { return new RedirectResult("~/Home/Index"); }
 
-            XElement special = OpenArchive.StaticObjects.Engine.GetItemByIdBasic(id, false);
+            XElement special = Turgunda7.SObjects.Engine.GetItemByIdBasic(id, false);
             if (special == null || special.Attribute("type") == null) { return new RedirectResult("~/Home/Index"); }
             string type = special.Attribute("type").Value;
 

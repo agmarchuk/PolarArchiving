@@ -15,14 +15,14 @@ namespace CassetteData
         // Видимо временное решение
         public string DaraSrc {  get { return requester?.DataSrc; } }
 
-        public CassetteIntegration(XElement xconfig, bool networking)
+        public CassetteIntegration(XElement xconfig)
         {
             localstorage = new DStorage();
             localstorage.Init(xconfig);
             _adapter = new XmlDbAdapter();
             localstorage.InitAdapter(_adapter);
             XElement net = xconfig.Element("Net");
-            if (networking && net != null)
+            if (net != null)
             {
                 try
                 {

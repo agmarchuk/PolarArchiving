@@ -1,4 +1,4 @@
-﻿using OpenArchive;
+﻿//using OpenArchive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +13,11 @@ namespace OpenArchiveMVC.Models
         public IEnumerable<XElement> fonds = Enumerable.Empty<XElement>();
         public IndexModel()
         {
-            if (OpenArchive.StaticObjects.funds_id == null) { return; }
+            if (Turgunda7.SObjects.funds_id == null) { return; }
             XElement item = null;
             try
             {
-                item = OpenArchive.StaticObjects.Engine.GetItemById(OpenArchive.StaticObjects.funds_id, format);
+                item = Turgunda7.SObjects.Engine.GetItemById(Turgunda7.SObjects.funds_id, format);
             }
             catch (Exception)
             {
@@ -68,7 +68,7 @@ namespace OpenArchiveMVC.Models
         {
             try
             {
-                funds_coll = StaticObjects.Engine.GetItemById(StaticObjects.funds_id, format_funds_coll);
+                funds_coll = Turgunda7.SObjects.GetItemById(Turgunda7.SObjects.funds_id, format_funds_coll);
             }
             catch (Exception)
             {
@@ -77,10 +77,10 @@ namespace OpenArchiveMVC.Models
             funds = funds_coll.Elements("inverse")
                 .Select((XElement inv) => inv.Element("record").Element("direct").Element("record")).ToArray();
             string fund_id = funds.First().Attribute("id").Value;
-            var qu = StaticObjects.GetDocsFromCollection(fund_id);
 
-            comparedates = new SCompare();
+            comparedates = new Turgunda7.SCompare();
         }
+
         public string fund = null, context = null, person = null, org = null, coll = null, geo = null, fdate = null, tdate = null;
         public bool IsPost = false;
         public IEnumerable<XElement> query = Enumerable.Empty<XElement>();
@@ -98,10 +98,10 @@ namespace OpenArchiveMVC.Models
             //string tdate = Request.Form["tdate"];
             this.fund = fund; this.context = context; this.person = person; this.org = org; this.coll = coll; this.geo = geo; this.fdate = fdate; this.tdate = tdate;
             IsPost = true;
-            //var docs = StaticObjects.GetDocsFromCollection(fund != null && fund != "all" ? fund : StaticObjects.funds_id);
-            //IEnumerable<string> searchresults = docs
-            //    .Select(x => x.Attribute("id").Value);
-            IEnumerable<string> searchresults = StaticObjects.CollectAllChildDocumentIds(fund);
+
+            IEnumerable<string> searchresults = CollectAllChildDocumentIds(fund);
+
+
             var xarr = searchresults.Distinct().ToArray();
             XElement searchformat = new XElement("record",
                 new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
@@ -138,7 +138,7 @@ namespace OpenArchiveMVC.Models
             // =========== Формирование результата поиска ============
             query = searchresults
                 //.Select(id => StaticObjects.Engine.GetItemByIdBasic(id, false))
-                .Select(id => StaticObjects.Engine.GetItemById(id, searchformat))
+                .Select(id => Turgunda7.SObjects.Engine.GetItemById(id, searchformat))
                 ;
             if (!string.IsNullOrEmpty(context))
             {
@@ -149,8 +149,8 @@ namespace OpenArchiveMVC.Models
                 query = query
                     .Where(x =>
                     {
-                        string text = StaticObjects.GetField(x, "http://fogid.net/o/name").ToLower();
-                        string descr = StaticObjects.GetField(x, "http://fogid.net/o/description");
+                        string text = Turgunda7.SObjects.GetField(x, "http://fogid.net/o/name").ToLower();
+                        string descr = Turgunda7.SObjects.GetField(x, "http://fogid.net/o/description");
                         if (descr != null)
                         {
                             text = text + " " + descr.ToLower();
@@ -171,7 +171,7 @@ namespace OpenArchiveMVC.Models
                             .Select(xi => xi.Element("record")?.Element("direct")?.Element("record"))
                             .FirstOrDefault();
                         if (xrec == null) { return false; }
-                        string text = StaticObjects.GetField(xrec, "http://fogid.net/o/name").ToLower();
+                        string text = Turgunda7.SObjects.GetField(xrec, "http://fogid.net/o/name").ToLower();
                         return text.StartsWith(word);
                     });
             }
@@ -186,7 +186,7 @@ namespace OpenArchiveMVC.Models
                             .Select(xi => xi.Element("record").Element("direct").Element("record"))
                             .FirstOrDefault();
                         if (xrec == null) { return false; }
-                        string text = StaticObjects.GetField(xrec, "http://fogid.net/o/name").ToLower();
+                        string text = Turgunda7.SObjects.GetField(xrec, "http://fogid.net/o/name").ToLower();
                         return text.StartsWith(word);
                     });
             }
@@ -198,6 +198,29 @@ namespace OpenArchiveMVC.Models
                 new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
                     new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
+
+        private static XElement formattochildfromcollection =
+            new XElement("record",
+                new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+                    new XElement("record",
+                        new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")))))));
+        public static IEnumerable<string> CollectAllChildDocumentIds(string id)
+        {
+            XElement xt = Turgunda7.SObjects.GetItemById(id, formattochildfromcollection);
+            var query = xt.Elements("inverse")
+                .Where(xi => xi.Attribute("prop").Value == "http://fogid.net/o/in-collection")
+                .SelectMany(xi =>
+                {
+                    XElement child = xi.Element("record")?.Element("direct")?.Element("record");
+                    if (child == null) { return Enumerable.Empty<string>(); }
+                    if (child.Attribute("type").Value == "http://fogid.net/o/collection") return CollectAllChildDocumentIds(child.Attribute("id").Value);
+                    else if (child.Attribute("type").Value == "http://fogid.net/o/document") return new string[] { child.Attribute("id").Value };
+                    else return Enumerable.Empty<string>();
+                });
+            return query;
+        }
 
     }
     public class PortraitPersonModel
@@ -268,7 +291,7 @@ namespace OpenArchiveMVC.Models
         {
             this.id = id;
 
-            XElement item = OpenArchive.StaticObjects.Engine.GetItemById(id, format);
+            XElement item = Turgunda7.SObjects.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -277,7 +300,7 @@ namespace OpenArchiveMVC.Models
             var desc_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/description");
             this.description = desc_el == null ? "" : desc_el.Value;
             // Даты
-            string _dates = OpenArchive.StaticObjects.GetDates(item);
+            string _dates = Turgunda7.SObjects.GetDates(item);
             this.dates = string.IsNullOrEmpty(_dates) ? "" : "(" + _dates + ")";
             // Титулы
             titles = item.Elements("inverse")
@@ -290,13 +313,13 @@ namespace OpenArchiveMVC.Models
             works = participations.Where(re =>
             {
                 XElement org = re.Element("direct").Element("record");
-                string org_classification = OpenArchive.StaticObjects.GetField(org, "http://fogid.net/o/role-classification");
+                string org_classification = Turgunda7.SObjects.GetField(org, "http://fogid.net/o/role-classification");
                 return string.IsNullOrEmpty(org_classification) || org_classification == "organization";
             });
             notworks = participations.Where(re =>
             {
                 XElement org = re.Element("direct").Element("record");
-                string org_classification = OpenArchive.StaticObjects.GetField(org, "http://fogid.net/o/role-classification");
+                string org_classification = Turgunda7.SObjects.GetField(org, "http://fogid.net/o/role-classification");
                 return !string.IsNullOrEmpty(org_classification) && org_classification != "organization";
             });
             // Проживание
@@ -356,7 +379,7 @@ namespace OpenArchiveMVC.Models
         {
             if (id == null) { return; }
             this.id = id;
-            XElement item = StaticObjects.Engine.GetItemById(id, format);
+            XElement item = Turgunda7.SObjects.GetItemById(id, format);
 
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -398,7 +421,7 @@ namespace OpenArchiveMVC.Models
         {
             this.id = id;
 
-            XElement item = StaticObjects.Engine.GetItemById(id, format);
+            XElement item = Turgunda7.SObjects.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -407,10 +430,10 @@ namespace OpenArchiveMVC.Models
             var desc_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/description");
             description = desc_el == null ? "" : desc_el.Value;
             // Даты
-            string _dates = StaticObjects.GetDates(item);
+            string _dates = Turgunda7.SObjects.GetDates(item);
             dates = string.IsNullOrEmpty(_dates) ? "" : "(" + _dates + ")";
             // Классификатор
-            var oclassification = StaticObjects.GetField(item, "http://fogid.net/o/rg-classification");
+            var oclassification = Turgunda7.SObjects.GetField(item, "http://fogid.net/o/rg-classification");
             isorg = oclassification != null && oclassification == "organization";
             // Участие или работа
             participants = item.Elements("inverse")
@@ -488,7 +511,7 @@ namespace OpenArchiveMVC.Models
         {
             this.id = id;
             if (id == null) { return; }
-            XElement item = StaticObjects.Engine.GetItemById(id, format);
+            XElement item = Turgunda7.SObjects.GetItemById(id, format);
             typeid = item.Attribute("id").Value;
             if (item == null) { return; }
             // Вытягиваем информацию
@@ -498,10 +521,10 @@ namespace OpenArchiveMVC.Models
             var desc_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/description");
             description = desc_el == null ? "" : desc_el.Value;
             // Даты
-            date = StaticObjects.GetField(item, "http://fogid.net/o/from-date");
-            doccontent = StaticObjects.GetField(item, "http://fogid.net/o/doc-content");
-            uri = StaticObjects.GetField(item, "http://fogid.net/o/uri");
-            var docmetainfo = StaticObjects.GetField(item, "http://fogid.net/o/docmetainfo");
+            date = Turgunda7.SObjects.GetField(item, "http://fogid.net/o/from-date");
+            doccontent = Turgunda7.SObjects.GetField(item, "http://fogid.net/o/doc-content");
+            uri = Turgunda7.SObjects.GetField(item, "http://fogid.net/o/uri");
+            var docmetainfo = Turgunda7.SObjects.GetField(item, "http://fogid.net/o/docmetainfo");
             contenttype = docmetainfo == null ? "" : (docmetainfo.Split(';')
                 .Where(pair => pair.StartsWith("documenttype:"))
                 .Select(pair => pair.Substring("documenttype:".Length)).FirstOrDefault());
@@ -512,10 +535,10 @@ namespace OpenArchiveMVC.Models
                 .Select(rec => new
                 {
                     docpart = rec.Element("direct")?.Element("record"),
-                    page = StaticObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
+                    page = Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
                 })
                 .OrderBy(pair => pair.page)
-                .ThenBy(pair => pair.docpart == null ? "" : StaticObjects.GetField(pair.docpart, "http://fogid.net/o/name"))
+                .ThenBy(pair => pair.docpart == null ? "" : Turgunda7.SObjects.GetField(pair.docpart, "http://fogid.net/o/name"))
                 .Select(pair => pair.docpart);
             // Отражения
             reflections = item.Elements("inverse")
@@ -527,12 +550,12 @@ namespace OpenArchiveMVC.Models
                 .Select(inv => inv.Element("record"));
             // Дополнения от Фурсенко
             authors = authorities
-                .Where(rec => ((StaticObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "author")
-                || (StaticObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "out-org")))
+                .Where(rec => ((Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "author")
+                || (Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "out-org")))
                 .Select(rec => rec.Element("direct")?.Element("record"));
             recipients = authorities
-                .Where(rec => ((StaticObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "recipient")
-                || (StaticObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "in-org")))
+                .Where(rec => ((Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "recipient")
+                || (Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/authority-specificator") == "in-org")))
                 .Select(rec => rec.Element("direct")?.Element("record"));
             // Геоинформация    
             geoplaces = item.Elements("inverse")
@@ -559,7 +582,7 @@ namespace OpenArchiveMVC.Models
             // Это пока не нужно
             docContentSources = new Dictionary<string, string>();
             // Будем использовать это
-            docSrc = StaticObjects.Engine.DaraSrc;
+            //docSrc = StaticObjects.Engine.DaraSrc;
             
         }
         private static XElement format = new XElement("record", new XAttribute("type", "http://fogid.net/o/document"),
@@ -625,7 +648,7 @@ namespace OpenArchiveMVC.Models
         public IEnumerable<XElement> reflections, locations, locations_person, locations_org, locations_doc;
         public PortraitGeoModel(string id)
         {
-            XElement item = StaticObjects.Engine.GetItemById(id, format);
+            XElement item = Turgunda7.SObjects.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -634,7 +657,7 @@ namespace OpenArchiveMVC.Models
             var desc_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/description");
             description = desc_el == null ? "" : desc_el.Value;
             // Даты
-            string _dates = StaticObjects.GetDates(item);
+            string _dates = Turgunda7.SObjects.GetDates(item);
             dates = string.IsNullOrEmpty(_dates) ? "" : "(" + _dates + ")";
             // Отражения
             reflections = item.Elements("inverse")
@@ -688,7 +711,7 @@ namespace OpenArchiveMVC.Models
         public DocumentImageModel(string id, string eid)
         {
             this.id = id;
-            item = StaticObjects.Engine.GetItemById(id, format);
+            item = Turgunda7.SObjects.GetItemById(id, format);
             if (item == null) { return; }
             // Вытягиваем информацию
             var name_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name");
@@ -700,10 +723,10 @@ namespace OpenArchiveMVC.Models
                 .Select(rec => new
                 {
                     docpart = rec.Element("direct").Element("record"),
-                    page = StaticObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
+                    page = Turgunda7.SObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
                 })
                 .OrderBy(pair => pair.page)
-                .ThenBy(pair => StaticObjects.GetField(pair.docpart, "http://fogid.net/o/name"))
+                .ThenBy(pair => Turgunda7.SObjects.GetField(pair.docpart, "http://fogid.net/o/name"))
                 .Select(pair => pair.docpart)
                 .ToArray();
             var part = parts
@@ -716,7 +739,7 @@ namespace OpenArchiveMVC.Models
             //    .FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/forDocument");
             //if (fromuri == null) { return; }
             //uri = StaticObjects.GetField(fromuri.Element("record"), "http://fogid.net/o/uri");
-            uri = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
+            uri = Turgunda7.SObjects.GetField(doc, "http://fogid.net/o/uri");
         }
 
         private static XElement format = new XElement("record", new XAttribute("type", "http://fogid.net/o/document"),

@@ -1,5 +1,5 @@
 ﻿@using System.Xml.Linq
-@using OpenArchive
+@*using OpenArchive*@
 @model PortraitDocumentModel
 @{
     PortraitDocumentModel m = Model;
@@ -9,9 +9,9 @@
 	&raquo;
 	<a href="~/Home/Index">Фонды</a>
 	&raquo;
-    @foreach (XElement cnode in StaticObjects.GetCollectionPath(m.id))
+    @foreach (XElement cnode in Turgunda7.SObjects.GetCollectionPath(m.id))
     {
-        string nm = StaticObjects.GetField(cnode, "http://fogid.net/o/name");
+        string nm = Turgunda7.SObjects.GetField(cnode, "http://fogid.net/o/name");
 	    <a href='~/Home/Portrait?id=@cnode.Attribute("id").Value'>@nm</a>
 	    <span>&raquo;</span>
     }
@@ -51,13 +51,13 @@
             @foreach (var doc in m.parts)
             {
                 if (doc == null) { continue; }
-                string nm = StaticObjects.GetField(doc, "http://fogid.net/o/name");
+                string nm = Turgunda7.SObjects.GetField(doc, "http://fogid.net/o/name");
                 //var fromuri = doc.Elements("inverse")
                 //    .FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/forDocument");
                 //if (fromuri == null) { continue; }
                 //XElement rec = fromuri.Element("record");
                 //string uri = StaticObjects.GetField(rec, "http://fogid.net/o/uri");
-                string uri = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
+                string uri = Turgunda7.SObjects.GetField(doc, "http://fogid.net/o/uri");
                 string eid = doc.Attribute("id").Value;
 
                 string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=small&u=" + uri;
@@ -96,7 +96,7 @@
 		<td width="75%" class="line-info">
             @foreach (var who in m.reflections.Where(re => re != null))
             {
-                @sep; sep = ","; <a href='~/Home/Portrait?id=@who.Attribute("id").Value'>@StaticObjects.GetField(who, "http://fogid.net/o/name")</a>;
+                @sep; sep = ","; <a href='~/Home/Portrait?id=@who.Attribute("id").Value'>@Turgunda7.SObjects.GetField(who, "http://fogid.net/o/name")</a>;
 
             }
 		</td>
@@ -112,7 +112,7 @@
             @foreach (var au in m.authors)
             {
                 @sep; sep = ", ";  // Добавлен разделитель
-                <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>;
+                <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@Turgunda7.SObjects.GetField(au, "http://fogid.net/o/name")</a>;
             }
 		</td>
 	</tr>
@@ -126,7 +126,7 @@
             @foreach (var au in m.recipients)
             {
                 @sep; sep = ",";  // Добавлен разделитель
-                <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@StaticObjects.GetField(au, "http://fogid.net/o/name")</a>;
+                <a href='~/Home/Portrait?id=@au.Attribute("id").Value'>@Turgunda7.SObjects.GetField(au, "http://fogid.net/o/name")</a>;
             }
 		</td>
 	</tr>
@@ -138,7 +138,7 @@
 		<td width="75%" class="line-info">
             @foreach (var geo in m.geoplaces.Where(g => g != null))
             {
-                <a href='~/Home/Portrait?id=@geo.Attribute("id").Value'>@StaticObjects.GetField(geo, "http://fogid.net/o/name")</a>
+                <a href='~/Home/Portrait?id=@geo.Attribute("id").Value'>@Turgunda7.SObjects.GetField(geo, "http://fogid.net/o/name")</a>
             }
 		</td>
 	</tr>
@@ -148,7 +148,7 @@
 	<tr valign="top">
 		<td width="25%" class="line-name">Источник поступления:</td>
 		<td width="75%" class="line-info">
-            <a href='~/Home/Portrait?id=@m.infosource.Attribute("id").Value'>@StaticObjects.GetField(m.infosource, "http://fogid.net/o/name")</a>
+            <a href='~/Home/Portrait?id=@m.infosource.Attribute("id").Value'>@Turgunda7.SObjects.GetField(m.infosource, "http://fogid.net/o/name")</a>
             @if (m.descr_infosource != null)
             {
             <span>@m.descr_infosource.Value</span>
@@ -163,7 +163,7 @@
 		<td width="75%" class="line-info">
             @foreach (XElement coll in m.collections)
             {
-                <a href='~/Home/Portrait?id=@coll.Attribute("id").Value'>@StaticObjects.GetField(coll, "http://fogid.net/o/name")</a>
+                <a href='~/Home/Portrait?id=@coll.Attribute("id").Value'>@Turgunda7.SObjects.GetField(coll, "http://fogid.net/o/name")</a>
                 <br />
             }
 		</td>
