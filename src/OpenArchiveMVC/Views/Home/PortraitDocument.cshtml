@@ -24,7 +24,10 @@
 
     @if (!string.IsNullOrEmpty(m.uri) && m.contenttype == "image/jpeg")
     {
-        string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=medium&u=" + m.uri;
+        //string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=medium&u=" + m.uri;
+        string sr = (Turgunda7.SObjects.Engine.DaraSrc == null ? "~" : 
+            Turgunda7.SObjects.Engine.DaraSrc) + "/Docs/GetPhoto?s=medium&u=" + m.uri;
+
         <img src="@Url.Content(sr)" />
     }
 
@@ -60,7 +63,9 @@
                 string uri = Turgunda7.SObjects.GetField(doc, "http://fogid.net/o/uri");
                 string eid = doc.Attribute("id").Value;
 
-                string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=small&u=" + uri;
+                //string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=small&u=" + uri;
+                string sr = (Turgunda7.SObjects.Engine.DaraSrc == null ? "~" : 
+                    Turgunda7.SObjects.Engine.DaraSrc) + "/Docs/GetPhoto?s=small&u=" + uri;
 
 
                 <div class="show-small">

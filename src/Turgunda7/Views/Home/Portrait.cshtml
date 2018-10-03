@@ -361,7 +361,7 @@ else
                         var elementset = ir.Elements("r").OrderBy(rr => rr.Value);
                         string[] doclist = elementset.Where(rr => rr.Element("r") != null && rr.Element("r").Attribute("id") != null)
                             .Select(rr => rr.Element("r").Attribute("id").Value).ToArray();
-                        if (doclist.Length > 0) { Context.Session.SetString("doclist", doclist.Aggregate((sum, s) => sum += s)); }
+                        //if (doclist.Length > 0) { Context.Session.SetString("doclist", doclist.Aggregate((sum, s) => sum += s)); }
                         <a href="?id=@id&at=1">T</a>
                         foreach (XElement r in elementset)
                         {

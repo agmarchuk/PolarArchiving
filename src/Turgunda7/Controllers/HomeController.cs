@@ -348,7 +348,7 @@ namespace Turgunda7.Controllers
                         if (resource_el != null)
                         {
                             string pvalue = resource_el.Attribute(ONames.rdfresource).Value;
-                            HttpContext.Session.SetString("inDocumentId", pvalue);
+                            //HttpContext.Session.SetString("inDocumentId", pvalue);
                             int ind = 0;
                             for (; ind < Turgunda7.Models.RecordModel.nfields; ind++)
                                 if (rmodel.GetPValue(ind) == pvalue) break;
@@ -359,7 +359,7 @@ namespace Turgunda7.Controllers
                                 //var s3 = rmodel.GetTValue(ind);
                                 //var s4 = rmodel.GetVValue(ind);
 
-                                HttpContext.Session.SetString("inDocumentName", rmodel.GetVValue(ind));
+                                //HttpContext.Session.SetString("inDocumentName", rmodel.GetVValue(ind));
                             }
                         }
                     }
