@@ -35,8 +35,8 @@ namespace Turgunda7
         public static void Init(string pth)
         {
             path = pth + "/";
-            try
-            {
+            //try
+            //{
                 if (!System.IO.File.Exists(path + "wwwroot/config.xml"))
                 {
                     if (System.IO.File.Exists(path + "wwwroot/config0.xml"))
@@ -74,8 +74,8 @@ namespace Turgunda7
                 TurgundaCommon.ModelCommon.LoadOntNamesFromOntology(ontology);
                 TurgundaCommon.ModelCommon.LoadInvOntNamesFromOntology(ontology);
 
-            }
-            catch (Exception e) { Initiated = false; _errors.Append(e.Message); Log(e.Message); }
+            //}
+            //catch (Exception e) { Initiated = false; _errors.Append(e.Message); Log(e.Message); }
                 //storage.SaveDb("C:/Home/syp_db.xml");
             try
             {
