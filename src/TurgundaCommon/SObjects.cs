@@ -192,6 +192,7 @@ namespace Turgunda7
         {
             XElement item_corrected = new XElement(item);
             item_corrected.Add(new XAttribute("owner", username), new XAttribute("mT", DateTime.Now.ToUniversalTime().ToString("u")));
+            if (tocreateid && item.Attribute(Polar.Cassettes.ONames.rdfabout) != null) throw new Exception("Err 2982454 in SObjects.PutItemToDb");
             lock (saveInDb)
             {
                 item_corrected = _engine.localstorage.EditCommand(item_corrected);
