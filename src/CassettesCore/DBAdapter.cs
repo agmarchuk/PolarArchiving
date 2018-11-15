@@ -89,13 +89,15 @@ namespace Polar.Cassettes.DocumentStorage
 
         // ================= Раздел работы по цепочкам эквивалентности ==============
         protected Dictionary<string, ResInfo> table_ri;
-        public void InitTableRI() { table_ri = new Dictionary<string, ResInfo>(); }
+        public void InitTableRI() { table_ri = new Dictionary<string, ResInfo>(); count_delete = count_substitute = 0; }
+        public int count_delete = 0, count_substitute = 0;
         public void AppendXflowToRiTable(IEnumerable<XElement> xflow, string ff, Action<string> err)
         {
             foreach (XElement xelement in xflow)
             {
                 if (xelement.Name == fogi + "delete")
                 {
+                    count_delete++;
                     XAttribute att = xelement.Attribute("id");
                     if (att == null) continue;
                     string id = att.Value;
@@ -121,6 +123,7 @@ namespace Polar.Cassettes.DocumentStorage
                 }
                 else if (xelement.Name == fogi + "substitute")
                 {
+                    count_substitute++;
                     XAttribute att_old = xelement.Attribute("old-id");
                     XAttribute att_new = xelement.Attribute("new-id");
                     if (att_old == null || att_new == null) continue;

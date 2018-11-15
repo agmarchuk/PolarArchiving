@@ -169,6 +169,7 @@ namespace Polar.Cassettes.DocumentStorage
             dbadapter.LoadFromCassettesExpress(fogfilearr, turlog, convertlog);
             turlog("Конец загрузки кассет");
             dbadapter.FinishFillDb(turlog);
+            Console.WriteLine($"Конец загрузки кассет. delete={dbadapter.count_delete} substitute={dbadapter.count_substitute}");
 
             turlog("Конец загрузки данных.");
             //factograph.RDFDocumentInfo.logwrite = mess => turlog(mess); // Это для выдачи ошибок из кассетных методов в системный лог

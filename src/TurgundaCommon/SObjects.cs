@@ -87,7 +87,7 @@ namespace Turgunda7
             }
 
             // Тест
-            var items = Turgunda7.SObjects.Engine.SearchByName("").ToArray();
+            //var items = Turgunda7.SObjects.Engine.SearchByName("").ToArray();
 
             // Заплата вычисления выделенного объекта
             string funds_name = "Фонды";
@@ -134,9 +134,18 @@ namespace Turgunda7
             return SObjects.Engine.localstorage.connection.cassettesInfo[fid];
         }
 
-        public static IEnumerable<XElement> SearchByName(string searchstring) { return _engine.SearchByName(searchstring); }
-        public static XElement GetItemById(string id, XElement format) { return _engine.GetItemById(id, format); }
-        public static XElement GetItemByIdSpecial(string id) { return _engine.GetItemByIdBasic(id, true); }
+        public static IEnumerable<XElement> SearchByName(string searchstring)
+        {
+            lock (saveInDb) { return _engine.SearchByName(searchstring); }
+        }
+        public static XElement GetItemById(string id, XElement format)
+        {
+            lock (saveInDb) { return _engine.GetItemById(id, format); }
+        }
+        public static XElement GetItemByIdSpecial(string id)
+        {
+            lock (saveInDb) { return _engine.GetItemByIdBasic(id, true); }
+        }
 
         // ============== Редактирование базы данных ===============
         public static string AddInvRelation(string eid, string prop, string rtype, string username)
@@ -190,11 +199,12 @@ namespace Turgunda7
         /// <returns>скорректированный элемент, помещаенный в базы данных</returns>
         public static XElement PutItemToDb(XElement item, bool tocreateid, string username)
         {
-            XElement item_corrected = new XElement(item);
-            item_corrected.Add(new XAttribute("owner", username), new XAttribute("mT", DateTime.Now.ToUniversalTime().ToString("u")));
             if (tocreateid && item.Attribute(Polar.Cassettes.ONames.rdfabout) != null) throw new Exception("Err 2982454 in SObjects.PutItemToDb");
+            XElement item_corrected = null;
             lock (saveInDb)
             {
+                item_corrected = new XElement(item);
+                item_corrected.Add(new XAttribute("owner", username), new XAttribute("mT", DateTime.Now.ToUniversalTime().ToString("u")));
                 item_corrected = _engine.localstorage.EditCommand(item_corrected);
             }
             //Log("PutItemToDb ok?");
