@@ -2,7 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Polar.CellIndexes" Version="1.0.6" />
+    <PackageReference Include="Polar.Cells" Version="1.0.0" />
+    <PackageReference Include="Polar.DB" Version="1.0.2" />
+    <PackageReference Include="Polar.PagedStreams" Version="1.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />

@@ -19,7 +19,10 @@ namespace CassetteData
         {
             localstorage = new DStorage();
             localstorage.Init(xconfig);
-            _adapter = new XmlDbAdapter();
+
+            //_adapter = new XmlDbAdapter();
+            _adapter = new SimpleDbAdapter();
+
             localstorage.InitAdapter(_adapter);
             XElement net = xconfig.Element("Net");
             if (net != null)
