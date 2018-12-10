@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Polar.DB;
-using Polar.CellIndexes;
+//using Polar.DB;
+//using Polar.CellIndexes;
 
 namespace Polar.Cassettes.DocumentStorage
 {
@@ -12,37 +12,24 @@ namespace Polar.Cassettes.DocumentStorage
     /// </summary>
     public class SimpleDbAdapter : DbAdapter
     {
+        private XElement db = null;
         private Action<string> errors = s => { Console.WriteLine(s); };
-        private PType tp_elem = null;
-        TableViewImmutable table;
+        private int totalelements = 0;
+        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         /// <summary>
         /// Инициирование базы данных
         /// </summary>
         /// <param name="connectionstring">префикс варианта базы данных xml:, больше в connectionstring ничего не существенно </param>
         public override void Init(string connectionstring)
         {
-            tp_elem = new PTypeRecord(
-                new NamedType("id", new PType(PTypeEnumeration.sstring)),
-                new NamedType("mT", new PType(PTypeEnumeration.longinteger)),
-                new NamedType("xtext", new PType(PTypeEnumeration.sstring)));
-            table = new TableViewImmutable("wwwroot/table", tp_elem);
-
-            IndexDynamic<string, IndexHalfkeyImmutable<string>> keyIndex =
-                new IndexDynamic<string, IndexHalfkeyImmutable<string>>(false, new IndexHalfkeyImmutable<string>("wwwroot/keyindex"))
-                {
-                    //KeyProducer = ob => (string)((object[])(((object[])ob)[1])[0]);
-                };
+            db = new XElement("db");
+            totalelements = 0;
         }
 
-        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-        int totalelements = 0;
         // Загрузка базы данных
         public override void StartFillDb(Action<string> turlog)
         {
-            //throw new Exception("1334");
             sw.Start();
-            table.Clear();
-            table.Fill(new object[0]);
         }
         public override void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog)
         {
@@ -50,24 +37,35 @@ namespace Polar.Cassettes.DocumentStorage
             {
                 XElement fog = XElement.Load(filename);
                 totalelements += fog.Elements().Count();
-                foreach (XElement elem in fog.Elements())
+                XDocument xdoc = new XDocument();
+                XElement fog2 = new XElement(XName.Get("RDF", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+                XNamespace r = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+                XNamespace f = "http://fogid.net/o/";
+                XElement root = new XElement(r + "RDF",
+                    new XAttribute(XNamespace.Xmlns + "rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"),
+                    new XAttribute(XNamespace.Xmlns + "fog", "http://fogid.net/o/"),
+                    null);
+                foreach (XElement xel in fog.Elements())
                 {
-                    string s = elem.ToString();
-                    string id = elem.Name.LocalName == "delete" ? elem.Attribute("id").Value : elem.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about").Value;
-                    XAttribute mTatt = elem.Attribute("mT");
-                    long mt = mTatt == null ? 0L : DateTime.Parse(mTatt.Value).ToBinary();
-                    if (elem.Name.LocalName == "delete") { }
-                    table.AppendElement(new object[] { id, mt, s });
+                    var pref1 = xel.GetPrefixOfNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+                    if (pref1 == null) continue; // Это не фог! TODO: нужна диагностика!
+                    var pref2 = xel.GetPrefixOfNamespace("http://fogid.net/o/");
+                    if (pref2 == null)
+                    {
+                            
+                    }
+                    if (xel.Name == "{http://fogid.net/o/}delete") this.count_delete++;
+                    if (xel.Name == "{http://fogid.net/o/}substitute") this.count_substitute++;
                 }
+                db.Add(fog);
             }
         }
         public override void FinishFillDb(Action<string> turlog)
         {
-            //throw new Exception("29485");
-            table.Flush();
             sw.Stop();
             Console.WriteLine($"Load ok. duration = {sw.ElapsedMilliseconds} totalelements={totalelements}");
         }
+
 
         public override void Save(string filename)
         {
