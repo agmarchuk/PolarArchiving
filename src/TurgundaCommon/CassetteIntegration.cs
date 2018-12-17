@@ -20,8 +20,15 @@ namespace CassetteData
             localstorage = new DStorage();
             localstorage.Init(xconfig);
 
-            //_adapter = new XmlDbAdapter();
-            _adapter = new SimpleDbAdapter();
+            string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
+            if (connectionstring == null || connectionstring.StartsWith("xml:"))
+            {
+                _adapter = new XmlDbAdapter();
+            }
+            else if (connectionstring.StartsWith("sxml:"))
+            {
+                _adapter = new SimpleDbAdapter();
+            }
 
             localstorage.InitAdapter(_adapter);
             XElement net = xconfig.Element("Net");

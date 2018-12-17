@@ -47,15 +47,45 @@ namespace Polar.Cassettes.DocumentStorage
                     null);
                 foreach (XElement xel in fog.Elements())
                 {
+                    XElement xel2 = xel;
+                    if (xel.Name.LocalName == "delete")
+                    {
+                        this.count_delete++;
+                        xel2 = new XElement("del", new XAttribute(r + "about", xel.Attribute("id").Value));
+                    }
+                    if (xel.Name.LocalName == "substitute") this.count_substitute++;
+
                     var pref1 = xel.GetPrefixOfNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
                     if (pref1 == null) continue; // Это не фог! TODO: нужна диагностика!
                     var pref2 = xel.GetPrefixOfNamespace("http://fogid.net/o/");
                     if (pref2 == null)
                     {
-                            
+                        var xel3 = DbAdapter.ConvertXElement(xel2);
+                        //var xel4 = new XElement(xel3.Name, xel3.Elements()
+                        //    .Where(el => el.Attribute(r+"resource") != null || string.IsNullOrEmpty(el.Value))
+                        //    .Select(el => new XElement(el))
+                        //    );
+                        foreach (var e in xel3.Elements())
+                        {
+                            if (e.Attribute(r+"resource") == null && string.IsNullOrEmpty(e.Value))
+                            {
+                                e.Remove();
+                            }
+                        }
+                        root.Add(xel3);    
                     }
-                    if (xel.Name == "{http://fogid.net/o/}delete") this.count_delete++;
-                    if (xel.Name == "{http://fogid.net/o/}substitute") this.count_substitute++;
+                }
+                if (root.Elements().Count() > 0)
+                {
+                    root.Add(
+                        new XAttribute(fog.Attribute("dbid")),
+                        new XAttribute(fog.Attribute("owner")),
+                        new XAttribute(fog.Attribute("uri")),
+                        new XAttribute(fog.Attribute("prefix")),
+                        new XAttribute(fog.Attribute("counter")),
+                        null);
+                    root.Save(filename + ".xml");
+                    fog = root;
                 }
                 db.Add(fog);
             }

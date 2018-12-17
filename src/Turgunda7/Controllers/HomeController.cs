@@ -217,7 +217,8 @@ namespace Turgunda7.Controllers
                 nid = SObjects.CreateNewItem(searchstring, type, umodel.Uuser);
             }
             if (nid == null) return Error("Не создан элемент, возможно, у Вас нет полномочий");
-            return RedirectToAction("Portrait", "Home", new { id = nid });
+            //return RedirectToAction("Portrait", "Home", new { id = nid });
+            return Redirect("~/Home/Portrait?id=" + nid);
         }
         [HttpGet]
         public IActionResult ConnectUser(string userlogin, string id)
@@ -241,7 +242,9 @@ namespace Turgunda7.Controllers
         {
             SObjects.AddInvRelation(bid, prop, rtype, (new Turgunda7.Models.UserModel(Request)).Uuser);
             //string nid = StaticObjects.CreateNewItem(searchstring, type, User.Identity.Name);
-            return RedirectToAction("Portrait", "Home", new { id = bid });
+            //return RedirectToAction("Portrait", "Home", new { id = bid });
+            return Redirect("~/Home/Portrait?id=" + bid);
+
         }
 
         [HttpGet]
