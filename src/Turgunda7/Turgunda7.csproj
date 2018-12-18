@@ -6,28 +6,28 @@
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Compile Remove="wwwroot\newcassettesdirpath\**" />
     <Content Remove="wwwroot\newcassettesdirpath\**" />
     <EmbeddedResource Remove="wwwroot\newcassettesdirpath\**" />
     <None Remove="wwwroot\newcassettesdirpath\**" />
-  </ItemGroup>
+  </ItemGroup> -->
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Compile Remove="App_Code\SObjects.cs" />
-  </ItemGroup>
+  </ItemGroup> -->
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Content Remove="wwwroot\accounts.xml" />
     <Content Remove="wwwroot\accounts0.xml" />
     <Content Remove="wwwroot\ApplicationProfile.xml" />
     <Content Remove="wwwroot\config.xml" />
     <Content Remove="wwwroot\log.txt" />
-  </ItemGroup>
+  </ItemGroup> -->
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <None Remove="config.xml" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <PackageReference Include="ExifLib.Standard" Version="1.7.0" />
@@ -42,9 +42,9 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <None Include="wwwroot\config0.xml" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
