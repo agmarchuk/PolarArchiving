@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
-  <database connectionstring="xml"/>
+  <database connectionstring="xml:"/>
   <!--Parameters extappbinpath="C:/Home/bin/" newcassettesdirpath="C:/Home/FactographProjects/newcassettes/">
   </Parameters-->
   <params appname="Открытый архив СО РАН (редактирующее приложение)"></params>
