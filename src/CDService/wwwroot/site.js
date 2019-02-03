@@ -33,15 +33,14 @@ function converttoplainstring(record) {
     $.each(record.arcs,
         function (i, item) {
             let alt = item.alt;
-            str += " <span style='color: blue;'>" + item.prop + "</span>";
             if (alt === "field") {
-                str += " " + item.text;
+                str += " <span style='color: blue;'>" + item.prop + "</span> " + item.text;
             } else if (alt === "direct") {
-                str += " " + converttoplainstring(item.rec);
+                str += " <span style='color: blue;'>" + item.prop + "</span> " + converttoplainstring(item.rec);
             } else if (alt === "inverse") {
                 $.each(item.recs,
                     function (j, rec) {
-                        str += " " + converttoplainstring(rec);
+                        str += "<br/><span style='color: blue;'>" + item.prop + "</span> " + converttoplainstring(rec);
                     });
             }
         });

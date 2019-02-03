@@ -37,10 +37,12 @@ namespace CDService.Controllers
             {
                 string type_id = xproba.Attribute("type").Value;
                 XElement format = TurgundaCommon.ModelCommon.formats.Elements()
-                    .First(el => el.Attribute("type").Value == type_id);
-
-                XElement xresult = Turgunda7.SObjects.GetItemById(id, format);
-                rec = XElement2Record(xresult);
+                    .FirstOrDefault(el => el.Attribute("type").Value == type_id);
+                if (format != null)
+                {
+                    XElement xresult = Turgunda7.SObjects.GetItemById(id, format);
+                    rec = XElement2Record(xresult);
+                }
             }
             return new ObjectResult(rec);
         }
@@ -48,27 +50,31 @@ namespace CDService.Controllers
         {
             string id = xel.Attribute("id").Value;
             string ty = xel.Attribute("type")?.Value;
+            if (ty != null) { string w = TurgundaCommon.ModelCommon.OntNames[ty]; ty = w; }
             Arc[] arcs = xel.Elements().Select<XElement, Arc>(xe =>
                 {
+                    string prop = xe.Attribute("prop").Value;
+                    string word = TurgundaCommon.ModelCommon.OntNames[prop];
+                    if (word != null) prop = word;
                     if (xe.Name == "field")
                         return new ArcField
                         {
                             alt = "field",
-                            prop = xe.Attribute("prop").Value,
+                            prop = prop,
                             text = xe.Value
                         };
                     else if (xe.Name == "direct")
                         return new ArcDirect
                         {
                             alt = "direct",
-                            prop = xe.Attribute("prop").Value,
+                            prop = prop,
                             rec = XElement2Record(xe.Element("record"))
                         };
                     else if (xe.Name == "inverse")
                         return new ArcInverse
                         {
                             alt = "inverse",
-                            prop = xe.Attribute("prop").Value,
+                            prop = prop,
                             recs = xe.Elements("record")
                                 .Select(r => XElement2Record(r))
                                 .ToArray()
