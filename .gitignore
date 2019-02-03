@@ -302,3 +302,6 @@ __pycache__/
 /src/OpenArchiveMVC/wwwroot/config.xml
 /old/Turgunda6/wwwroot/config.xml
 /old/Turgunda6/wwwroot/accounts.xml
+/src/CDService/wwwroot/config.xml
+/src/CDService/wwwroot/accounts.xml
+/src/CDService/wwwroot/ApplicationProfile.xml

@@ -1,29 +1,51 @@
 ﻿const uri = "api/todo";
+let cnt = 0;
 $(document).ready(function () {
     //getData();
     //alert("document ready");
 });
-function get() {
-    let id = $("#itemid").val();
-    //alert(id);
-    const item = {
-        id: id
-    };
-
+//function getfrom() { let hel = $("#itemid"); let id = hel.value; get(id); }
+function getfrom() { let hel = document.getElementById("itemid"); let id = hel.value; get(id); }
+function get(id) {
     $.ajax({
         type: "GET",
         accepts: "application/json",
-        url: "Data/Get/" + id,
+        //url: "data/get?id=" + id + "&t=" + encodeURIComponent(new Date()),
         contentType: "application/json",
+        //contentType: "text/xml",
         //data: JSON.stringify(item),
+        url: "data/get",
+        data: {id: id, dt: Date()},
         error: function (jqXHR, textStatus, errorThrown) {
             alert("Something went wrong!");
         },
         success: function (result) {
-            //getData();
-            //$("#itemid").val("");
+            let str = converttoplainstring(result);
+            const vvrr = $("#viewresult");
+            vvrr.empty();
+            vvrr.append($("<span>" + str + "</span>"));
         }
     });
+}
+function converttoplainstring(record) {
+    let str = "<a href='javascript:void(0)' onclick='get(\"" + record.id + "\")'>@</a>" +
+        " <span style='color: green;'>" + record.ty + "</span>";
+    $.each(record.arcs,
+        function (i, item) {
+            let alt = item.alt;
+            str += " <span style='color: blue;'>" + item.prop + "</span>";
+            if (alt === "field") {
+                str += " " + item.text;
+            } else if (alt === "direct") {
+                str += " " + converttoplainstring(item.rec);
+            } else if (alt === "inverse") {
+                $.each(item.recs,
+                    function (j, rec) {
+                        str += " " + converttoplainstring(rec);
+                    });
+            }
+        });
+    return str;
 }
 
 

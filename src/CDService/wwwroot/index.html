@@ -30,11 +30,13 @@
     </style>
 </head>
 <body>
-    <h2>Смотреть</h2>
-    <form action="javascript:void(0);" method="get" onsubmit="get()">
+    <h2>Смотреть Все</h2>
+    <div id="viewresult">viewresult</div>
+    <form action="javascript:void(0);" method="get" onsubmit="getfrom()">
         <input type="text" id="itemid" placeholder="item id">
         <input type="submit" value="view">
     </form>
+
     <h2>Редактировать</h2>
     <h3>Add</h3>
     <form action="javascript:void(0);" method="POST" onsubmit="addItem()">

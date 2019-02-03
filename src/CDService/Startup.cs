@@ -47,6 +47,9 @@ namespace TodoApi
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
+
+            Turgunda7.SObjects.Init(env.ContentRootPath);
+
             //app.UseMvc();
             app.UseMvc(routes =>
             {
