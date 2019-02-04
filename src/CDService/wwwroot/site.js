@@ -6,6 +6,7 @@ $(document).ready(function () {
 });
 //function getfrom() { let hel = $("#itemid"); let id = hel.value; get(id); }
 function getfrom() { let hel = document.getElementById("itemid"); let id = hel.value; get(id); }
+//function getfrom() { return get("Xu_zoya_634993802406113281_1030"); }
 function get(id) {
     $.ajax({
         type: "GET",
@@ -27,20 +28,24 @@ function get(id) {
         }
     });
 }
+function hyper(idd, txt) { return "<a href='javascript:void(0)' onclick='get(\"" + idd + "\")'>" + txt + "</a>"; }
+function mark(txt) { return "<img src='mark.jpg' alt='"+txt+"'>"; } 
+
 function converttoplainstring(record) {
-    let str = "<a href='javascript:void(0)' onclick='get(\"" + record.id + "\")'>@</a>" +
-        " <span style='color: green;'>" + record.ty + "</span>";
+    let str =  "<span style='color: green;'>" + record.ty + "</span>";
     $.each(record.arcs,
         function (i, item) {
             let alt = item.alt;
             if (alt === "field") {
-                str += " <span style='color: blue;'>" + item.prop + "</span> " + item.text;
+                str += mark(item.prop);
+                if (item.prop === "имя") str += hyper(record.id, item.text);
+                else str += item.text;
             } else if (alt === "direct") {
-                str += " <span style='color: blue;'>" + item.prop + "</span> " + converttoplainstring(item.rec);
+                str += mark(item.prop) + converttoplainstring(item.rec);
             } else if (alt === "inverse") {
                 $.each(item.recs,
                     function (j, rec) {
-                        str += "<br/><span style='color: blue;'>" + item.prop + "</span> " + converttoplainstring(rec);
+                        str += "<br/>" + mark(item.prop) + converttoplainstring(rec);
                     });
             }
         });
