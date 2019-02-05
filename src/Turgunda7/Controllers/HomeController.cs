@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 //using Fogid.Cassettes;
@@ -516,7 +517,27 @@ namespace Turgunda7.Controllers
             return View("SystemConfiguration");
         }
 
-
+        // ====================== Экспресс-вариант портрета ========================
+        public IActionResult P(string id)
+        {
+            ContentResult cr = new ContentResult() { ContentType = "text/html" };
+            XElement html = new XElement("html",
+                new XElement("head",
+                    new XElement("meta", new XAttribute("charset", "utf-8")),
+                    new XElement("link", new XAttribute("rel", "stylesheet"), new XAttribute("href", "/css/site.css")),
+                    new XElement("script", new XAttribute("type", "text/javascript"), " ")),
+                new XElement("body", 
+                    new XElement("table", new XAttribute("width", "100%"), new XAttribute("border", "0"), 
+                        new XAttribute("style", "margin-top:10px;"),
+                        new XElement("tbody",
+                            new XElement("tr", new XAttribute("valign", "top"),
+                                new XElement("td", new XAttribute("rowspan", "2"),
+                                    new XElement("div", new XAttribute("style", "width:120px;"), new XAttribute("align", "center"),
+                                        new XElement("a", new XAttribute("href", "/Home/Index"),
+                                            new XElement("img", new XAttribute("src", "/images/logo1.jpg"))))))))));
+            cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
+            return cr;
+        }
 
     }
 }
