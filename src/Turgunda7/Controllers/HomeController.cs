@@ -521,7 +521,6 @@ namespace Turgunda7.Controllers
         public IActionResult P(string id)
         {
             string tilda = HttpContext.Request.PathBase;
-            Console.WriteLine($"==============================={this.HttpContext.Request.Path} {this.HttpContext.Request.PathBase}");
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement html = new XElement("html",
                 new XElement("head",
@@ -536,7 +535,29 @@ namespace Turgunda7.Controllers
                                 new XElement("td", new XAttribute("rowspan", "2"),
                                     new XElement("div", new XAttribute("style", "width:120px;"), new XAttribute("align", "center"),
                                         new XElement("a", new XAttribute("href", tilda + "/Home/Index"),
-                                            new XElement("img", new XAttribute("src", tilda + "/images/logo1.jpg"))))))))));
+                                            new XElement("img", new XAttribute("src", tilda + "/images/logo1.jpg"))))),
+                                new XElement("td",
+                                    new XElement("div",
+                                        new XElement("a", new XAttribute("href", tilda + "/Home/index"), "Начало"))),
+                                new XElement("td", new XAttribute("width", "100%"),
+                                    new XElement("h2", new XAttribute("style", "color:#5c87b2;padding: 0 0 0 0;") ,"Универсальный редактор")),
+                                new XElement("td",
+                                    new XElement("div", new XAttribute("style", "width:100px; text-align:right;"), 
+                                        new XElement("a", new XAttribute("href", tilda + "/Home/index"), "ред"))),
+                                null),
+                            new XElement("tr", new XAttribute("valign", "bottom"),
+                                new XElement("td", new XAttribute("colspan", "3"),
+                                    new XElement("div", new XAttribute("style", "vertical-align:bottom;"),
+                                        new XElement("form", new XAttribute("method", "get"), new XAttribute("action", tilda+"/Home/Srch"),
+                                            new XAttribute("style", "margin:0;"),
+                                            new XElement("input", new XAttribute("type", "text"), new XAttribute("name", "searchstring"), 
+                                                new XAttribute("style", "width:300px;")),
+                                            new XElement("select", new XAttribute("name", "choosetype"),
+                                                new XElement("option", " "),
+                                                new XElement("option", new XAttribute("value", "cheburashka"), "Чебурашка")),
+                                            new XElement("input", new XAttribute("type", "submit"), new XAttribute("value", "искать"),
+                                                new XAttribute("style", "font-size:small;"))))))
+                                                ))));
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
         }
