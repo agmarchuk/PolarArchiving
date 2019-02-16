@@ -4,6 +4,32 @@ $(document).ready(function () {
     //getData();
     //alert("document ready");
 });
+
+function getfrom1() { let hel = document.getElementById("itemid1"); let id = hel.value; getxmlbyid(id); }
+function getxmlbyid(id) {
+    $.ajax({
+        type: "GET",
+        //accepts: "application/json",
+        accepts: "text/xml",
+        //url: "data/get?id=" + id + "&t=" + encodeURIComponent(new Date()),
+        //contentType: "application/json",
+        contentType: "text/xml",
+        //data: JSON.stringify(item),
+        url: "data/get",
+        data: { id: id, dt: Date() },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Something went wrong!");
+        },
+        success: function (result) {
+            let str = converttoplainstring(result);
+            const vvrr = $("#viewresult1");
+            vvrr.empty();
+            vvrr.append($("<span>" + str + "</span>"));
+        }
+    });
+}
+
+
 //function getfrom() { let hel = $("#itemid"); let id = hel.value; get(id); }
 function getfrom() { let hel = document.getElementById("itemid"); let id = hel.value; get(id); }
 //function getfrom() { return get("Xu_zoya_634993802406113281_1030"); }
