@@ -213,6 +213,7 @@ namespace Turgunda7
 
         public static string GetField(XElement item, string prop)
         {
+            if (item == null) return ""; 
             XElement el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == prop);
             return el == null ? "" : el.Value;
         }
