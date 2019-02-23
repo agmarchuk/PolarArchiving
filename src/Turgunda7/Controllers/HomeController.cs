@@ -518,12 +518,19 @@ namespace Turgunda7.Controllers
         }
 
         // ====================== Экспресс-вариант портрета ========================
-        public IActionResult P(string id, string tt)
+        private string mode = "panel"; // другой вариант - table
+        public IActionResult P(string id, string tt, string mode)
         {
+            if (mode != null) this.mode = mode;
             if (tilda == null) tilda = HttpContext.Request.PathBase;
             if (id == null) { id = "Xu_zoya_634993802406113281_1030"; tt = "http://fogid.net/o/person"; }
 
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
+            if (tt == null)
+            {
+                XElement xres = Turgunda7.SObjects.GetItemByIdSpecial(id);
+                tt = xres.Attribute("type").Value;
+            }
             XElement format = TurgundaCommon.ModelCommon.formats.Elements()
                                 .FirstOrDefault(el => el.Attribute("type").Value == tt);
             XElement html = PageLayout(SearchPanel(null, null), PortraitPanel(id, format));
@@ -537,29 +544,33 @@ namespace Turgunda7.Controllers
 new XElement("head",
     new XElement("meta", new XAttribute("charset", "utf-8")),
     new XElement("link", new XAttribute("rel", "stylesheet"), new XAttribute("href", tilda + "/css/site.css")),
-    new XElement("script", new XAttribute("type", "text/javascript"), " ")),
+    new XElement("script", new XAttribute("type", "text/javascript"), " "),
+    new XElement("style", "table td {border: solid 1px;}")),
 new XElement("body",
-    new XElement("table", new XAttribute("width", "100%"), new XAttribute("border", "0"),
-        new XAttribute("style", "margin-top:10px;"),
-        new XElement("tbody",
-            new XElement("tr", new XAttribute("valign", "top"),
-                new XElement("td", new XAttribute("rowspan", "2"),
-                    new XElement("div", new XAttribute("style", "width:120px;"), new XAttribute("align", "center"),
-                        new XElement("a", new XAttribute("href", tilda + "/Home/Index"),
-                            new XElement("img", new XAttribute("src", tilda + "/images/logo1.jpg"))))),
-                new XElement("td",
-                    new XElement("div",
-                        new XElement("a", new XAttribute("href", tilda + "/Home/index"), "Начало"))),
-                new XElement("td", new XAttribute("width", "100%"),
-                    new XElement("h2", new XAttribute("style", "color:#5c87b2;padding: 0 0 0 0;"), "Универсальный редактор")),
-                new XElement("td",
-                    new XElement("div", new XAttribute("style", "width:100px; text-align:right;"),
-                        new XElement("a", new XAttribute("href", tilda + "/Home/index"), "ред")))),
-            new XElement("tr", new XAttribute("valign", "bottom"),
-                new XElement("td", new XAttribute("colspan", "3"),
-                    searchPanel,
-                    bodyPanel
-))))));
+    new XElement("table", new XAttribute("width", "100%"), new XAttribute("style", "margin-top:10px;"),
+        new XElement("tr", new XAttribute("valign", "top"),
+            new XElement("td", new XAttribute("rowspan", "2"),
+                new XElement("div", new XAttribute("style", "width:120px;"), new XAttribute("align", "center"),
+                    new XElement("a", new XAttribute("href", tilda + "/Home/Index"),
+                        new XElement("img", new XAttribute("src", tilda + "/images/logo1.jpg"))))),
+            new XElement("td",
+                new XElement("div", new XAttribute("style", "width:200px;"),
+                    new XElement("a", new XAttribute("href", tilda + "/Home/index"), "Начало"))),
+            new XElement("td", new XAttribute("width", "100%"),
+                new XElement("h2", new XAttribute("style", "color:#5c87b2;padding: 0 0 0 0;"), "Открытый архив СО РАН (редактирующее приложение)")),
+            new XElement("td",
+                new XElement("div", new XAttribute("style", "width:100px; text-align:right;"),
+                    new XElement("a", new XAttribute("href", tilda + "/Home/index"), "ред")))),
+        new XElement("tr", new XAttribute("valign", "bottom"),
+            new XElement("td", new XAttribute("colspan", "3"),
+                searchPanel)),
+        new XElement("tr", new XAttribute("valign", "bottom"),
+            new XElement("td"),
+            new XElement("td", new XAttribute("colspan", "3"),
+                bodyPanel))
+
+                
+)));
             return html;
         }
         public IActionResult Srch(string searchstring, string choosetype)
@@ -614,33 +625,88 @@ new XElement("body",
         {
             XElement xresult = Turgunda7.SObjects.GetItemById(id, format);
 
+            string uri = Turgunda7.SObjects.GetField(xresult, "http://fogid.net/o/uri");
+            string typ = xresult.Attribute("type").Value;
+            XElement doc_content = null;
+            if (uri != null && typ == "http://fogid.net/o/photo-doc")
+            {
+                doc_content = new XElement("div",
+                    new XElement("img",
+                        new XAttribute("src", tilda + "/Docs/GetPhoto?s=normal&u=" + uri)));
+            }
+
             XElement panel = new XElement("div",
                 new XElement("div", TurgundaCommon.ModelCommon.OntNames[format.Attribute("type").Value]),
-                Htable(Enumerable.Repeat(xresult, 1) , format),
+                doc_content,
+                Htable(Enumerable.Repeat(xresult, 1) , format, "d"),
+                new XElement("table",
                 format.Elements()
                     .Where(f => f.Name == "inverse")
                     .Select(f =>
                     {
                         string prop = f.Attribute("prop").Value;
+                        XElement frec = f.Elements("record").FirstOrDefault();
+                        string panelview = frec.Attribute("view")?.Value;
                         XElement[] rels = xresult.Elements("inverse")
                             .Where(inv => inv.Attribute("prop").Value == f.Attribute("prop").Value)
                             .Select(inv => inv.Elements().FirstOrDefault())
                             .ToArray();
                         if (rels.Length > 0)
                         {
-                            return new XElement("div", 
-                                new XElement("div", TurgundaCommon.ModelCommon.InvOntNames[prop]),
-                                Htable(rels, f.Elements().FirstOrDefault()));
+                            return new XElement("tr", new XAttribute("valign", "top"),
+                                new XElement("td", 
+                                    TurgundaCommon.ModelCommon.InvOntNames[prop],
+                                    panelview == "largeicons"? 
+                                    new XElement("div", " ",
+                                        new XElement("a", new XAttribute("href", 
+                                            tilda+"/Home/P?id="+id+"&mode=" + 
+                                                (mode==null||mode=="panel"?"table":"panel")),
+                                                (mode == null || mode == "panel"?"T":"P"))) :
+                                    null),
+                                new XElement("td",
+                                    !(panelview == "largeicons" && mode == "panel") ? 
+                                    Htable(rels, frec, null) : 
+                                    new XElement("div", rels.Select(r =>
+                                    {
+                                        XElement rc = r.Element("direct")?.Element("record");
+                                        string src = tilda + "/icons/medium/default_m.jpg";
+                                        string href = "";
+                                        string name = "noname";
+                                        string startdate = Turgunda7.SObjects.GetField(rc, "http://fogid.net/o/from-date");
+
+
+                                        if (rc != null)
+                                        {
+                                            string ty = rc.Attribute("type").Value;
+                                            string ur = Turgunda7.SObjects.GetField(rc, "http://fogid.net/o/uri");
+                                            name = Turgunda7.SObjects.GetField(rc, "http://fogid.net/o/name");
+                                            if (ty == "http://fogid.net/o/photo-doc" && ur != null)
+                                            {
+                                                src = tilda + "/Docs/GetPhoto?s=small&u=" + ur;
+                                            }
+                                            else if (TurgundaCommon.ModelCommon.icons.ContainsKey(ty))
+                                            {
+                                                src = tilda + "/icons/medium/" + TurgundaCommon.ModelCommon.icons[ty];
+                                            }
+                                            href = tilda + "/Home/P?id=" + rc.Attribute("id").Value + "&tt=" + ty;
+                                        }
+                                        return new XElement("div", new XAttribute("class", "brick"), 
+                                            new XElement("div", 
+                                                new XElement("a", new XAttribute("href", href),
+                                                    new XElement("img", new XAttribute("src", src)),                                                    new XElement("href", ""))),
+                                            new XElement("div", new XAttribute("style", "font-size:smaller;"), startdate),
+                                            null);
+                                    }))));
                         }
                         else return null;
                     })
-                );
+                ));
             return panel;
         }
-        private XElement Htable(IEnumerable<XElement> xrecs, XElement format)
+        private XElement Htable(IEnumerable<XElement> xrecs, XElement format, string cla)
         {
             XElement[] xx = xrecs.ToArray();
-            return new XElement("table",
+            return new XElement("table", 
                 new XElement("thead",
                     new XElement("tr",
                         format.Elements()
@@ -655,13 +721,13 @@ new XElement("body",
                         return new XElement("tr",
                             format.Elements()
                             .Where(f => f.Name == "field" || f.Name == "direct")
-                            .Select<XElement, XElement>(f => new XElement("td",
+                            .Select<XElement, XElement>(f => new XElement("td", cla==null?null: new XAttribute("class", cla),
                                 (f.Name == "field") ? Turgunda7.SObjects.GetField(r, f.Attribute("prop").Value) : null,
                                 (f.Name == "direct") ?  new XElement("a", 
                                     new XAttribute("href", tilda+"/Home/P?id=" 
-                                        + r.Element("direct").Element("record").Attribute("id").Value + "&tt="
-                                        + r.Element("direct").Element("record").Attribute("type").Value),
-                                    Turgunda7.SObjects.GetField(r.Element("direct").Element("record"), "http://fogid.net/o/name")) : null,
+                                        + r.Element("direct")?.Element("record")?.Attribute("id")?.Value + "&tt="
+                                        + r.Element("direct")?.Element("record")?.Attribute("type")?.Value),
+                                    Turgunda7.SObjects.GetField(r.Element("direct")?.Element("record"), "http://fogid.net/o/name")) : null,
                                     null)
                                 ));
 
