@@ -60,6 +60,8 @@ namespace Turgunda7.Controllers
         {
             string filename = "/question.jpg";
             filename = SObjects.Engine.localstorage.GetPhotoFileName(u, s) + ".jpg";
+            if (s == "normal" && !System.IO.File.Exists(filename))
+                filename = SObjects.Engine.localstorage.GetPhotoFileName(u, "medium") + ".jpg";
             //return new FilePathResult(filename, "image/jpeg");
             return new PhysicalFileResult(filename, "image/jpeg");
 
