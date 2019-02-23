@@ -575,6 +575,7 @@ new XElement("body",
         }
         public IActionResult Srch(string searchstring, string choosetype)
         {
+            if (tilda == null) tilda = HttpContext.Request.PathBase;
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement html = PageLayout(SearchPanel(searchstring, choosetype), null);
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
