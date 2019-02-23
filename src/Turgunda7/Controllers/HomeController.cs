@@ -521,7 +521,7 @@ namespace Turgunda7.Controllers
         public IActionResult P(string id, string tt)
         {
             if (tilda == null) tilda = HttpContext.Request.PathBase;
-            if (id == null) { id = "syp2001-p-marchuk_a"; tt = "http://fogid.net/o/person"; }
+            if (id == null) { id = "Xu_zoya_634993802406113281_1030"; tt = "http://fogid.net/o/person"; }
 
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement format = TurgundaCommon.ModelCommon.formats.Elements()
