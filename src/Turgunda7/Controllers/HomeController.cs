@@ -46,9 +46,9 @@ namespace Turgunda7.Controllers
                 System.Web.HttpUtility.UrlEncode(Turgunda7.SObjects.Errors)); }
             string nm = Request.Query["name"];
             if (nm == null) nm = "Фонды";
-            if ( nm != null)
+            if (nm != null)
             {
-                XElement my_element = SObjects.Engine.SearchByName(nm).FirstOrDefault(x => 
+                XElement my_element = SObjects.Engine.SearchByName(nm).FirstOrDefault(x =>
                     x.Elements("field").Any(f => f.Attribute("prop").Value == "http://fogid.net/o/name" && f.Value == nm));
                 if (my_element != null) return Redirect("~/Home/Portrait?id=" + my_element.Attribute("id").Value);
             }
@@ -92,8 +92,8 @@ namespace Turgunda7.Controllers
             var umodel = new Turgunda7.Models.UserModel(Request);
             string user = umodel.Uuser;
             // Нужно проверить прова
-            if (!umodel.IsInRole("admin")) return Error("Файлы может добавлять только администратор"); 
-                
+            if (!umodel.IsInRole("admin")) return Error("Файлы может добавлять только администратор");
+
             var cassetteInfo = SObjects.GetCassetteInfoById(id);
             Cassette cassette = cassetteInfo.cassette;
             if (cassetteInfo == null) return Error("Developers error 287344");
@@ -142,7 +142,7 @@ namespace Turgunda7.Controllers
                 // Сохраним документ в промежуточном месте
                 string fullname = formFile.FileName;
                 int pos = fullname.LastIndexOfAny(new char[] { '/', '\\' });
-                string localname = pos == -1 ? fullname : fullname.Substring(pos + 1);  
+                string localname = pos == -1 ? fullname : fullname.Substring(pos + 1);
                 string tmpfilepath = dirpath + localname;
                 using (var stream = new System.IO.FileStream(tmpfilepath, System.IO.FileMode.Create, System.IO.FileAccess.Write))
                 {
@@ -206,8 +206,8 @@ namespace Turgunda7.Controllers
                 if (string.IsNullOrEmpty(searchstring)) return Error("Имя кассеты не должно быть пустым");
                 Cassette ncass = Cassette.Create(SObjects.newcassettesdirpath + searchstring, (new Turgunda7.Models.UserModel(Request)).Uuser);
                 SObjects.xconfig.Add(
-                    new XElement("LoadCassette", 
-                        new XAttribute("write", "yes"), 
+                    new XElement("LoadCassette",
+                        new XAttribute("write", "yes"),
                         SObjects.newcassettesdirpath + ncass.Name));
                 SObjects.SaveConfig();
                 SObjects.Init();
@@ -434,7 +434,7 @@ namespace Turgunda7.Controllers
             {
                 list.Add(new Models.Conf() { Cass = c.cassette, Editable = c.isEditable, Owner = c.owner,
                     Active = usermodel.ActiveCassette() });
-                
+
             }
 
             //Turgunda7.Models.ConfigurationModel cmodel = new Models.ConfigurationModel(fogs);
@@ -484,7 +484,7 @@ namespace Turgunda7.Controllers
             bool changed = false;
             if (loadcassetteelements != null)
             { // зафиксировать результат
-                for (int i=0; i<loadcassetteelements.Length; i++)
+                for (int i = 0; i < loadcassetteelements.Length; i++)
                 {
                     // коррекция атрибута write
                     XElement el = loadcassetteelements[i];
@@ -502,7 +502,7 @@ namespace Turgunda7.Controllers
                 if (Directory.Exists(addcassette) && System.IO.File.Exists(addcassette + "/cassette.finfo"))
                 {
                     SObjects.xconfig.Add(
-                        new XElement("LoadCassette", 
+                        new XElement("LoadCassette",
                             new XAttribute("write", awrite ? "yes" : "no"),
                             addcassette));
                     changed = true;
@@ -517,14 +517,64 @@ namespace Turgunda7.Controllers
             return View("SystemConfiguration");
         }
 
-        // ====================== Экспресс-вариант портрета ========================
-        private string mode = "panel"; // другой вариант - table
-        public IActionResult P(string id, string tt, string mode)
+        internal struct Sostoyanie
         {
-            if (mode != null) this.mode = mode;
+            internal bool toedit;
+            internal string user;
+            internal string id;
+            internal string mode; // варианты - panel, table
+            internal int cnt; // для технических аспектов и измерений
+            internal string tilda;
+            internal string Code()
+            {
+                return toedit.ToString() + "\n" +
+                    user + "\n" +
+                    id + "\n" +
+                    mode + "\n" +
+                    "";
+            }
+            internal void Decode(string cs)
+            {
+                var parts = cs.Split('\n');
+                toedit = bool.Parse(parts[0]);
+                user = parts[1];
+                id = parts[2];
+                mode = parts[3];
+            }
+            internal void Init()
+            {
+                toedit = false;
+                user = "anonimous";
+                id = "no_id";
+                mode = "panel";
+            }
+        }
+        internal Sostoyanie sos;
+        private string tilda = null;
+        // ====================== Экспресс-вариант портрета ========================
+        private void PageConstructBefore()
+        {
             if (tilda == null) tilda = HttpContext.Request.PathBase;
-            if (id == null) { id = "syp2001-p-marchuk_a"; tt = "http://fogid.net/o/person"; }
 
+            string sostoyanie = HttpContext.Session.GetString("sostoyanie");
+            if (sostoyanie == null) sos.Init();
+            else sos.Decode(sostoyanie);
+
+        }
+        private void PageConstructAfter()
+        {
+            string sostoyanie = sos.Code();
+            HttpContext.Session.SetString("sostoyanie", sostoyanie);
+        }
+
+        public IActionResult P(string id, string tt, string mode, bool? toedit)
+        {
+            PageConstructBefore();
+            if (toedit != null) sos.toedit = (bool)toedit;
+            if (mode != null) sos.mode = mode;
+            if (id != null) sos.id = id;
+            else id = sos.id;
+            if (id == null || id == "no_id") { id = "syp2001-p-marchuk_a"; tt = "http://fogid.net/o/person"; }
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             if (tt == null)
             {
@@ -534,10 +584,10 @@ namespace Turgunda7.Controllers
             XElement format = TurgundaCommon.ModelCommon.formats.Elements()
                                 .FirstOrDefault(el => el.Attribute("type").Value == tt);
             XElement html = PageLayout(SearchPanel(null, null), PortraitPanel(id, format));
+            PageConstructAfter();
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
         }
-        private string tilda = null;
         private XElement PageLayout(XElement searchPanel, XElement bodyPanel)
         {
             XElement html = new XElement("html",
@@ -560,7 +610,8 @@ new XElement("body",
                 new XElement("h2", new XAttribute("style", "color:#5c87b2;padding: 0 0 0 0;"), "Открытый архив СО РАН (редактирующее приложение)")),
             new XElement("td",
                 new XElement("div", new XAttribute("style", "width:100px; text-align:right;"),
-                    new XElement("a", new XAttribute("href", tilda + "/Home/index"), "ред")))),
+                    new XElement("a", new XAttribute("href", tilda + $"/Home/P?toedit={(sos.toedit ? "false" : "true")}"), 
+                        sos.toedit ? "выход" : "ред")))),
         new XElement("tr", new XAttribute("valign", "bottom"),
             new XElement("td", new XAttribute("colspan", "3"),
                 searchPanel)),
@@ -575,8 +626,10 @@ new XElement("body",
         }
         public IActionResult Srch(string searchstring, string choosetype)
         {
+            PageConstructBefore();
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement html = PageLayout(SearchPanel(searchstring, choosetype), null);
+            PageConstructAfter();
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
         }
@@ -636,6 +689,7 @@ new XElement("body",
             }
 
             XElement panel = new XElement("div",
+                new XElement("div", sos.cnt++),                
                 new XElement("div", TurgundaCommon.ModelCommon.OntNames[format.Attribute("type").Value]),
                 doc_content,
                 Htable(Enumerable.Repeat(xresult, 1) , format, "d"),
@@ -660,11 +714,11 @@ new XElement("body",
                                     new XElement("div", " ",
                                         new XElement("a", new XAttribute("href", 
                                             tilda+"/Home/P?id="+id+"&mode=" + 
-                                                (mode==null||mode=="panel"?"table":"panel")),
-                                                (mode == null || mode == "panel"?"T":"P"))) :
+                                                (sos.mode==null|| sos.mode =="panel"?"table":"panel")),
+                                                (sos.mode == null || sos.mode == "panel"?"T":"P"))) :
                                     null),
                                 new XElement("td",
-                                    !(panelview == "largeicons" && mode == "panel") ? 
+                                    !(panelview == "largeicons" && sos.mode == "panel") ? 
                                     Htable(rels, frec, null) : 
                                     new XElement("div", rels.Select(r =>
                                     {
@@ -717,7 +771,6 @@ new XElement("body",
                 new XElement("tbody",
                     xrecs.Select(r =>
                     {
-                        //XElement rr = ;
                         return new XElement("tr",
                             format.Elements()
                             .Where(f => f.Name == "field" || f.Name == "direct")
@@ -729,7 +782,8 @@ new XElement("body",
                                         + r.Element("direct")?.Element("record")?.Attribute("type")?.Value),
                                     Turgunda7.SObjects.GetField(r.Element("direct")?.Element("record"), "http://fogid.net/o/name")) : null,
                                     null)
-                                ));
+                                ),
+                            new XElement("td", "ред дел"));
 
                     }
                 )));

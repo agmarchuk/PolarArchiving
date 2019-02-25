@@ -29,7 +29,7 @@ namespace Turgunda7
             });
             //    .AddSessionStateTempDataProvider();
 
-            // services.AddSession();
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,7 +46,7 @@ namespace Turgunda7
             }
 
             app.UseStaticFiles();
-            //app.UseSession();
+            app.UseSession();
             //app.UsePathBase()
 
             Turgunda7.SObjects.Init(env.ContentRootPath);
