@@ -555,6 +555,11 @@ namespace Turgunda7.Controllers
         private void PageConstructBefore()
         {
             if (tilda == null) tilda = HttpContext.Request.PathBase;
+<<<<<<< .mine
+
+=======
+            if (id == null) { id = "Xu_zoya_634993802406113281_1030"; tt = "http://fogid.net/o/person"; }
+>>>>>>> .theirs
 
             string sostoyanie = HttpContext.Session.GetString("sostoyanie");
             if (sostoyanie == null) sos.Init();
@@ -626,7 +631,11 @@ new XElement("body",
         }
         public IActionResult Srch(string searchstring, string choosetype)
         {
+<<<<<<< .mine
             PageConstructBefore();
+=======
+            if (tilda == null) tilda = HttpContext.Request.PathBase;
+>>>>>>> .theirs
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement html = PageLayout(SearchPanel(searchstring, choosetype), null);
             PageConstructAfter();
