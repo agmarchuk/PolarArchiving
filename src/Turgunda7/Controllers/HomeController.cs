@@ -555,11 +555,6 @@ namespace Turgunda7.Controllers
         private void PageConstructBefore()
         {
             if (tilda == null) tilda = HttpContext.Request.PathBase;
-<<<<<<< .mine
-
-=======
-            if (id == null) { id = "Xu_zoya_634993802406113281_1030"; tt = "http://fogid.net/o/person"; }
->>>>>>> .theirs
 
             string sostoyanie = HttpContext.Session.GetString("sostoyanie");
             if (sostoyanie == null) sos.Init();
@@ -575,6 +570,8 @@ namespace Turgunda7.Controllers
         public IActionResult P(string id, string tt, string mode, bool? toedit)
         {
             PageConstructBefore();
+            //if (id == null) { id = "Xu_zoya_634993802406113281_1030"; tt = "http://fogid.net/o/person"; }
+
             if (toedit != null) sos.toedit = (bool)toedit;
             if (mode != null) sos.mode = mode;
             if (id != null) sos.id = id;
@@ -631,11 +628,7 @@ new XElement("body",
         }
         public IActionResult Srch(string searchstring, string choosetype)
         {
-<<<<<<< .mine
             PageConstructBefore();
-=======
-            if (tilda == null) tilda = HttpContext.Request.PathBase;
->>>>>>> .theirs
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement html = PageLayout(SearchPanel(searchstring, choosetype), null);
             PageConstructAfter();
