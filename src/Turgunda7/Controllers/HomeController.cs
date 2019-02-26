@@ -570,22 +570,26 @@ namespace Turgunda7.Controllers
         public IActionResult P(string id, string tt, string mode, bool? toedit)
         {
             PageConstructBefore();
-            //if (id == null) { id = "Xu_zoya_634993802406113281_1030"; tt = "http://fogid.net/o/person"; }
+            ContentResult cr = new ContentResult() { ContentType = "text/html" };
 
             if (toedit != null) sos.toedit = (bool)toedit;
             if (mode != null) sos.mode = mode;
             if (id != null) sos.id = id;
             else id = sos.id;
-            if (id == null || id == "no_id") { id = "syp2001-p-marchuk_a"; tt = "http://fogid.net/o/person"; }
-            ContentResult cr = new ContentResult() { ContentType = "text/html" };
-            if (tt == null)
+            XElement main_panel = null;
+            if (id != null && id != "no_id")
             {
-                XElement xres = Turgunda7.SObjects.GetItemByIdSpecial(id);
-                tt = xres.Attribute("type").Value;
+                if (tt == null)
+                {
+                    XElement xres = Turgunda7.SObjects.GetItemByIdSpecial(id);
+                    tt = xres.Attribute("type").Value;
+                }
+                XElement format = TurgundaCommon.ModelCommon.formats.Elements()
+                                    .FirstOrDefault(el => el.Attribute("type").Value == tt);
+                main_panel = PortraitPanel(id, format);
+
             }
-            XElement format = TurgundaCommon.ModelCommon.formats.Elements()
-                                .FirstOrDefault(el => el.Attribute("type").Value == tt);
-            XElement html = PageLayout(SearchPanel(null, null), PortraitPanel(id, format));
+            XElement html = PageLayout(SearchPanel(null, null), main_panel);
             PageConstructAfter();
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
