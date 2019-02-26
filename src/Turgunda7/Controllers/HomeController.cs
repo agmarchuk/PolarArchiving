@@ -600,7 +600,7 @@ namespace Turgunda7.Controllers
 new XElement("head",
     new XElement("meta", new XAttribute("charset", "utf-8")),
     new XElement("link", new XAttribute("rel", "stylesheet"), new XAttribute("href", tilda + "/css/site.css")),
-    new XElement("script", new XAttribute("type", "text/javascript"), " "),
+    new XElement("script", new XAttribute("type", "text/javascript"), new XAttribute("src", tilda+"/s.js"), " "),
     new XElement("style", "table td {border: solid 1px;}")),
 new XElement("body",
     new XElement("table", new XAttribute("width", "100%"), new XAttribute("style", "margin-top:10px;"),
@@ -789,11 +789,21 @@ new XElement("body",
                                     Turgunda7.SObjects.GetField(r.Element("direct")?.Element("record"), "http://fogid.net/o/name")) : null,
                                     null)
                                 ),
-                            new XElement("td", "ред дел"));
+                            sos.toedit ? 
+                            new XElement("td",
+                                new XElement("a", new XAttribute("href", ""), "ред"), " ",
+                                new XElement("a", new XAttribute("href", tilda+"/Home/D?did=" + r.Attribute("id").Value),
+                                    new XAttribute("onclick_", "look(); return false;"), "x")) : 
+                            null);
 
                     }
                 )));
         }
-
+        public IActionResult D(string did)
+        {
+            PageConstructBefore();
+            SObjects.DeleteItem(did, sos.user);
+            return P(sos.id, null, null, null);
+        }
     }
 }
