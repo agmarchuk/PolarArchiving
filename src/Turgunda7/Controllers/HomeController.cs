@@ -523,14 +523,16 @@ namespace Turgunda7.Controllers
             internal string user;
             internal string id;
             internal string mode; // варианты - panel, table
+            internal string eid;
             internal int cnt; // для технических аспектов и измерений
-            internal string tilda;
+            //internal string tilda;
             internal string Code()
             {
                 return toedit.ToString() + "\n" +
                     user + "\n" +
                     id + "\n" +
                     mode + "\n" +
+                    eid + "\n" +
                     "";
             }
             internal void Decode(string cs)
@@ -540,6 +542,7 @@ namespace Turgunda7.Controllers
                 user = parts[1];
                 id = parts[2];
                 mode = parts[3];
+                eid = parts[4];
             }
             internal void Init()
             {
@@ -552,7 +555,7 @@ namespace Turgunda7.Controllers
         internal Sostoyanie sos;
         private string tilda = null;
         // ====================== Экспресс-вариант портрета ========================
-        private void PageConstructBefore()
+        private void LoadSostoyanie()
         {
             if (tilda == null) tilda = HttpContext.Request.PathBase;
 
@@ -561,15 +564,15 @@ namespace Turgunda7.Controllers
             else sos.Decode(sostoyanie);
 
         }
-        private void PageConstructAfter()
+        private void SaveSostoyanie()
         {
             string sostoyanie = sos.Code();
             HttpContext.Session.SetString("sostoyanie", sostoyanie);
         }
 
-        public IActionResult P(string id, string tt, string mode, bool? toedit)
+        public IActionResult P(string id, string tt, string mode, bool? toedit, string eid)
         {
-            PageConstructBefore();
+            LoadSostoyanie();
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
 
             if (toedit != null) sos.toedit = (bool)toedit;
@@ -577,20 +580,32 @@ namespace Turgunda7.Controllers
             if (id != null) sos.id = id;
             else id = sos.id;
             XElement main_panel = null;
+
+            // Параметры быстрого отладочного запуска
+            if (true)
+            {
+                sos.id = id = "syp2001-p-marchuk_a";
+                sos.toedit = true;
+                sos.user = "mag";
+            }
+
             if (id != null && id != "no_id")
             {
                 if (tt == null)
                 {
                     XElement xres = Turgunda7.SObjects.GetItemByIdSpecial(id);
-                    tt = xres.Attribute("type").Value;
+                    tt = xres?.Attribute("type").Value;
                 }
-                XElement format = TurgundaCommon.ModelCommon.formats.Elements()
-                                    .FirstOrDefault(el => el.Attribute("type").Value == tt);
-                main_panel = PortraitPanel(id, format);
+                if (tt != null)
+                {
+                    XElement format = TurgundaCommon.ModelCommon.formats.Elements()
+                                        .FirstOrDefault(el => el.Attribute("type").Value == tt);
+                    main_panel = PortraitPanel(id, eid, format);
+                }
 
             }
             XElement html = PageLayout(SearchPanel(null, null), main_panel);
-            PageConstructAfter();
+            SaveSostoyanie();
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
         }
@@ -616,8 +631,9 @@ new XElement("body",
                 new XElement("h2", new XAttribute("style", "color:#5c87b2;padding: 0 0 0 0;"), "Открытый архив СО РАН (редактирующее приложение)")),
             new XElement("td",
                 new XElement("div", new XAttribute("style", "width:100px; text-align:right;"),
-                    new XElement("a", new XAttribute("href", tilda + $"/Home/P?toedit={(sos.toedit ? "false" : "true")}"), 
-                        sos.toedit ? "выход" : "ред")))),
+                    sos.user + " ",
+                    new XElement("a", new XAttribute("href", tilda + $"/Home/L"), 
+                        sos.toedit ? "вых" : "ред")))),
         new XElement("tr", new XAttribute("valign", "bottom"),
             new XElement("td", new XAttribute("colspan", "3"),
                 searchPanel)),
@@ -632,10 +648,10 @@ new XElement("body",
         }
         public IActionResult Srch(string searchstring, string choosetype)
         {
-            PageConstructBefore();
+            LoadSostoyanie();
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement html = PageLayout(SearchPanel(searchstring, choosetype), null);
-            PageConstructAfter();
+            SaveSostoyanie();
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
         }
@@ -680,7 +696,7 @@ new XElement("body",
                             tu.Item1)))
                     );
         }
-        private XElement PortraitPanel(string id, XElement format)
+        private XElement PortraitPanel(string id, string eid, XElement format)
         {
             XElement xresult = Turgunda7.SObjects.GetItemById(id, format);
 
@@ -695,10 +711,9 @@ new XElement("body",
             }
 
             XElement panel = new XElement("div",
-                new XElement("div", sos.cnt++),                
                 new XElement("div", TurgundaCommon.ModelCommon.OntNames[format.Attribute("type").Value]),
                 doc_content,
-                Htable(Enumerable.Repeat(xresult, 1) , format, "d"),
+                Htable(Enumerable.Repeat(xresult, 1) , format, "d", eid),
                 new XElement("table",
                 format.Elements()
                     .Where(f => f.Name == "inverse")
@@ -725,7 +740,7 @@ new XElement("body",
                                     null),
                                 new XElement("td",
                                     !(panelview == "largeicons" && sos.mode == "panel") ? 
-                                    Htable(rels, frec, null) : 
+                                    Htable(rels, frec, null, eid) : 
                                     new XElement("div", rels.Select(r =>
                                     {
                                         XElement rc = r.Element("direct")?.Element("record");
@@ -763,7 +778,7 @@ new XElement("body",
                 ));
             return panel;
         }
-        private XElement Htable(IEnumerable<XElement> xrecs, XElement format, string cla)
+        private XElement Htable(IEnumerable<XElement> xrecs, XElement format, string cla, string eid)
         {
             XElement[] xx = xrecs.ToArray();
             return new XElement("table", 
@@ -771,39 +786,156 @@ new XElement("body",
                     new XElement("tr",
                         format.Elements()
                         .Where(f => f.Name == "field" || f.Name == "direct")
-                        .Select(f => new XElement("th", 
+                        .Select(f => new XElement("th",
                             TurgundaCommon.ModelCommon.OntNames[f.Attribute("prop").Value]))
                     )),
                 new XElement("tbody",
                     xrecs.Select(r =>
                     {
-                        return new XElement("tr",
-                            format.Elements()
-                            .Where(f => f.Name == "field" || f.Name == "direct")
-                            .Select<XElement, XElement>(f => new XElement("td", cla==null?null: new XAttribute("class", cla),
-                                (f.Name == "field") ? Turgunda7.SObjects.GetField(r, f.Attribute("prop").Value) : null,
-                                (f.Name == "direct") ?  new XElement("a", 
-                                    new XAttribute("href", tilda+"/Home/P?id=" 
-                                        + r.Element("direct")?.Element("record")?.Attribute("id")?.Value + "&tt="
-                                        + r.Element("direct")?.Element("record")?.Attribute("type")?.Value),
-                                    Turgunda7.SObjects.GetField(r.Element("direct")?.Element("record"), "http://fogid.net/o/name")) : null,
-                                    null)
-                                ),
-                            sos.toedit ? 
-                            new XElement("td",
-                                new XElement("a", new XAttribute("href", ""), "ред"), " ",
-                                new XElement("a", new XAttribute("href", tilda+"/Home/D?did=" + r.Attribute("id").Value),
-                                    new XAttribute("onclick_", "look(); return false;"), "x")) : 
-                            null);
+                        XElement row = new XElement("tr");
+                        if (r.Attribute("id").Value == eid)
+                        { // форма редактирования
+                            var fe_arr = format.Elements()
+                                .Where(f => f.Name == "field" || f.Name == "direct")
+                                .ToArray(); // Можно и без преобразования в массив
+// === вычисление таблицы редактирования
+XElement etable = new XElement("div", new XAttribute("style", "border-width:thin; border-style:dashed; border-color:Black;"),
+    new XElement("form", new XAttribute("method", "post"), new XAttribute("action", tilda+"/Home/E"), 
+    new XElement("table", new XAttribute("width", "100%"),
+        new XElement("input", new XAttribute("type", "hidden"), new XAttribute("name", "eid"), new XAttribute("value", eid)),
+        fe_arr.Select<XElement, XElement>(f =>
+        {
+            string prop = f.Attribute("prop").Value;
+            string direction = f.Name.LocalName;
+            XElement cell = null;
+            cell = new XElement("input", new XAttribute("type", "text"),
+                new XAttribute("style", "width: 400px;"),
+                new XAttribute("name", "nmmm"),
+                new XAttribute("value", Turgunda7.SObjects.GetField(r, prop)));
+            return new XElement("tr",
+                new XElement("td", TurgundaCommon.ModelCommon.OntNames[prop]),
+                new XElement("td", cell),
+                null);
+        }),
+        new XElement("tr",
+            new XElement("td"),
+            new XElement("td", 
+                new XElement("input", new XAttribute("type", "submit"), 
+                    new XAttribute("name", "comm_chk"), new XAttribute("value", "пров.")),
+                new XElement("input", new XAttribute("type", "submit"),
+                    new XAttribute("name", "comm_save"), new XAttribute("value", "сохр.")),
+                new XElement("input", new XAttribute("type", "submit"),
+                    new XAttribute("name", "comm_canc"), new XAttribute("value", "отм.")),
+                null))
+        )));
+// ===
+                            row.Add(
+                                new XElement("td", new XAttribute("colspan", fe_arr.Count()+1), etable));
 
+                        }
+                        else
+                        { // форма рядка
+                            row.Add(
+                                format.Elements()
+                                .Where(f => f.Name == "field" || f.Name == "direct")
+                                .Select(f => new XElement("td", cla == null ? null : new XAttribute("class", cla),
+                                    (f.Name == "field") ? Turgunda7.SObjects.GetField(r, f.Attribute("prop").Value) : null,
+                                    (f.Name == "direct") ? new XElement("a",
+                                        new XAttribute("href", tilda + "/Home/P?id="
+                                            + r.Element("direct")?.Element("record")?.Attribute("id")?.Value + "&tt="
+                                            + r.Element("direct")?.Element("record")?.Attribute("type")?.Value),
+                                        Turgunda7.SObjects.GetField(r.Element("direct")?.Element("record"), "http://fogid.net/o/name")) : null,
+                                        null)
+                                    ),
+                                sos.toedit ?
+                                new XElement("td",
+                                    new XElement("a", new XAttribute("href", tilda + "/Home/P?eid="+ r.Attribute("id").Value), "ред"), " ",
+                                    r.Elements("inverse").Count() > 0 ? null :
+                                    new XElement("a", new XAttribute("href", tilda + "/Home/D?did=" + r.Attribute("id").Value),
+                                        //new XAttribute("onclick_", "look(); return false;"), "x")) :
+                                        new XAttribute("onclick", "look(); "), "x")) :
+                                null);
+                        }
+                        return row;
                     }
                 )));
         }
+        // Login
+        //[HttpPost]
+        public IActionResult L(string login, string pass, string newuser) 
+        {
+            LoadSostoyanie();
+            // Если нажали в режиме редактирования, значит это выход и надо сделать выход из режима
+            if (sos.toedit)
+            {
+                sos.toedit = false;
+                SaveSostoyanie();
+                return P(sos.id, null, null, null, null);
+            }
+            // здесь могут быть уже сформированные данные, если они правильные, надо просто переключить режим
+            if (login != null)
+            {
+                var candidate = SObjects.accounts.Elements("account")
+                    .FirstOrDefault(a => a.Attribute("login").Value == login);
+                // правильные данные: либо логин и пасс совпадают, либо кандидат пустой, пасс непустой, и newuser
+                if (candidate?.Attribute("pass").Value == pass || (candidate == null && pass != null && newuser == "on"))
+                {
+                    // Фиксируем изменения
+                    sos.toedit = true;
+                    sos.user = login;
+                    if (newuser == "on")
+                    {
+                        SObjects.accounts.Add(new XElement("account",
+                            new XAttribute("login", login), new XAttribute("pass", pass)));
+                        SObjects.SaveAccounts();
+                    }
+                    SaveSostoyanie();
+                    return P(sos.id, null, null, null, null);
+                }
+                // А остальное - ошибочные данные, нужно повторять ввод 
+            }
+            ContentResult cr = new ContentResult() { ContentType = "text/html" };
+
+            XElement html = new XElement("html",
+new XElement("head",
+new XElement("meta", new XAttribute("charset", "utf-8")),
+new XElement("link", new XAttribute("rel", "stylesheet"), new XAttribute("href", tilda + "/css/site.css"))),
+new XElement("body", new XAttribute("style", "margin: 20px;"),
+new XElement("h2", "Для редактирования, надо авторизоваться"),
+new XElement("form", new XAttribute("method", "get"), new XAttribute("action", ""),
+    new XElement("table",
+        new XElement("tr",
+            new XElement("td", "код пользователя"),
+            new XElement("td", new XElement("input", new XAttribute("type", "text"), new XAttribute("name", "login")))),
+        new XElement("tr",
+            new XElement("td", "пароль"),
+            new XElement("td", new XElement("input", new XAttribute("type", "text"), new XAttribute("name", "pass")))),
+        new XElement("tr",
+            new XElement("td", "новый пользователь?"),
+            new XElement("td", new XElement("input", new XAttribute("type", "checkbox"), new XAttribute("name", "newuser")))),
+        new XElement("tr",
+            new XElement("td"),
+            new XElement("td", new XElement("input", new XAttribute("type", "submit")))),
+        null))));
+
+            cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
+            return cr;
+
+        }
+        // Delete
         public IActionResult D(string did)
         {
-            PageConstructBefore();
+            LoadSostoyanie();
             SObjects.DeleteItem(did, sos.user);
-            return P(sos.id, null, null, null);
+            return P(sos.id, null, null, null, null);
+        }
+        // EditRecord
+        [HttpPost]
+        public IActionResult E(string eid)
+        {
+            var v = HttpContext.Request.Form["comm_chk"];
+            LoadSostoyanie();
+            return P(sos.id, null, null, null, null);
         }
     }
 }
