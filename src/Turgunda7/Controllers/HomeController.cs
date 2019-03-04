@@ -584,9 +584,9 @@ namespace Turgunda7.Controllers
             // Параметры быстрого отладочного запуска
             if (id == null || id == "no_id")
             {
-                sos.id = id = "cass_mag05_1008"; //"syp2001-p-marchuk_a";
-                sos.toedit = false;
-                sos.user = "mag";
+                sos.id = id = "syp2001-p-marchuk_a"; //"cass_mag05_1008"; //"syp2001-p-marchuk_a";
+                sos.toedit = true;
+                sos.user = "anonimous";
             }
 
             if (id != null && id != "no_id")
@@ -687,7 +687,12 @@ new XElement("body",
                         })),
                     new XElement("input", new XAttribute("type", "submit"), new XAttribute("value", "искать"),
                         new XAttribute("style", "font-size:small;"))), ss == null ? null :
-                new XElement("div", "найдено: " + xresults.Length),
+                new XElement("div", 
+                (sos.toedit && !string.IsNullOrEmpty(tt))
+                ? new XElement("div", 
+                    new XElement("a", 
+                        new XAttribute("href", tilda + "/Home/N?ss="+ss+"&tt="+tt)), "нов.")  
+                : new XElement("div", "найдено: " + xresults.Length)),
                 xresults.Select(x => new Tuple<string, XElement>(SObjects.GetField(x, "http://fogid.net/o/name"), x ))
                     .OrderBy(tu => tu.Item1)
                     .Select(tu => new XElement("div",
@@ -731,19 +736,29 @@ new XElement("body",
                         if (rels.Length > 0)
                         {
                             return new XElement("tr", new XAttribute("valign", "top"),
-                                new XElement("td", 
+                                new XElement("td",
                                     TurgundaCommon.ModelCommon.InvOntNames[prop],
-                                    panelview == "largeicons"? 
-                                    new XElement("div", " ",
-                                        new XElement("a", new XAttribute("href", 
-                                            tilda+"/Home/P?id="+id+"&mode=" + 
-                                                (sos.mode==null|| sos.mode =="panel"?"table":"panel")),
-                                                (sos.mode == null || sos.mode == "panel"?"T":"P"))) :
+                                    //((panelview == "largeicons")
+                                    //? new XElement("div",
+                                    //    " ",
+                                    //    new XElement("a", new XAttribute("href", tilda + "/Home/P?id=" + id + "&mode=" +
+                                    //            (sos.mode == null || sos.mode == "panel" ? "table" : "panel")),
+                                    //            (sos.mode == null || sos.mode == "panel" ? "T" : "P")),
+                                    //    " ",
+                                    //    (sos.toedit ? new XElement("a", new XAttribute("href", tilda + "/Home/NI"), "нов.") : new XElement("div"))
+                                    //: null)),
+                                    panelview == "largeicons"
+                                    ? new XElement("div", " ",
+                                        new XElement("a", new XAttribute("href", tilda + "/Home/P?id=" + id + "&mode=" +
+                                                (sos.mode == null || sos.mode == "panel" ? "table" : "panel")),
+                                                (sos.mode == null || sos.mode == "panel" ? "T" : "P")),
+                                        null)
+                                    : null,
                                     null),
                                 new XElement("td",
-                                    !(panelview == "largeicons" && sos.mode == "panel") ? 
-                                    Htable(rels, frec.ToString(), null, eid, id, prop) : 
-                                    new XElement("div", rels.Select(r =>
+                                    (panelview != "largeicons" || sos.mode == "table")
+                                    ? Htable(rels, frec.ToString(), null, eid, id, prop)
+                                    : new XElement("div", rels.Select(r =>
                                     {
                                         XElement rc = r.Element("direct")?.Element("record");
                                         string src = tilda + "/icons/medium/default_m.jpg";
@@ -767,10 +782,10 @@ new XElement("body",
                                             }
                                             href = tilda + "/Home/P?id=" + rc.Attribute("id").Value + "&tt=" + ty;
                                         }
-                                        return new XElement("div", new XAttribute("class", "brick"), 
-                                            new XElement("div", 
+                                        return new XElement("div", new XAttribute("class", "brick"),
+                                            new XElement("div",
                                                 new XElement("a", new XAttribute("href", href),
-                                                    new XElement("img", new XAttribute("src", src)),                                                    new XElement("href", ""))),
+                                                    new XElement("img", new XAttribute("src", src)), new XElement("href", ""))),
                                             new XElement("div", new XAttribute("style", "font-size:smaller;"), startdate),
                                             null);
                                     }))));
@@ -989,6 +1004,15 @@ new XElement("form", new XAttribute("method", "get"), new XAttribute("action", "
             return cr;
 
         }
+        // New record
+        public IActionResult N(string ss, string tt)
+        {
+            LoadSostoyanie();
+            //SObjects.DeleteItem(did, sos.user);
+            //return P(sos.id, null, null, null, null);
+            string id = Turgunda7.SObjects.CreateNewItem(ss, tt, sos.user);
+            return new RedirectResult(tilda + "/Home/P?id=" + id);
+        }
         // Delete
         public IActionResult D(string did)
         {
@@ -1038,6 +1062,10 @@ new XElement("form", new XAttribute("method", "get"), new XAttribute("action", "
                     if (f.Name == "field")
                     {
                         elem.Value = val;
+                        if (TurgundaCommon.ModelCommon.IsTextField(pr))
+                        {
+                            elem.Add(new XAttribute(ONames.xmllang, "ru"));
+                        }
                     }
                     else
                     {
