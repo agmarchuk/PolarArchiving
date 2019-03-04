@@ -582,10 +582,10 @@ namespace Turgunda7.Controllers
             XElement main_panel = null;
 
             // Параметры быстрого отладочного запуска
-            if (true)
+            if (id == null || id == "no_id")
             {
-                sos.id = id = "syp2001-p-marchuk_a";
-                sos.toedit = true;
+                sos.id = id = "cass_mag05_1008"; //"syp2001-p-marchuk_a";
+                sos.toedit = false;
                 sos.user = "mag";
             }
 
@@ -703,17 +703,19 @@ new XElement("body",
             string uri = Turgunda7.SObjects.GetField(xresult, "http://fogid.net/o/uri");
             string typ = xresult.Attribute("type").Value;
             XElement doc_content = null;
-            if (uri != null && typ == "http://fogid.net/o/photo-doc")
+            if (!string.IsNullOrEmpty(uri) && typ == "http://fogid.net/o/photo-doc")
             {
                 doc_content = new XElement("div",
                     new XElement("img",
                         new XAttribute("src", tilda + "/Docs/GetPhoto?s=normal&u=" + uri)));
             }
 
+            XElement htable0 = Htable(Enumerable.Repeat(xresult, 1), format.ToString(), "d", eid, id, null);
             XElement panel = new XElement("div",
                 new XElement("div", TurgundaCommon.ModelCommon.OntNames[format.Attribute("type").Value]),
                 doc_content,
-                Htable(Enumerable.Repeat(xresult, 1) , format, "d", eid),
+                //Htable(Enumerable.Repeat(xresult, 1) , format.ToString(), "d", id, eid, null),
+                htable0,
                 new XElement("table",
                 format.Elements()
                     .Where(f => f.Name == "inverse")
@@ -740,7 +742,7 @@ new XElement("body",
                                     null),
                                 new XElement("td",
                                     !(panelview == "largeicons" && sos.mode == "panel") ? 
-                                    Htable(rels, frec, null, eid) : 
+                                    Htable(rels, frec.ToString(), null, eid, id, prop) : 
                                     new XElement("div", rels.Select(r =>
                                     {
                                         XElement rc = r.Element("direct")?.Element("record");
@@ -778,8 +780,18 @@ new XElement("body",
                 ));
             return panel;
         }
-        private XElement Htable(IEnumerable<XElement> xrecs, XElement format, string cla, string eid)
+        /// <summary>
+        /// Построение таблицы и конкретных рядков таблицы
+        /// </summary>
+        /// <param name="xrecs">массив записей</param>
+        /// <param name="format">формат элементов массива</param>
+        /// <param name="cla">класс для визуализации</param>
+        /// <param name="eid">выделенный рядок</param>
+        /// <param name="iprop">обратное свойтво верхнего уровня</param>
+        /// <returns>Построенный HTML таблицы</returns>
+        private XElement Htable(IEnumerable<XElement> xrecs, string forma_t, string cla, string eid, string bid, string iprop)
         {
+            XElement format = XElement.Parse(forma_t);
             XElement[] xx = xrecs.ToArray();
             return new XElement("table", 
                 new XElement("thead",
@@ -803,15 +815,51 @@ XElement etable = new XElement("div", new XAttribute("style", "border-width:thin
     new XElement("form", new XAttribute("method", "post"), new XAttribute("action", tilda+"/Home/E"), 
     new XElement("table", new XAttribute("width", "100%"),
         new XElement("input", new XAttribute("type", "hidden"), new XAttribute("name", "eid"), new XAttribute("value", eid)),
+        new XElement("input", new XAttribute("type", "hidden"), new XAttribute("name", "bid"), new XAttribute("value", bid)),
+        string.IsNullOrEmpty(iprop) ? null: new XElement("input", new XAttribute("type", "hidden"), new XAttribute("name", "prop"), new XAttribute("value", iprop)),
+        string.IsNullOrEmpty(forma_t) ? null : new XElement("input", new XAttribute("type", "hidden"), new XAttribute("name", "forma_t"), new XAttribute("value", forma_t)),
+        new XElement("input", new XAttribute("type", "hidden"), new XAttribute("name", "rtype"), new XAttribute("value", r.Attribute("type").Value)),
         fe_arr.Select<XElement, XElement>(f =>
         {
             string prop = f.Attribute("prop").Value;
             string direction = f.Name.LocalName;
             XElement cell = null;
-            cell = new XElement("input", new XAttribute("type", "text"),
-                new XAttribute("style", "width: 400px;"),
-                new XAttribute("name", "nmmm"),
-                new XAttribute("value", Turgunda7.SObjects.GetField(r, prop)));
+
+            if (direction == "field")
+            {
+                if (prop == "http://fogid.net/o/description" || prop == "http://fogid.net/o/doc-content")
+                {
+                    cell = new XElement("textarea", new XAttribute("rows", "5"),
+                        new XAttribute("style", "width: 400px;"),
+                        new XAttribute("name", prop),
+                        Turgunda7.SObjects.GetField(r, prop));
+                }
+                else
+                {
+                    // Обработка перечисления
+                    string ftype = f.Attribute("type")?.Value;
+                    if (ftype != null)
+                    {
+                        var variants = TurgundaCommon.ModelCommon.GetEnumStates(ftype)
+                            .ToArray();
+                        cell = new XElement("select", new XAttribute("name", prop),
+                            new XElement("option", new XAttribute("value", " ")),
+                            variants.Select(variant => new XElement("option", new XAttribute("value", variant.Attribute("value").Value),
+                                variant.Attribute("value").Value == Turgunda7.SObjects.GetField(r, prop) ? new XAttribute("selected", "selected") : null,
+                                variant.Value)),
+                            null);
+                    }
+                    else
+                    {
+                        cell = new XElement("input", new XAttribute("type", "text"),
+                            new XAttribute("style", "width: 400px;"),
+                            new XAttribute("name", prop),
+                            new XAttribute("value", Turgunda7.SObjects.GetField(r, prop)));
+                    }
+                }
+
+            }
+
             return new XElement("tr",
                 new XElement("td", TurgundaCommon.ModelCommon.OntNames[prop]),
                 new XElement("td", cell),
@@ -838,18 +886,34 @@ XElement etable = new XElement("div", new XAttribute("style", "border-width:thin
                             row.Add(
                                 format.Elements()
                                 .Where(f => f.Name == "field" || f.Name == "direct")
-                                .Select(f => new XElement("td", cla == null ? null : new XAttribute("class", cla),
-                                    (f.Name == "field") ? Turgunda7.SObjects.GetField(r, f.Attribute("prop").Value) : null,
-                                    (f.Name == "direct") ? new XElement("a",
-                                        new XAttribute("href", tilda + "/Home/P?id="
+                                .Select(f =>
+                                {
+                                    XElement xcontent = null;
+                                    if (f.Name == "field")
+                                    {
+                                        string s = Turgunda7.SObjects.GetField(r, f.Attribute("prop").Value);
+                                        string ftype = f.Attribute("type")?.Value;
+                                        if (ftype != null)
+                                        {
+                                            string rustext = TurgundaCommon.ModelCommon.GetEnumStateLabel(ftype, s);
+                                            if (rustext != null) s = rustext;
+                                        }
+                                        xcontent = new XElement("span", s);
+                                    }
+                                    else if (f.Name == "direct")
+                                    {
+                                        xcontent = new XElement("a", new XAttribute("href", tilda + "/Home/P?id="
                                             + r.Element("direct")?.Element("record")?.Attribute("id")?.Value + "&tt="
                                             + r.Element("direct")?.Element("record")?.Attribute("type")?.Value),
-                                        Turgunda7.SObjects.GetField(r.Element("direct")?.Element("record"), "http://fogid.net/o/name")) : null,
-                                        null)
+                                            Turgunda7.SObjects.GetField(r.Element("direct")?.Element("record"), "http://fogid.net/o/name"));
+
+                                    }
+                                    return new XElement("td", cla == null ? null : new XAttribute("class", cla), xcontent);
+                                }
                                     ),
                                 sos.toedit ?
                                 new XElement("td",
-                                    new XElement("a", new XAttribute("href", tilda + "/Home/P?eid="+ r.Attribute("id").Value), "ред"), " ",
+                                    new XElement("a", new XAttribute("href", tilda + "/Home/P?eid="+r.Attribute("id").Value), "ред"), " ",
                                     r.Elements("inverse").Count() > 0 ? null :
                                     new XElement("a", new XAttribute("href", tilda + "/Home/D?did=" + r.Attribute("id").Value),
                                         //new XAttribute("onclick_", "look(); return false;"), "x")) :
@@ -869,8 +933,10 @@ XElement etable = new XElement("div", new XAttribute("style", "border-width:thin
             if (sos.toedit)
             {
                 sos.toedit = false;
+                sos.user = null;
                 SaveSostoyanie();
-                return P(sos.id, null, null, null, null);
+                //return P(sos.id, null, null, null, null);
+                return new RedirectResult(tilda + "/Home/P?id=" + sos.id);
             }
             // здесь могут быть уже сформированные данные, если они правильные, надо просто переключить режим
             if (login != null)
@@ -890,7 +956,8 @@ XElement etable = new XElement("div", new XAttribute("style", "border-width:thin
                         SObjects.SaveAccounts();
                     }
                     SaveSostoyanie();
-                    return P(sos.id, null, null, null, null);
+                    //return P(sos.id, null, null, null, null);
+                    return new RedirectResult(tilda + "/Home/P?id=" + sos.id);
                 }
                 // А остальное - ошибочные данные, нужно повторять ввод 
             }
@@ -927,15 +994,61 @@ new XElement("form", new XAttribute("method", "get"), new XAttribute("action", "
         {
             LoadSostoyanie();
             SObjects.DeleteItem(did, sos.user);
-            return P(sos.id, null, null, null, null);
+            //return P(sos.id, null, null, null, null);
+            return new RedirectResult(tilda + "/Home/P?id=" + sos.id);
         }
         // EditRecord
         [HttpPost]
-        public IActionResult E(string eid)
+        public IActionResult E(string comm_chk, string comm_save, string comm_canc,
+            string eid, string bid, string prop, string forma_t, string rtype)
         {
-            var v = HttpContext.Request.Form["comm_chk"];
+            //var v = HttpContext.Request.Form["comm_canc"];
+            //HttpContext.Request.Form.Where(kv => kv.Key[0] == '_');
             LoadSostoyanie();
-            return P(sos.id, null, null, null, null);
+            if (comm_canc != null) return new RedirectResult(tilda + "/Home/P?id=" + sos.id);
+
+            if (comm_save != null)
+            {   // Надо обрать запись из того, что пришло. Предполагается, что были посланы: 
+                // eid - идентификатор записи
+                // bid - вышестоящая запись
+                // prop - вышестоящее отношение
+                // forma_t - формат записи (без вышестоящего отношения) в строковом виде
+                // Тип записи берется из формата
+                if (forma_t == null) throw new Exception("Err: 93832");
+                //XElement format = XElement.Parse(forma_t);
+                //string rtype = format.Attribute("type").Value;
+                // Вычисляю Name записи
+                int slash = rtype.LastIndexOf('/');
+                XName rectag = XName.Get(rtype.Substring(slash + 1), rtype.Substring(0, slash + 1));
+                //var rname = XName.Get("person", "http://fogid.net/o/");
+                XElement record = new XElement(rectag, new XAttribute(ONames.rdfabout, eid));
+                XElement format = TurgundaCommon.ModelCommon.formats.Elements("record")
+                    .FirstOrDefault(f => f.Attribute("type").Value == rtype);
+                // Если нет, то что-то странное
+                if (format == null) throw new Exception("Err: 2482978");
+                // Сканирую формат, собираю поля и прямые ссылки
+                foreach (var f in format.Elements().Where(f => f.Name == "field" || f.Name == "direct"))
+                {
+                    string pr = f.Attribute("prop").Value;
+                    // достать значение
+                    string val = HttpContext.Request.Form[pr];
+                    if (string.IsNullOrEmpty(val)) continue;
+                    int lastslash = pr.LastIndexOf('/');
+                    XElement elem = new XElement(XName.Get(pr.Substring(lastslash + 1), pr.Substring(0, lastslash + 1)));
+                    if (f.Name == "field")
+                    {
+                        elem.Value = val;
+                    }
+                    else
+                    {
+                        elem.Add(new XAttribute(ONames.rdfresource, val));
+                    }
+                    record.Add(elem);
+                }
+                SObjects.PutItemToDb(record, false, sos.user);
+            }
+            //string eid = HttpContext.Request.Form["eid"];
+            return new RedirectResult(tilda + "/Home/P?id=" + sos.id);
         }
     }
 }
