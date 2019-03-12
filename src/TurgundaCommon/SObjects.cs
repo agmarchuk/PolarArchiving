@@ -71,6 +71,7 @@ namespace Turgunda7
                 appProfile = XElement.Load(path + "wwwroot/ApplicationProfile.xml");
                 XElement ontology = XElement.Load(path + "wwwroot/ontology_iis-v12-doc_ruen.xml");
                 TurgundaCommon.ModelCommon.formats = appProfile.Element("formats");
+                TurgundaCommon.ModelCommon.EditRecords = appProfile.Element("EditRecords");
                 TurgundaCommon.ModelCommon.LoadOntNamesFromOntology(ontology);
                 TurgundaCommon.ModelCommon.LoadInvOntNamesFromOntology(ontology);
 

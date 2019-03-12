@@ -10,6 +10,7 @@ namespace TurgundaCommon
     public class ModelCommon
     {
         public static XElement formats = new XElement("formats"); // хранилище основных форматов, загружаемых напр. из ApplicationProfile.xml 
+        public static XElement EditRecords = new XElement("EditRecords"); // хранилище основных форматов, загружаемых напр. из ApplicationProfile.xml 
         public static string[][] OntPairs = new string[][] {
             new string[] {"http://fogid.net/o/archive", "архив"},
             new string[] {"http://fogid.net/o/person", "персона"},
