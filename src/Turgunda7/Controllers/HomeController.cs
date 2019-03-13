@@ -593,9 +593,9 @@ namespace Turgunda7.Controllers
             // Параметры быстрого отладочного запуска
             if (id == null || id == "no_id")
             {
-                sos.id = id = "cass_mag02_1011";//"syp2001-p-marchuk_a"; //"cass_mag05_1008"; //"syp2001-p-marchuk_a";
-                sos.toedit = true;
-                sos.user = "mag";
+                //sos.id = id = "cass_mag02_1011";//"syp2001-p-marchuk_a"; //"cass_mag05_1008"; //"syp2001-p-marchuk_a";
+                //sos.toedit = true;
+                //sos.user = "mag";
             }
 
             if (id != null && id != "no_id")
