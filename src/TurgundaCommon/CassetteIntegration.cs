@@ -29,6 +29,10 @@ namespace CassetteData
             {
                 _adapter = new SimpleDbAdapter();
             }
+            else if (connectionstring.StartsWith("trs:"))
+            {
+                _adapter = new TRecordStorage();
+            }
 
             localstorage.InitAdapter(_adapter);
             XElement net = xconfig.Element("Net");
