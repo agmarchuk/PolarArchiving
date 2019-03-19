@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 
 namespace Polar.Cassettes.DocumentStorage
@@ -32,6 +33,12 @@ namespace Polar.Cassettes.DocumentStorage
         }
         public override void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog)
         {
+            // Нужно для чтиния в кодировке windows-1251. Нужен также Nuget System.Text.Encoding.CodePages
+            var v = CodePagesEncodingProvider.Instance;
+            Encoding.RegisterProvider(v);
+            //var v = System.Text.Encoding.CodePagesEncodingProvider.Instance;
+            System.Text.Encoding.RegisterProvider(v);
+
             InitTableRI();
             foreach (string filename in fogfilearr)
             {
