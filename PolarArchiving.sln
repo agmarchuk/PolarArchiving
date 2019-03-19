@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertVideo", "old\Convert
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TurgundaCommon", "src\TurgundaCommon\TurgundaCommon.csproj", "{43B75845-171E-4841-8F2A-0B0648C39356}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDService", "src\CDService\CDService.csproj", "{B20DADB7-5EC1-446F-B2C1-3CC19761D22E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDService", "src\CDService\CDService.csproj", "{B20DADB7-5EC1-446F-B2C1-3CC19761D22E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
