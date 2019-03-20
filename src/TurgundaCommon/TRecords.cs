@@ -53,7 +53,7 @@ namespace Polar.Cassettes.DocumentStorage
         }
         public override void FinishFillDb(Action<string> turlog)
         {
-            throw new NotImplementedException();
+            // Все делает table.Fill()
         }
         private Action<string> errors = s => { Console.WriteLine(s); };
         public override void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog)
@@ -71,14 +71,32 @@ namespace Polar.Cassettes.DocumentStorage
             {
                 XElement fog = XElement.Load(filename);
                 var xflow = fog.Elements()
-                    .Select(el => ConvertXElement(el));
+                    .Select(el => ConvertXElement(el)).ToArray();
                 LoadXFlowUsingRiTable(xflow);
             }
         }
 
         public override void LoadXFlowUsingRiTable(IEnumerable<XElement> xflow)
         {
-            throw new NotImplementedException();
+            var query = xflow.SelectMany(xe =>
+            {
+                List<object[]> triples = new List<object[]>();
+                string id = xe.Attribute(ONames.rdfabout)?.Value;
+                if (id == null) return Enumerable.Empty<object[]>();
+                var nm = xe.Name;
+                string t = nm.NamespaceName + nm.LocalName;
+                triples.Add(new object[] { id, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", new object[] { 1, t } });
+                triples.AddRange(xe.Elements().Select(se => 
+                {
+                    var nms = se.Name;
+                    string pred = nms.NamespaceName + nms.LocalName;
+                    var resource = se.Attribute(ONames.rdfresource);
+                    object[] obj = resource == null ? new object[] { 2, se.Value } : new object[] { 1, resource.Value };
+                    return new object[] { id, pred,  obj};
+                }));
+                return triples;
+            }).ToArray();
+            table.Fill(query);
         }
 
         public override void Save(string filename)
@@ -120,7 +138,8 @@ namespace Polar.Cassettes.DocumentStorage
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return Enumerable.Empty<XElement>();
         }
 
     }
