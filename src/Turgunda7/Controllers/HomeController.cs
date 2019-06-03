@@ -5,7 +5,6 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 //using Fogid.Cassettes;
@@ -1058,9 +1057,32 @@ new XElement("form", new XAttribute("method", "get"), new XAttribute("action", "
         // New record
         public IActionResult N(string ss, string tt, string prop)
         {
+            if (tt == null) tt = "http://fogid.net/o/person";
+            string nid = null;
+            var umodel = new Turgunda7.Models.UserModel(Request);
             LoadSostoyanie();
-            string id = Turgunda7.SObjects.CreateNewItem(ss, tt, sos.user);
-            return new RedirectResult(tilda + "/Home/P?id=" + id);
+
+            if (tt == "http://fogid.net/o/cassette")
+            {
+                if (!umodel.IsInRole("admin")) return Error("Кассеты может создавать только администратор");
+                if (string.IsNullOrEmpty(ss)) return Error("Имя кассеты не должно быть пустым");
+                Cassette ncass = Cassette.Create(SObjects.newcassettesdirpath + ss, (new Turgunda7.Models.UserModel(Request)).Uuser);
+                SObjects.xconfig.Add(
+                    new XElement("LoadCassette",
+                        new XAttribute("write", "yes"),
+                        SObjects.newcassettesdirpath + ncass.Name));
+                SObjects.SaveConfig();
+                SObjects.Init();
+                nid = ncass.Name + "_cassetteId";
+            }
+            else
+            {
+                //nid = SObjects.CreateNewItem(searchstring, type, umodel.Uuser);
+                nid = Turgunda7.SObjects.CreateNewItem(ss, tt, sos.user);
+            }
+            if (nid == null) return Error("Не создан элемент, возможно, у Вас нет полномочий");
+
+            return new RedirectResult(tilda + "/Home/P?id=" + sos.id);
         }
         // New Relation
         public IActionResult R(string eid, string prop, string tt)
