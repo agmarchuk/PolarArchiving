@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
 using Polar.Cassettes.DocumentStorage;
+using Polar.TripleStore;
 
 namespace CassetteData
 {
@@ -21,7 +22,11 @@ namespace CassetteData
             localstorage.Init(xconfig);
 
             string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
-            if (connectionstring == null || connectionstring.StartsWith("xml:"))
+            if (connectionstring == null || connectionstring.StartsWith("ts:"))
+            {
+                _adapter = new TripleStoreAdapter();//  XmlDbAdapter();
+            }
+            else if (connectionstring.StartsWith("xml:"))
             {
                 _adapter = new XmlDbAdapter();
             }

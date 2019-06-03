@@ -10,6 +10,8 @@ namespace Turgunda7
 {
     public class SObjects
     {
+        public static XElement look = new XElement("empty");
+
         public static XElement accounts = null;
         public static string path = null;
         public static string extappbinpath = null;

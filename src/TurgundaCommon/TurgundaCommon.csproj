@@ -1,16 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
+    <ApplicationIcon />
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Polar.CellIndexes" Version="1.0.6" />
-    <PackageReference Include="Polar.Cells" Version="1.0.0" />
-    <PackageReference Include="Polar.DB" Version="1.0.2" />
-    <PackageReference Include="Polar.PagedStreams" Version="1.0.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
+    <PackageReference Include="Polar.CellIndexes" Version="1.0.7" />
+    <PackageReference Include="Polar.Cells" Version="1.0.1" />
+    <PackageReference Include="Polar.DB" Version="1.0.5" />
+    <PackageReference Include="Polar.TripleStore" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>
