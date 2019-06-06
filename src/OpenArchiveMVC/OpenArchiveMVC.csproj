@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
-    <ProjectReference Include="..\TurgundaCommon\TurgundaCommon.csproj" />
   </ItemGroup>
 
 </Project>

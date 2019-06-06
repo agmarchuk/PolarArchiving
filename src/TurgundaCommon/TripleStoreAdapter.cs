@@ -307,9 +307,93 @@ namespace Polar.Cassettes.DocumentStorage
             }
             return null;
         }
+        //private XElement CodeFormat(XElement format)
+        //{ // Это формат записи
+        //    if (format.Name != "record") throw new Exception("Err: 292334");
+        //    string id = format.Attribute("id")?.Value;
+        //    string type = format.Attribute("type")?.Value;
+        //    XElement rec = new XElement("record",
+        //        id != null ? new XAttribute("id", store.CodeEntity(id)) : null,
+        //        type != null ? new XAttribute("type", store.CodeEntity(type)) : null);
+        //    rec.Add(format.Elements()
+        //        .Where(fel => fel.Name == "field" || fel.Name == "direct" || fel.Name == "inverse")
+        //        .Select(fel => new XElement(fel.Name, new XAttribute("prop", store.CodeEntity(fel.Attribute("prop").Value)),
+        //            fel.Nodes()
+        //            .Select((XNode nd) =>
+        //            {
+        //                if (nd.NodeType == System.Xml.XmlNodeType.Element && ((XElement)nd).Name == "record")
+        //                {
+        //                    return CodeFormat((XElement)nd);
+        //                }
+        //                else if (nd.NodeType == System.Xml.XmlNodeType.Text)
+        //                {
+        //                    return ((XText)nd).Value;
+        //                }
+        //                else if (nd.NodeType == System.Xml.XmlNodeType.Element)
+        //                {
+        //                    return new XElement((XElement)nd);
+        //                }
+        //                else
+        //                {
+        //                    return null;
+        //                }
+        //            }))));
+        //    return rec;
+        //}
+        private XElement CodeTree(XElement tree)
+        {
+            XElement rformat = new XElement(tree);
+            CodeAttributes(rformat);
+            return rformat;
+        }
+        private XElement DecodeTree(XElement itree)
+        {
+            XElement rformat = new XElement(itree);
+            DecodeAttributes(rformat);
+            return rformat;
+        }
+        private void CodeAttributes(XElement tree)
+        {
+            CodeAtt(tree, "id");
+            CodeAtt(tree, "type");
+            CodeAtt(tree, "prop");
+            foreach (XElement el in tree.Elements()) CodeAttributes(el);
+        }
+        private void DecodeAttributes(XElement itree)
+        {
+            DecodeAtt(itree, "id");
+            DecodeAtt(itree, "type");
+            DecodeAtt(itree, "prop");
+            foreach (XElement el in itree.Elements()) DecodeAttributes(el);
+        }
+        private void CodeAtt(XElement format, string att_name)
+        {
+            var att = format.Attribute(att_name);
+            if (att != null)
+            {
+                string val = att.Value;
+                att.Value = "" + store.CodeEntity(val);
+            }
+        }
+        private void DecodeAtt(XElement format, string att_name)
+        {
+            var att = format.Attribute(att_name);
+            if (att != null)
+            {
+                string val = att.Value;
+                att.Value = store.DecodeEntity(Int32.Parse(val));
+            }
+        }
+
         public override XElement GetItemById(string id, XElement format)
         {
-            XElement x2 = GetItemByNode2(id, store.Get_s(id), format);
+            // Кодирование идентификатора и формата
+            int iid = store.CodeEntity(id);
+            XElement iformat = CodeTree(format);
+            XElement x2 = GetItemByNode2(iid, store.Get_s(id), iformat);
+            // Декодирование результата
+            XElement x3 = DecodeTree(x2);
+            return x3;
             if (!records.TryGetValue(id, out DbNode node)) return null;
             XElement x = GetItemByNode(node, format);
             return x;
@@ -383,31 +467,31 @@ namespace Polar.Cassettes.DocumentStorage
                     else return null;
                 }));
         }
-
-        private XElement GetItemByNode2(string id, IEnumerable<object> dtriples,  XElement format)
+        /// <summary>
+        /// Рекурсивная процедура получения дерева результата в кодированной форме. Параметры: id и format кодированы.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dtriples">Прямые свойства</param>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        private XElement GetItemByNode2(int id, IEnumerable<object> dtriples,  XElement format)
         {
-            //XElement xel = node.xel;
-            //if (xel == null) return null;
-            //string type = xel.Name.NamespaceName + xel.Name.LocalName;
-            string type = null;
+            int type = Int32.MinValue;
             foreach (object[] tr in dtriples)
                 if ((int)tr[1] == store.Code_rdftype)
-                    type = (string)(store.DecodeEntity((int)((object[])tr[2])[1]));
-            //var ft = format.Attribute("type")?.Value;
-            //if (ft != null && type != ft) return null;
+                    type = (int)((object[])tr[2])[1];
             return new XElement("record",
                 new XAttribute("id", id),
                 new XAttribute("type", type),
                 format.Elements().Where(fel => fel.Name == "field" || fel.Name == "direct" || fel.Name == "inverse")
                 .SelectMany(fel =>
                 {
-                    string prop = fel.Attribute("prop").Value;
-                    int iprop = store.CodeEntity(prop);
+                    int iprop = Int32.Parse(fel.Attribute("prop").Value);
                     if (fel.Name == "field")
                     {
                         return dtriples.Cast<object[]>()
                             .Where(tr => (int)tr[1] == iprop)
-                            .Select(tr => new XElement("field", new XAttribute("prop", prop),
+                            .Select(tr => new XElement("field", new XAttribute("prop", iprop),
                                 (string)((object[])tr[2])[1]));
                     }
                     else if (fel.Name == "direct")
@@ -417,49 +501,51 @@ namespace Polar.Cassettes.DocumentStorage
                             .Select(tr =>
                             {
                                 int iresource = (int)((object[])tr[2])[1];
-                                string resource = store.DecodeEntity(iresource);
                                 var sub_dtriples = store.Get_s(iresource);
                                 var tt = sub_dtriples.Cast<object[]>()
                                     .FirstOrDefault(tri => (int)tri[1] == store.Code_rdftype);
                                 if (tt == null) return null;
-                                string t = store.DecodeEntity((int)((object[])tt[2])[1]);
                                 XElement f = fel.Elements("record")
                                     .FirstOrDefault(fr =>
                                     {
                                         XAttribute t_att = fr.Attribute("type");
                                         if (t_att == null) return true;
-                                        return t_att.Value == t;
+                                        return Int32.Parse(t_att.Value) == (int)((object[])tt[2])[1];
                                     });
                                 if (f == null) return null;
-                                return new XElement("direct", new XAttribute("prop", prop),
-                                    GetItemByNode2(resource, sub_dtriples, f));
+                                return new XElement("direct", new XAttribute("prop", iprop),
+                                    GetItemByNode2(iresource, sub_dtriples, f));
                             });
                     }
-                    //else if (fel.Name == "inverse")
-                    //{
-                    //    //return node.inverse
-                    //    //    .Where(el => el.Name.NamespaceName + el.Name.LocalName == prop)
-                    //    //    .Select(el => new XElement("inverse", new XAttribute("prop", prop),
-                    //    //        fel.Element("record") == null ? null :
-                    //    //        GetItemById(el.Parent.Attribute(Cassettes.ONames.rdfabout).Value, fel.Element("record"))));
-                    //    return node.inverse
-                    //        .Where(el => el.Name.NamespaceName + el.Name.LocalName == prop)
-                    //        .Select<XElement, XElement>(el =>
-                    //        {
-                    //            if (!records.TryGetValue(el.Parent.Attribute(Cassettes.ONames.rdfabout).Value, out DbNode node2) || node2.xel == null) return null;
-                    //            string t = node2.xel.Name.NamespaceName + node2.xel.Name.LocalName;
-                    //            XElement f = fel.Elements("record")
-                    //                .FirstOrDefault(fr =>
-                    //                {
-                    //                    XAttribute t_att = fr.Attribute("type");
-                    //                    if (t_att == null) return true;
-                    //                    return t_att.Value == t;
-                    //                });
-                    //            if (f == null) return null;
-                    //            return new XElement("inverse", new XAttribute("prop", prop),
-                    //                GetItemByNode(node2, f));
-                    //        });
-                    //}
+                    else if (fel.Name == "inverse")
+                    {
+                        var itriples = store.Get_t(id);
+                        var query = itriples.Cast<object[]>()
+                            .Where(tr => (int)tr[1] == iprop)
+                            .Select(tr =>
+                            {
+                                int subject = (int)tr[0];
+                                var sub_dtriples = store.Get_s(subject);
+                                var tt = sub_dtriples.Cast<object[]>()
+                                    .FirstOrDefault(tri => (int)tri[1] == store.Code_rdftype);
+                                // tt не должен быть нулем 
+                                if (tt == null) throw new Exception("Err in GetItemByNode2: sub format " + fel);
+                                // находим подходящий формат записи
+                                XElement f = fel.Elements("record")
+                                    .FirstOrDefault(fr =>
+                                    {
+                                        XAttribute t_att = fr.Attribute("type");
+                                        if (t_att == null) return true;
+                                        return Int32.Parse(t_att.Value) == (int)((object[])tt[2])[1];
+                                    });
+                                var x = new XElement("inverse",
+                                    new XAttribute("prop", iprop),
+                                    GetItemByNode2(subject, sub_dtriples, f)
+                                    );
+                                return x;
+                            });
+                        return query;
+                    }
                     else return new XElement[0];
                 }));
         }

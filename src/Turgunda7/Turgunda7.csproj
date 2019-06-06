@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -48,7 +48,6 @@
   </ItemGroup> -->
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PolarDB\src\TripleStore\TripleStore.csproj" />
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
     <ProjectReference Include="..\TurgundaCommon\TurgundaCommon.csproj" />
   </ItemGroup>
