@@ -14,16 +14,16 @@ namespace Polar.Cassettes.DocumentStorage
     /// </summary>
     public class TripleStoreAdapter : DbAdapter
     {
-        private class DbNode
-        {
-            public string id; // Нужен поскольку определяющая запись может быть отсутствовать
-            public XElement xel;
-            public List<XElement> inverse;
-        }
-        private XElement db = null;
+        //private class DbNode
+        //{
+        //    public string id; // Нужен поскольку определяющая запись может быть отсутствовать
+        //    public XElement xel;
+        //    public List<XElement> inverse;
+        //}
+        //private XElement db = null;
 
         // ========= Носитель базы данных ==========
-        private Dictionary<string, DbNode> records = null;
+        //private Dictionary<string, DbNode> records = null;
         private Polar.TripleStore.TripleStoreInt32 store;
 
         private Action<string> errors = s => { Console.WriteLine(s); };
@@ -47,7 +47,7 @@ namespace Polar.Cassettes.DocumentStorage
         // Загрузка базы данных
         public override void StartFillDb(Action<string> turlog)
         {
-            db = new XElement("db");
+            //db = new XElement("db");
             store.Clear();
         }
         public override void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog)
@@ -78,7 +78,8 @@ namespace Polar.Cassettes.DocumentStorage
         }
         public override void Save(string filename)
         {
-            db.Save(filename);
+            //db.Save(filename);
+            //store.Flush(); //TODO:
         }
 
         public override void LoadXFlowUsingRiTable(IEnumerable<XElement> xflow)
@@ -104,7 +105,7 @@ namespace Polar.Cassettes.DocumentStorage
                 if (modificationTime_new != ri.timestamp) continue; // отметка времени не совпала
 
                 // Зафиксируем в базе данных
-                db.Add(xel); // старый вариант
+                //db.Add(xel); // старый вариант
 
                 string ent = store.DecodeEntity(1);
                 int rec_type = store.CodeEntity("http://fogid.net/o/" + xel.Name.LocalName);
@@ -134,41 +135,41 @@ namespace Polar.Cassettes.DocumentStorage
 
         public override void FinishFillDb(Action<string> turlog)
         {
-            records = new Dictionary<string, DbNode>();
+            //records = new Dictionary<string, DbNode>();
 
-            foreach (XElement xel in db.Elements())
-            {
-                // Это есть запись, которую надо зафиксировать под ее именем
-                string id = xel.Attribute(Cassettes.ONames.rdfabout).Value;
-                if (records.TryGetValue(id, out DbNode node))
-                { // есть определение
-                    node.xel = xel;
-                }
-                else
-                {
-                    records.Add(id, new DbNode() { id = id, xel = xel, inverse = new List<XElement>() });
-                }
-                // Теперь проанализируем прямые ссылки
-                foreach (XElement el in xel.Elements())
-                {
-                    XAttribute res_att = el.Attribute(Cassettes.ONames.rdfresource);
-                    if (res_att == null) continue;
-                    string resource_id = res_att.Value;
-                    if (records.TryGetValue(resource_id, out node))
-                    { // есть определение
-                        node.inverse.Add(el);
-                    }
-                    else
-                    {
-                        records.Add(resource_id,
-                            new DbNode()
-                            {
-                                id = resource_id,
-                                inverse = Enumerable.Repeat<XElement>(el, 1).ToList()
-                            });
-                    }
-                }
-            }
+            //foreach (XElement xel in db.Elements())
+            //{
+            //    // Это есть запись, которую надо зафиксировать под ее именем
+            //    string id = xel.Attribute(Cassettes.ONames.rdfabout).Value;
+            //    if (records.TryGetValue(id, out DbNode node))
+            //    { // есть определение
+            //        node.xel = xel;
+            //    }
+            //    else
+            //    {
+            //        records.Add(id, new DbNode() { id = id, xel = xel, inverse = new List<XElement>() });
+            //    }
+            //    // Теперь проанализируем прямые ссылки
+            //    foreach (XElement el in xel.Elements())
+            //    {
+            //        XAttribute res_att = el.Attribute(Cassettes.ONames.rdfresource);
+            //        if (res_att == null) continue;
+            //        string resource_id = res_att.Value;
+            //        if (records.TryGetValue(resource_id, out node))
+            //        { // есть определение
+            //            node.inverse.Add(el);
+            //        }
+            //        else
+            //        {
+            //            records.Add(resource_id,
+            //                new DbNode()
+            //                {
+            //                    id = resource_id,
+            //                    inverse = Enumerable.Repeat<XElement>(el, 1).ToList()
+            //                });
+            //        }
+            //    }
+            //}
             // по-новому
             store.Build();
         }
@@ -177,20 +178,6 @@ namespace Polar.Cassettes.DocumentStorage
         {
             var query2 = SearchByName2(searchstring);
             return query2;
-
-            string ss = searchstring == null ? "" : searchstring.ToLower();
-            var query = db.Elements()
-                .SelectMany(xel => xel.Elements().Where(el => el.Name == "{http://fogid.net/o/}name"))
-                .Where(el => el.Value.ToLower().StartsWith(ss))
-                .Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(Cassettes.ONames.rdfabout).Value),
-                    new XAttribute("type", el.Parent.Name.NamespaceName + el.Parent.Name.LocalName),
-                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"), el.Value)))
-                .ToArray()
-                ;
-            //.Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(Cassettes.ONames.rdfabout).Value)));
-
-            Turgunda7.SObjects.look = new XElement("sequ", SearchByName2(searchstring));
-            return query;
         }
         public IEnumerable<XElement> SearchByName2(string searchstring)
         {
@@ -203,10 +190,6 @@ namespace Polar.Cassettes.DocumentStorage
                     string id = store.DecodeEntity((int)el[0]);
                     string name = (string)((object[])el[2])[1];
                     var qu = store.Get_s((int)el[0]);;
-                    //foreach (var t in qu)
-                    //{
-                    //    string s = store.TripleToString((object[])t);
-                    //}
                     object[] a_triple = (object[])qu.FirstOrDefault(ob => 
                     {
                         object[] tri = (object[])ob;
@@ -226,120 +209,51 @@ namespace Polar.Cassettes.DocumentStorage
         public XElement GetItemByIdBasic2(string id, bool addinverse)
         {
             XElement record = null;
-            var query = store.Get_s(id)
-                .ToArray()
-                ;
-            if (query.Count() > 0)
+            var query = store.Get_s(id);
+            string type = null;
+            // сканируем чтобы заполнить переменную type
+            foreach (object[] tr in query)
             {
-                string type = null;
-                // сканируем чтобы заполнить переменную type
-                foreach (object[] tr in query)
+                if ((int)tr[1] == store.Code_rdftype && type == null)
+                    type = store.DecodeEntity((int)((object[])tr[2])[1]);
+            }
+            record = new XElement("record",
+                new XAttribute("id", id),
+                new XAttribute("type", type),
+                query.Cast<object[]>()
+                .Where(tr => (int)tr[1] != store.Code_rdftype) // пропустить определение типа
+                .Select(tr =>
                 {
-                    if ((int)tr[1] == store.Code_rdftype && type == null)
-                        type = store.DecodeEntity((int)((object[])tr[2])[1]);
-                }
-                record = new XElement("record",
-                    new XAttribute("id", id),
-                    new XAttribute("type", type),
-                    query.Cast<object[]>()
-                    .Where(tr => (int)tr[1] != store.Code_rdftype) // пропустить определение типа
+                    string prop = store.DecodeEntity((int)tr[1]);
+                    object[] ob = (object[])tr[2];
+                    if ((int)ob[0] == 1)
+                        return new XElement("direct",
+                            new XAttribute("prop", prop),
+                            new XElement("record", new XAttribute("id", store.DecodeEntity((int)ob[1]))));
+                    else
+                        return new XElement("field",
+                            new XAttribute("prop", prop), (string)ob[1]);
+                }));
+            if (addinverse)
+            {
+                var query_inverse = store.Get_t(id);
+                record.Add(
+                    query_inverse.Cast<object[]>()
                     .Select(tr =>
                     {
                         string prop = store.DecodeEntity((int)tr[1]);
-                        object[] ob = (object[])tr[2];
-                        if ((int)ob[0] == 1)
-                            return new XElement("direct",
-                                new XAttribute("prop", prop),
-                                new XElement("record", new XAttribute("id", store.DecodeEntity((int)ob[1]))));
-                        else
-                            return new XElement("field",
-                                new XAttribute("prop", prop), (string)ob[1]);
+                        return new XElement("inverse",
+                            new XAttribute("prop", prop),
+                            new XElement("record", new XAttribute("id", store.DecodeEntity((int)tr[0]))));
                     }));
-                if (addinverse)
-                {
-                    var query_inverse = store.Get_t(id);
-                    record.Add(
-                        query_inverse.Cast<object[]>()
-                        .Select(tr =>
-                        {
-                            string prop = store.DecodeEntity((int)tr[1]);
-                            return new XElement("inverse",
-                                new XAttribute("prop", prop),
-                                new XElement("record", new XAttribute("id", store.DecodeEntity((int)tr[0]))));
-                        }));
-                }
-                return record;
             }
-            return null;
+            return record;
         }
         public override XElement GetItemByIdBasic(string id, bool addinverse)
         {
             var query2 = GetItemByIdBasic2(id, addinverse);
             return query2;
-
-            if (records.TryGetValue(id, out DbNode node))
-            {
-                XElement xel = node.xel;
-                string type = xel.Name.NamespaceName + xel.Name.LocalName;
-                return new XElement("record", new XAttribute("id", id),
-                    new XAttribute("type", type),
-                    xel.Elements()
-                    .Select<XElement, XElement>(el =>
-                    {
-                        XAttribute resource = el.Attribute(Cassettes.ONames.rdfresource);
-                        string prop = el.Name.NamespaceName + el.Name.LocalName;
-                        if (resource == null)
-                        {
-                            return new XElement("field", new XAttribute("prop", prop), el.Value);
-                        }
-                        else
-                        {
-                            //if (el.Name == Cassettes.ONames.rdftype) return null;
-                            return new XElement("direct", new XAttribute("prop", prop),
-                                new XElement("record", new XAttribute("id", resource.Value)));
-                        }
-                    }),
-                    addinverse ?
-                    node.inverse
-                    .Select(inv => new XElement("inverse", new XAttribute("prop", inv.Name.NamespaceName + inv.Name.LocalName),
-                        new XElement("record", new XAttribute("id", inv.Parent.Attribute(Cassettes.ONames.rdfabout).Value)))) :
-                    null);
-            }
-            return null;
         }
-        //private XElement CodeFormat(XElement format)
-        //{ // Это формат записи
-        //    if (format.Name != "record") throw new Exception("Err: 292334");
-        //    string id = format.Attribute("id")?.Value;
-        //    string type = format.Attribute("type")?.Value;
-        //    XElement rec = new XElement("record",
-        //        id != null ? new XAttribute("id", store.CodeEntity(id)) : null,
-        //        type != null ? new XAttribute("type", store.CodeEntity(type)) : null);
-        //    rec.Add(format.Elements()
-        //        .Where(fel => fel.Name == "field" || fel.Name == "direct" || fel.Name == "inverse")
-        //        .Select(fel => new XElement(fel.Name, new XAttribute("prop", store.CodeEntity(fel.Attribute("prop").Value)),
-        //            fel.Nodes()
-        //            .Select((XNode nd) =>
-        //            {
-        //                if (nd.NodeType == System.Xml.XmlNodeType.Element && ((XElement)nd).Name == "record")
-        //                {
-        //                    return CodeFormat((XElement)nd);
-        //                }
-        //                else if (nd.NodeType == System.Xml.XmlNodeType.Text)
-        //                {
-        //                    return ((XText)nd).Value;
-        //                }
-        //                else if (nd.NodeType == System.Xml.XmlNodeType.Element)
-        //                {
-        //                    return new XElement((XElement)nd);
-        //                }
-        //                else
-        //                {
-        //                    return null;
-        //                }
-        //            }))));
-        //    return rec;
-        //}
         private XElement CodeTree(XElement tree)
         {
             XElement rformat = new XElement(tree);
@@ -394,78 +308,6 @@ namespace Polar.Cassettes.DocumentStorage
             // Декодирование результата
             XElement x3 = DecodeTree(x2);
             return x3;
-            if (!records.TryGetValue(id, out DbNode node)) return null;
-            XElement x = GetItemByNode(node, format);
-            return x;
-        }
-        private XElement GetItemByNode(DbNode node, XElement format)
-        {
-            XElement xel = node.xel;
-            if (xel == null) return null;
-            string type = xel.Name.NamespaceName + xel.Name.LocalName;
-            //var ft = format.Attribute("type")?.Value;
-            //if (ft != null && type != ft) return null;
-            return new XElement("record",
-                new XAttribute("id", xel.Attribute(Cassettes.ONames.rdfabout).Value),
-                new XAttribute("type", type),
-                format.Elements().Where(fel => fel.Name == "field" || fel.Name == "direct" || fel.Name == "inverse")
-                .SelectMany(fel =>
-                {
-                    string prop = fel.Attribute("prop").Value;
-                    if (fel.Name == "field")
-                    {
-                        return xel.Elements()
-                            .Where(el => el.Name.NamespaceName + el.Name.LocalName == prop)
-                            .Select(el => new XElement("field", new XAttribute("prop", prop),
-                                el.Value));
-                    }
-                    else if (fel.Name == "direct")
-                    {
-                        return xel.Elements()
-                            .Where(el => el.Name.NamespaceName + el.Name.LocalName == prop)
-                            .Select<XElement, XElement>(el =>
-                            {
-                                if (!records.TryGetValue(el.Attribute(Cassettes.ONames.rdfresource).Value, out DbNode node2) || node2.xel == null) return null;
-                                string t = node2.xel.Name.NamespaceName + node2.xel.Name.LocalName;
-                                XElement f = fel.Elements("record")
-                                    .FirstOrDefault(fr =>
-                                    {
-                                        XAttribute t_att = fr.Attribute("type");
-                                        if (t_att == null) return true;
-                                        return t_att.Value == t;
-                                    });
-                                if (f == null) return null;
-                                return new XElement("direct", new XAttribute("prop", prop),
-                                    GetItemByNode(node2, f));
-                            });
-                    }
-                    else if (fel.Name == "inverse")
-                    {
-                        //return node.inverse
-                        //    .Where(el => el.Name.NamespaceName + el.Name.LocalName == prop)
-                        //    .Select(el => new XElement("inverse", new XAttribute("prop", prop),
-                        //        fel.Element("record") == null ? null :
-                        //        GetItemById(el.Parent.Attribute(Cassettes.ONames.rdfabout).Value, fel.Element("record"))));
-                        return node.inverse
-                            .Where(el => el.Name.NamespaceName + el.Name.LocalName == prop)
-                            .Select<XElement, XElement>(el =>
-                            {
-                                if (!records.TryGetValue(el.Parent.Attribute(Cassettes.ONames.rdfabout).Value, out DbNode node2) || node2.xel == null) return null;
-                                string t = node2.xel.Name.NamespaceName + node2.xel.Name.LocalName;
-                                XElement f = fel.Elements("record")
-                                    .FirstOrDefault(fr =>
-                                    {
-                                        XAttribute t_att = fr.Attribute("type");
-                                        if (t_att == null) return true;
-                                        return t_att.Value == t;
-                                    });
-                                if (f == null) return null;
-                                return new XElement("inverse", new XAttribute("prop", prop),
-                                    GetItemByNode(node2, f));
-                            });
-                    }
-                    else return null;
-                }));
         }
         /// <summary>
         /// Рекурсивная процедура получения дерева результата в кодированной форме. Параметры: id и format кодированы.
@@ -540,8 +382,7 @@ namespace Polar.Cassettes.DocumentStorage
                                     });
                                 var x = new XElement("inverse",
                                     new XAttribute("prop", iprop),
-                                    GetItemByNode2(subject, sub_dtriples, f)
-                                    );
+                                    GetItemByNode2(subject, sub_dtriples, f));
                                 return x;
                             });
                         return query;
@@ -558,89 +399,93 @@ namespace Polar.Cassettes.DocumentStorage
 
         private XElement RemoveRecord(string id)
         {
-            if (records.TryGetValue(id, out DbNode node))
-            {
-                // Удаляемый объект состоит из записи и из элементов-ссылок, попавших в "чужие" списки
-                // Сначала "работаем" по чужим спискам
-                XElement xel = node.xel;
-                foreach (XElement el in xel.Elements())
-                {
-                    XAttribute resource = el.Attribute(Cassettes.ONames.rdfresource);
-                    if (resource == null) continue;
-                    // находим список
-                    string id2 = resource.Value;
-                    if (records.TryGetValue(id2, out DbNode node2))
-                    {
-                        // Уберем из списка
-                        node2.inverse.Remove(el);
-                    }
-                }
-                // Открепляем из базы данных
-                xel.Remove();
-                return xel;
-            }
-            return null;
+            //if (records.TryGetValue(id, out DbNode node))
+            //{
+            //    // Удаляемый объект состоит из записи и из элементов-ссылок, попавших в "чужие" списки
+            //    // Сначала "работаем" по чужим спискам
+            //    XElement xel = node.xel;
+            //    foreach (XElement el in xel.Elements())
+            //    {
+            //        XAttribute resource = el.Attribute(Cassettes.ONames.rdfresource);
+            //        if (resource == null) continue;
+            //        // находим список
+            //        string id2 = resource.Value;
+            //        if (records.TryGetValue(id2, out DbNode node2))
+            //        {
+            //            // Уберем из списка
+            //            node2.inverse.Remove(el);
+            //        }
+            //    }
+            //    // Открепляем из базы данных
+            //    xel.Remove();
+            //    return xel;
+            //}
+            //return null;
+            throw new Exception("Unimplemented method RemoveRecord");
         }
         public override XElement Delete(string id)
         {
-            XElement record = RemoveRecord(id);
-            if (record == null) return null;
-            records.Remove(id);
-            return record;
+            //XElement record = RemoveRecord(id);
+            //if (record == null) return null;
+            //records.Remove(id);
+            //return record;
+            throw new Exception("Unimplemented method Delete");
         }
 
         public override XElement Add(XElement record)
         {
-            // Работаем по "чужим спискам
-            XElement xel = new XElement(record);
-            foreach (XElement el in xel.Elements())
-            {
-                XAttribute resource = el.Attribute(Cassettes.ONames.rdfresource);
-                if (resource == null) continue;
-                // находим список
-                string id2 = resource.Value;
-                if (records.TryGetValue(id2, out DbNode node2))
-                {
-                    // добавляем в список
-                    node2.inverse.Add(el);
-                }
-            }
+            //// Работаем по "чужим спискам
+            //XElement xel = new XElement(record);
+            //foreach (XElement el in xel.Elements())
+            //{
+            //    XAttribute resource = el.Attribute(Cassettes.ONames.rdfresource);
+            //    if (resource == null) continue;
+            //    // находим список
+            //    string id2 = resource.Value;
+            //    if (records.TryGetValue(id2, out DbNode node2))
+            //    {
+            //        // добавляем в список
+            //        node2.inverse.Add(el);
+            //    }
+            //}
 
-            // Прикрепляем (зачем-то) запись к базе данных
-            db.Add(xel);
-            // Добавляем к словарю
-            string id = record.Attribute(Cassettes.ONames.rdfabout).Value;
+            //// Прикрепляем (зачем-то) запись к базе данных
+            //db.Add(xel);
+            //// Добавляем к словарю
+            //string id = record.Attribute(Cassettes.ONames.rdfabout).Value;
 
-            if (records.TryGetValue(id, out DbNode node))
-            { // Если узел есть, то прикрепляем к полю узла
-                node.xel = xel;
-            }
-            else
-            { // Если узла нет, то создаем
-                records.Add(id, new DbNode() { id = id, xel = xel, inverse = new List<XElement>() });
-            }
-            return xel;
+            //if (records.TryGetValue(id, out DbNode node))
+            //{ // Если узел есть, то прикрепляем к полю узла
+            //    node.xel = xel;
+            //}
+            //else
+            //{ // Если узла нет, то создаем
+            //    records.Add(id, new DbNode() { id = id, xel = xel, inverse = new List<XElement>() });
+            //}
+            //return xel;
+            throw new Exception("Unimplemented method Add");
         }
 
         public override XElement AddUpdate(XElement record)
         {
-            string id = record.Attribute(Cassettes.ONames.rdfabout).Value;
-            if (records.TryGetValue(id, out DbNode node))
-            {
-                // Будем перебирать элементы "старого" значения и, если таких нет, добавлять в новое
-                foreach (XElement old_el in node.xel.Elements())
-                {
-                    XAttribute l_att = old_el.Attribute("{http://www.w3.org/XML/1998/namespace}lang");
-                    if (record.Elements().Any(el => el.Name == old_el.Name &&
-                        (l_att == null ? true :
-                            (el.Attribute("{http://www.w3.org/XML/1998/namespace}lang") != null &&
-                                l_att.Value == el.Attribute("{http://www.w3.org/XML/1998/namespace}lang").Value)))) continue;
-                    record.Add(old_el);
-                }
-                RemoveRecord(id);
-            }
-            Add(record);
-            return record;
+            //string id = record.Attribute(Cassettes.ONames.rdfabout).Value;
+            //if (records.TryGetValue(id, out DbNode node))
+            //{
+            //    // Будем перебирать элементы "старого" значения и, если таких нет, добавлять в новое
+            //    foreach (XElement old_el in node.xel.Elements())
+            //    {
+            //        XAttribute l_att = old_el.Attribute("{http://www.w3.org/XML/1998/namespace}lang");
+            //        if (record.Elements().Any(el => el.Name == old_el.Name &&
+            //            (l_att == null ? true :
+            //                (el.Attribute("{http://www.w3.org/XML/1998/namespace}lang") != null &&
+            //                    l_att.Value == el.Attribute("{http://www.w3.org/XML/1998/namespace}lang").Value)))) continue;
+            //        record.Add(old_el);
+            //    }
+            //    RemoveRecord(id);
+            //}
+            //Add(record);
+            //return record;
+            throw new Exception("Unimplemented method AddUpdate");
         }
     }
 }
