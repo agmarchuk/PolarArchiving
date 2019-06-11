@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Polar.DB" Version="1.0.5" />
+    <PackageReference Include="Polar.TripleStore" Version="1.0.3" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
   </ItemGroup>
 
