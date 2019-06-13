@@ -19,33 +19,37 @@ namespace TestConsoleApp
         private IndexKey32CompVector inv_index;
         private IndexView name_index;
         private Comparer<object> comp_like;
-        private string[] preload_names = { "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://fogid.net/o/name" };
-        public int Code_rdftype { get; set; }
-        public int Code_fogname { get; set; }
-        internal void PreloadFognames()
+        private string[] preload_names = { };
+        public string[] Preload { get { return preload_names; } set { preload_names = value; LoadPreloadnames(); } }
+        //public int Code_rdftype { get; set; }
+        //public int Code_fogname { get; set; }
+        internal void LoadPreloadnames()
         {
             foreach (string s in preload_names) nt.GetSetStr(s);
-            Code_rdftype = nt.GetSetStr("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-            Code_fogname = nt.GetSetStr("http://fogid.net/o/name");
             nt.Flush();
         }
+
+        public int Code(string s) => nt.GetSetStr(s);
+        public string Decode(int c) => nt.Decode(c);
+
         public TripleRecordStore(Func<Stream> stream_gen, string tmp_dir_path)
         {
             // сначала таблица имен
             nt = new Nametable32(stream_gen);
             // Предзагрузка должна быть обеспечена даже для пустой таблицы имен
-            PreloadFognames();
+            LoadPreloadnames();
             // Тип записи
             PType tp_record = new PTypeRecord(
                 new NamedType("id", new PType(PTypeEnumeration.integer)),
-                new NamedType("fields",
-                    new PTypeSequence(new PTypeRecord(
-                        new NamedType("prop", new PType(PTypeEnumeration.integer)),
-                        new NamedType("value", new PType(PTypeEnumeration.sstring))))),
                 new NamedType("directs",
                     new PTypeSequence(new PTypeRecord(
                         new NamedType("prop", new PType(PTypeEnumeration.integer)),
-                        new NamedType("entity", new PType(PTypeEnumeration.integer))))));
+                        new NamedType("entity", new PType(PTypeEnumeration.integer))))),
+                new NamedType("fields",
+                    new PTypeSequence(new PTypeRecord(
+                        new NamedType("prop", new PType(PTypeEnumeration.integer)),
+                        new NamedType("value", new PType(PTypeEnumeration.sstring)))))
+                );
             // Главная последовательность: множестов кодированных записей
             table = new BearingDeletable(tp_record, stream_gen);
             // прямой ключевой индекс: по задаваемому ключу получаем запись
@@ -55,7 +59,7 @@ namespace TestConsoleApp
             inv_index = new IndexKey32CompVector(stream_gen, table,
                 obj =>
                 {
-                    object[] directs = (object[])((object[])obj)[2];
+                    object[] directs = (object[])((object[])obj)[1];
                     return directs.Cast<object[]>()
                         .Select(pair => (int)pair[1]);
                 }, null);
@@ -102,7 +106,7 @@ namespace TestConsoleApp
             //name_index.Clear();
             nt.Clear();
             // Предзагрузка
-            PreloadFognames();
+            LoadPreloadnames();
         }
         public void Load(IEnumerable<object> records)
         {
@@ -110,8 +114,39 @@ namespace TestConsoleApp
             {
                 table.AppendItem(record);
             }
+            table.Flush();
         }
 
-
+        public object GetRecord(int c)
+        {
+            var qu = s_index.GetAllByKey(c)
+                .FirstOrDefault();
+            return qu;
+        } 
+        public string ToTT(object rec)
+        {
+            object[] rr = (object[])rec;
+            int id = (int)rr[0];
+            Func<int, string> Dec = (int c) => c < 0? ""+(-c-1) : nt.Decode(c);
+            object[] directs = (object[])rr[1];
+            object[] fields = (object[])rr[2];
+            bool firsttime = true;
+            StringBuilder sb = new StringBuilder();
+            foreach (object[] d in directs)
+            {
+                if (firsttime) { sb.Append('<').Append(Dec(id)).Append('>'); firsttime = false; }
+                sb.Append(" <").Append(Dec((int)d[0])).Append(">")
+                    .Append(" <").Append(Dec((int)d[1])).Append("> .")
+                    .Append('\n');
+            }
+            foreach (object[] f in fields)
+            {
+                if (firsttime) { sb.Append('<').Append(Dec(id)).Append('>'); firsttime = false; }
+                sb.Append(" <").Append(Dec((int)f[0])).Append(">")
+                    .Append(" \"").Append((string)f[1]).Append("\" .")
+                    .Append('\n');
+            }
+            return sb.ToString();
+        }
     }
 }

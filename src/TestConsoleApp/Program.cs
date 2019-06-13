@@ -10,7 +10,7 @@ namespace TestConsoleApp
     {
         public static void Main()
         {
-            Main2();
+            Main3();
         }
         static void Main1()
         {
