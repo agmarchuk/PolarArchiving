@@ -12,7 +12,7 @@ namespace TestConsoleApp
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             System.Random rnd = new Random();
-            string path = "D:/Home/data/Databases/";
+            string path = "C:/WinApps/data/Databases/";
             int fnom = 0;
             Func<Stream> GenStream = () => File.Open(path + (fnom++), FileMode.OpenOrCreate);
             Console.WriteLine("Start TestConsoleApp (Main32)");
@@ -30,11 +30,11 @@ namespace TestConsoleApp
             };
 
 
-            int npersons = 10_000_000;
+            int npersons = 400_000;
             int nphotos = npersons * 2;
             int nreflections = npersons * 6;
 
-            bool toload = false;
+            bool toload = true;
             if (toload)
             {
                 sw.Restart();
