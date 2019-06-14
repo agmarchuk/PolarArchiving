@@ -90,14 +90,6 @@ namespace TestConsoleApp
             table.Indexes = new IIndex[] { s_index, inv_index };
 
         }
-        public void Build()
-        {
-            s_index.Build();
-            inv_index.Build();
-            //name_index.Build();
-            nt.Build();
-            nt.Flush();
-        }
         public void Clear()
         {
             table.Clear();
@@ -116,6 +108,22 @@ namespace TestConsoleApp
             }
             table.Flush();
         }
+        public void Build()
+        {
+            s_index.Build();
+            inv_index.Build();
+            //name_index.Build();
+            nt.Build();
+            nt.Flush();
+        }
+        public void Refresh()
+        {
+            table.Refresh();
+            s_index.Refresh();
+            inv_index.Refresh();
+            //name_index.Refresh();
+            nt.Refresh();
+        }
 
         public object GetRecord(int c)
         {
@@ -123,6 +131,12 @@ namespace TestConsoleApp
                 .FirstOrDefault();
             return qu;
         } 
+        public IEnumerable<object> GetRefers(int c)
+        {
+            var qu = inv_index.GetAllByKey(c);
+            return qu;
+        }
+
         public string ToTT(object rec)
         {
             object[] rr = (object[])rec;

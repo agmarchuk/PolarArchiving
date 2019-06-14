@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenArchiveMVC", "src\OpenA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertVideo", "old\ConvertVideo\ConvertVideo.csproj", "{17855F92-605F-4B6C-886A-586872CBC80F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDService", "src\CDService\CDService.csproj", "{B20DADB7-5EC1-446F-B2C1-3CC19761D22E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TurgundaCommon", "src\TurgundaCommon\TurgundaCommon.csproj", "{CDA55121-03E1-4B65-916B-82B885EBF355}"
 EndProject
 Global
@@ -61,10 +59,6 @@ Global
 		{17855F92-605F-4B6C-886A-586872CBC80F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17855F92-605F-4B6C-886A-586872CBC80F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17855F92-605F-4B6C-886A-586872CBC80F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B20DADB7-5EC1-446F-B2C1-3CC19761D22E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B20DADB7-5EC1-446F-B2C1-3CC19761D22E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B20DADB7-5EC1-446F-B2C1-3CC19761D22E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B20DADB7-5EC1-446F-B2C1-3CC19761D22E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CDA55121-03E1-4B65-916B-82B885EBF355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CDA55121-03E1-4B65-916B-82B885EBF355}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDA55121-03E1-4B65-916B-82B885EBF355}.Release|Any CPU.ActiveCfg = Release|Any CPU
