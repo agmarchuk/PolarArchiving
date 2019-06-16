@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,22 +10,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Polar.DB" Version="1.0.6" />
-    <PackageReference Include="Polar.TripleStore" Version="1.0.3" />
+    <!-- <PackageReference Include="Polar.DB" Version="1.0.6" /> -->
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
+    <ProjectReference Include="..\..\..\PolarDB\src\TripleStore\Polar.TripleStore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Polar.DB">
-      <HintPath>..\..\..\PolarDB\src\Polar.DB\bin\Release\netstandard2.0\Polar.DB.dll</HintPath>
-    </Reference>
-    <Reference Include="Polar.TripleStore">
+    <!--<Reference Include="Polar.TripleStore">
       <HintPath>..\..\..\PolarDB\src\TripleStore\bin\Release\netstandard2.0\Polar.TripleStore.dll</HintPath>
-    </Reference>
+    </Reference>-->
   </ItemGroup>
 
 </Project>
