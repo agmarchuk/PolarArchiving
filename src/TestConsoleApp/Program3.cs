@@ -14,7 +14,8 @@ namespace TestConsoleApp
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             System.Random rnd = new Random();
-            string path = "../../../../data/Databases/";
+            //string path = "../../../../data/Databases/";
+            string path = "D:/Home/data/Databases/";
             int fnom = 0;
             Func<Stream> GenStream = () => File.Open(path + (fnom++), FileMode.OpenOrCreate);
             Console.WriteLine("Start TestConsoleApp (Main32)");
@@ -32,7 +33,7 @@ namespace TestConsoleApp
             };
 
 
-            int npersons = 400_000;
+            int npersons = 40_000;
             int nphotos = npersons * 2;
             int nreflections = npersons * 6;
 
@@ -96,8 +97,8 @@ namespace TestConsoleApp
                     }));
                 if (tocode)
                 {
-                    //store.Load(persons2.Concat(photos2).Concat(reflections2));
-                    store.Load(persons3.Concat(photos3).Concat(reflections3));
+                    store.Load(persons2.Concat(photos2).Concat(reflections2));
+                    //store.Load(persons3.Concat(photos3).Concat(reflections3));
                 }
                 else
                 {
