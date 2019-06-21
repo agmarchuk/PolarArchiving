@@ -10,7 +10,7 @@ namespace TestConsoleApp
     {
         public static void Main()
         {
-            Main3();
+            Main2();
         }
         static void Main1()
         {
@@ -30,8 +30,8 @@ namespace TestConsoleApp
 
             Console.WriteLine("Start TestConsoleApp");
             string path = "./";
-            Turgunda6.SObjects.Init(path);
-            var q = Turgunda6.SObjects.SearchByName("марчук");
+            SObjects.Init(path);
+            var q = SObjects.SearchByName("марчук");
             foreach (var e in q)
             {
                 Console.WriteLine(e.ToString());

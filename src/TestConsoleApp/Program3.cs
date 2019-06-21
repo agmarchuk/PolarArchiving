@@ -19,9 +19,7 @@ namespace TestConsoleApp
             int fnom = 0;
             Func<Stream> GenStream = () => File.Open(path + (fnom++), FileMode.OpenOrCreate);
             Console.WriteLine("Start TestConsoleApp (Main32)");
-            TripleRecordStore store = new TripleRecordStore(GenStream, path);
-
-            store.Preload = new string[] {
+            TripleRecordStore store = new TripleRecordStore(GenStream, path, new string[] {
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
                 , "http://fogid.net/o/name"
                 , "http://fogid.net/o/age"
@@ -30,8 +28,7 @@ namespace TestConsoleApp
                 , "http://fogid.net/o/reflection"
                 , "http://fogid.net/o/reflected"
                 , "http://fogid.net/o/in-doc"
-            };
-
+            });
 
             int npersons = 40_000;
             int nphotos = npersons * 2;

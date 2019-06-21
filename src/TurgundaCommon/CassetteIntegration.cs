@@ -9,7 +9,7 @@ namespace CassetteData
 {
     public class CassetteIntegration : DbAdapter
     {
-        public DStorage localstorage = null;
+        //public DStorage localstorage = null;
         private DbAdapter _adapter;
         private DbAdapter Adapter { get { return _adapter; } }
         private CassetteDataRequester requester;
@@ -22,7 +22,11 @@ namespace CassetteData
             localstorage.Init(xconfig);
 
             string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
-            if (connectionstring == null || connectionstring.StartsWith("ts:"))
+            if (connectionstring == null || connectionstring.StartsWith("trs:"))
+            {
+                _adapter = new TripleRecordStoreAdapter();
+            }
+            else if (connectionstring == null || connectionstring.StartsWith("ts:"))
             {
                 _adapter = new TripleStoreAdapter();//  XmlDbAdapter();
             }

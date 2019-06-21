@@ -16,13 +16,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
-    <ProjectReference Include="..\..\..\PolarDB\src\TripleStore\Polar.TripleStore.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!--<Reference Include="Polar.TripleStore">
+  <ItemGroup><!--<Reference Include="Polar.TripleStore">
       <HintPath>..\..\..\PolarDB\src\TripleStore\bin\Release\netstandard2.0\Polar.TripleStore.dll</HintPath>
     </Reference>-->
+  
+    <ProjectReference Include="..\TurgundaCommon\TurgundaCommon.csproj" />
   </ItemGroup>
 
 </Project>

@@ -20,8 +20,10 @@ namespace Turgunda7
         public static string appname = "Открытый архив СО РАН";
         //internal static DStorage storage = null;
         //private static DbAdapter engine = null;
-        private static CassetteData.CassetteIntegration _engine;
-        public static CassetteData.CassetteIntegration Engine { get { return _engine; } }
+        //private static CassetteData.CassetteIntegration _engine;
+        //public static CassetteData.CassetteIntegration Engine { get { return _engine; } }
+        private static DbAdapter _engine;
+        public static DbAdapter Engine { get { return _engine; } }
 
         public static bool Initiated = true;
         private static System.Text.StringBuilder _errors = new System.Text.StringBuilder();
@@ -58,15 +60,14 @@ namespace Turgunda7
                 // WARNING! Это опасно передавать параметры через статические переменные класса!!!
                 if (finfo_configdefault != null) Cassette.finfo_default = finfo_configdefault;
 
-                //storage = new DStorage();
-                //storage.Init(xconfig);
-                //engine = new XmlDbAdapter();
-                //storage.InitAdapter(engine);
-                _engine = new CassetteData.CassetteIntegration(xconfig);
+            //storage = new DStorage();
+            //storage.Init(xconfig);
+            //engine = new XmlDbAdapter();
+            //storage.InitAdapter(engine);
 
-
+            _engine = new CassetteData.CassetteIntegration(xconfig);
                 // Загрузка профиля и онтологии
-                if (!System.IO.File.Exists(path + "wwwroot/ApplicationProfile.xml"))
+            if (!System.IO.File.Exists(path + "wwwroot/ApplicationProfile.xml"))
                 {
                     System.IO.File.Copy(path + "wwwroot/ApplicationProfile0.xml", path + "wwwroot/ApplicationProfile.xml");
                 }
@@ -94,15 +95,15 @@ namespace Turgunda7
 
             // Заплата вычисления выделенного объекта
             string funds_name = "Фонды";
-            funds_id = Turgunda7.SObjects.Engine.SearchByName(funds_name)
-                .FirstOrDefault(r =>
-                {
-                    if (r.Attribute("type").Value != "http://fogid.net/o/collection") return false;
-                    var na = r.Elements("field")
-                        .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name" && f.Value == funds_name);
-                    if (na == null) return false;
-                    return true;
-                })?.Attribute("id").Value;
+            //funds_id = Turgunda7.SObjects.Engine.SearchByName(funds_name)
+            //    .FirstOrDefault(r =>
+            //    {
+            //        if (r.Attribute("type").Value != "http://fogid.net/o/collection") return false;
+            //        var na = r.Elements("field")
+            //            .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name" && f.Value == funds_name);
+            //        if (na == null) return false;
+            //        return true;
+            //    })?.Attribute("id").Value;
 
         }
 

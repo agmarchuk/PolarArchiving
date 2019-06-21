@@ -9,6 +9,7 @@ namespace Polar.Cassettes.DocumentStorage
 {
     abstract public class DbAdapter
     {
+        public DStorage localstorage;
         public abstract void Init(string connectionstring); 
         // ============== Основные методы доступа к БД =============
         public abstract IEnumerable<XElement> SearchByName(string searchstring);

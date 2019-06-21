@@ -1,28 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Xml.Linq;
 
-namespace TestConsoleApp
+namespace Turgunda8
 {
-    partial class Program
+    public class CassetteUtils
     {
-        public static void Main2()
-        {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            Console.WriteLine("Start TestConsoleApp Main2()");
-            sw.Start();
-            string path = "./";
-            // === Буду писать совсем новую программу работы с кассетами
-            int cnt = LoadFogsFromCassettes(path);
-
-            sw.Stop();
-            Console.WriteLine($"Total {cnt} unique defs. Load duration={sw.ElapsedMilliseconds}");
-
-        }
-
         private static int LoadFogsFromCassettes(string path)
         {
             // Начинаю с конфигуратора
@@ -135,5 +121,6 @@ namespace TestConsoleApp
 
             return cnt;
         }
+
     }
 }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Polar.Cassettes;
 using Polar.Cassettes.DocumentStorage;
 
-namespace Turgunda6
+namespace TestConsoleApp
 {
     public class SObjects
     {
@@ -20,7 +20,8 @@ namespace Turgunda6
             XElement xconfig = XElement.Load(path + "config.xml");
             storage = new DStorage();
             storage.Init(xconfig);
-            engine = new XmlDbAdapter();
+            //engine = new XmlDbAdapter();
+            engine = new Polar.TripleStore.TripleRecordStoreAdapter();
             storage.InitAdapter(engine);
 
             // Загрузка профиля и онтологии
