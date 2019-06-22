@@ -18,7 +18,7 @@ namespace CassetteData
 
         public CassetteIntegration(XElement xconfig)
         {
-            localstorage = new DStorage();
+            localstorage = new DStorage1();
             localstorage.Init(xconfig);
 
             string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
@@ -61,7 +61,6 @@ namespace CassetteData
             else
             {
                 localstorage.LoadFromCassettesExpress();
-
             }
         }
         // ============== API ==============

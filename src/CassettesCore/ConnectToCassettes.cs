@@ -7,11 +7,11 @@ using System.Xml.Linq;
 namespace Polar.Cassettes
 {
     public delegate void LogLine(string message);
-    public class CassettesConnection
+    public class CassettesConnection : Polar.Cassettes.DocumentStorage.CC
     {
-        public Dictionary<string, Cassettes.CassetteInfo> cassettesInfo = new Dictionary<string, Cassettes.CassetteInfo>();
+        //public Dictionary<string, Cassettes.CassetteInfo> cassettesInfo = new Dictionary<string, Cassettes.CassetteInfo>();
         public Dictionary<string, Cassettes.RDFDocumentInfo> docsInfo = new Dictionary<string, Cassettes.RDFDocumentInfo>();
-        public void ConnectToCassettes(IEnumerable<XElement> LoadCassette_elements, LogLine protocol)
+        public override void ConnectToCassettes(IEnumerable<XElement> LoadCassette_elements, LogLine protocol)
         {
             cassettesInfo = new Dictionary<string, Cassettes.CassetteInfo>();
             docsInfo = new Dictionary<string, Cassettes.RDFDocumentInfo>();
@@ -91,7 +91,7 @@ namespace Polar.Cassettes
                 //di0.ClearRoot(); // Возможно, нехороший побочный эффект
             }
         }
-        public IEnumerable<Cassettes.RDFDocumentInfo> GetFogFiles1()
+        public override IEnumerable<Cassettes.RDFDocumentInfo> GetFogFiles1()
         {
             // loaddata или toload - признак того, что нужно загружать внутренние fog-документы, если они есть 
             // isEditable или write - признак того, что позволено изменять элементы кассеты (файлы, фог-документы) 

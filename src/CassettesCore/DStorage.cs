@@ -11,15 +11,15 @@ namespace Polar.Cassettes.DocumentStorage
     /// <summary>
     /// Класс, реализующий документное хранилище
     /// </summary>
-    public class DStorage
+    public class DStorage : DS
     {
         private string connectionstring = "";
         private string cs_prefix = "";
-        public CassettesConnection connection = new CassettesConnection();
+        public CC connection = new CassettesConnection();
         // Возможно, надо будет отказаться от следующего конструктора
         public DStorage() { }
         // Загрузка config.xml
-        public void Init(XElement xconfig)
+        public override void Init(XElement xconfig)
         {
             XElement database_element = xconfig.Element("database");
             if (database_element != null)
@@ -59,7 +59,7 @@ namespace Polar.Cassettes.DocumentStorage
             string filenam = path + u.Substring(u.Length - 9);
             return filenam;
         }
-        public string GetPhotoFileName(string u, string s)
+        public override string GetPhotoFileName(string u, string s)
         {
             string fileName = null;
             string cass_name = u.Substring(0, u.Length - 15);
@@ -74,7 +74,7 @@ namespace Polar.Cassettes.DocumentStorage
         //    string filenam = GetPhotoFileName(u, s);
         //    return new FilePathResult(filename + ".jpg", "image/jpeg");
         //}
-        public string GetVideoFileName(string u)
+        public override string GetVideoFileName(string u)
         {
             if (string.IsNullOrEmpty(u) || !connection.cassettesInfo.ContainsKey(u.Substring(0, u.Length - 15).ToSpecialCase()))
             { return null; }
@@ -93,7 +93,7 @@ namespace Polar.Cassettes.DocumentStorage
         //    else if (System.IO.File.Exists(filenam + ".flv")) video_extension = ".flv";
         //    return new FilePathResult(filenam + video_extension, "video/" + video_extension.Substring(1));
         //}
-        public string GetAudioFileName(string u)
+        public override string GetAudioFileName(string u)
         {
             if (string.IsNullOrEmpty(u) || !connection.cassettesInfo.ContainsKey(u.Substring(0, u.Length - 15).ToSpecialCase()))
             { return null; }
@@ -149,7 +149,7 @@ namespace Polar.Cassettes.DocumentStorage
 
         // =========== Адаптер базы данных ===========
         private DbAdapter dbadapter = null;
-        public void InitAdapter(DbAdapter adapter) 
+        public override void InitAdapter(DbAdapter adapter) 
         { 
             dbadapter = adapter;
             if (adapter != null)
@@ -159,7 +159,7 @@ namespace Polar.Cassettes.DocumentStorage
         }
 
         // =========== Загрузка базы данных через адаптер ===========
-        public void LoadFromCassettesExpress()
+        public override void LoadFromCassettesExpress()
         {
             turlog("Начало загрузки данных");
             dbadapter.StartFillDb(turlog);
@@ -234,7 +234,7 @@ namespace Polar.Cassettes.DocumentStorage
         }
 
         //=============== Редактирующие методы =================
-        public XElement EditCommand(XElement comm)
+        public override XElement EditCommand(XElement comm)
         {
             // Определение активного fog-документа
             XAttribute owner_att = comm.Attribute("owner");

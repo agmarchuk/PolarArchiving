@@ -61,23 +61,6 @@ namespace Polar.TripleStore
             //var v = System.Text.Encoding.CodePagesEncodingProvider.Instance;
             System.Text.Encoding.RegisterProvider(v);
 
-            //InitTableRI();
-            //foreach (string filename in fogfilearr)
-            //{
-            //    XElement fog = XElement.Load(filename);
-            //    var xflow = fog.Elements()
-            //        .Select(el => ConvertXElement(el));
-            //    AppendXflowToRiTable(xflow, filename, errors);
-            //}
-            //// Использование таблицы
-            //foreach (string filename in fogfilearr)
-            //{
-            //    XElement fog = XElement.Load(filename);
-            //    var xflow = fog.Elements()
-            //        .Select(el => ConvertXElement(el));
-            //    LoadXFlowUsingRiTable(xflow);
-            //}
-
             // Готовим битовый массив для отметки того, что хеш id уже "попадал" в этот бит
             int ba_volume = 1024 * 1024;
             int mask = ~((-1) << 20);
@@ -198,7 +181,7 @@ namespace Polar.TripleStore
                     };
                     return orecord;
                 });
-            }).ToArray();
+            });
             store.Load(objectFlow);
             
         }
@@ -210,52 +193,53 @@ namespace Polar.TripleStore
 
         public override void LoadXFlowUsingRiTable(IEnumerable<XElement> xflow)
         {
-            int a_prop = store.CodeEntity(ONames.rdftype.NamespaceName + ONames.rdftype.LocalName);
+            throw new NotImplementedException("in LoadXFlowUsingRiTable");
+        //    int a_prop = store.CodeEntity(ONames.rdftype.NamespaceName + ONames.rdftype.LocalName);
 
-            foreach (XElement xel in xflow)
-            {
-                if (xel.Name == "{http://fogid.net/o/}delete" || xel.Name == "{http://fogid.net/o/}substitute") continue;
-                var aboutatt = xel.Attribute(Cassettes.ONames.rdfabout);
-                if (aboutatt == null) continue;
-                string id = aboutatt.Value;
-                // выявим Resource Info
-                if (!table_ri.TryGetValue(id, out ResInfo ri)) continue; // если нет, то отбрасываем вариант (это на всякий случай)
-                if (ri.removed) continue; // пропускаем уничтоженные
-                if (ri.id != id || ri.processed) continue; // это не оригинал или запись уже обрабатывалась
-                // Выявляем временную отметку
-                DateTime modificationTime_new = DateTime.MinValue;
-                XAttribute mt = xel.Attribute("mT");
-                if (mt != null) DateTime.TryParse(mt.Value, out modificationTime_new);
-                modificationTime_new = modificationTime_new.ToUniversalTime();
+        //    foreach (XElement xel in xflow)
+        //    {
+        //        if (xel.Name == "{http://fogid.net/o/}delete" || xel.Name == "{http://fogid.net/o/}substitute") continue;
+        //        var aboutatt = xel.Attribute(Cassettes.ONames.rdfabout);
+        //        if (aboutatt == null) continue;
+        //        string id = aboutatt.Value;
+        //        // выявим Resource Info
+        //        if (!table_ri.TryGetValue(id, out ResInfo ri)) continue; // если нет, то отбрасываем вариант (это на всякий случай)
+        //        if (ri.removed) continue; // пропускаем уничтоженные
+        //        if (ri.id != id || ri.processed) continue; // это не оригинал или запись уже обрабатывалась
+        //        // Выявляем временную отметку
+        //        DateTime modificationTime_new = DateTime.MinValue;
+        //        XAttribute mt = xel.Attribute("mT");
+        //        if (mt != null) DateTime.TryParse(mt.Value, out modificationTime_new);
+        //        modificationTime_new = modificationTime_new.ToUniversalTime();
 
-                if (modificationTime_new != ri.timestamp) continue; // отметка времени не совпала
+        //        if (modificationTime_new != ri.timestamp) continue; // отметка времени не совпала
 
-                // Зафиксируем в базе данных
-                //db.Add(xel); // старый вариант
+        //        // Зафиксируем в базе данных
+        //        //db.Add(xel); // старый вариант
 
-                //string ent = store.DecodeEntity(1);
-                int rec_type = store.CodeEntity("http://fogid.net/o/" + xel.Name.LocalName);
-                int id_ent = store.CodeEntity(id);
-                IEnumerable<object> query = (new object[] { new object[] { id_ent, a_prop, new object[] { 1, rec_type } } })
-                    .Concat(xel.Elements().Select(subel => // новый вариант
-                    {
-                        var prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
-                        var resource = subel.Attribute(ONames.rdfresource);
-                        if (resource == null)
-                        {
-                            return new object[] { id_ent, prop, new object[] { 2, subel.Value } };
-                        }
-                        else
-                        {
-                            int target = store.CodeEntity(resource.Value);
-                            return new object[] { id_ent, prop, new object[] { 1, target } };
-                        }
+        //        //string ent = store.DecodeEntity(1);
+        //        int rec_type = store.CodeEntity("http://fogid.net/o/" + xel.Name.LocalName);
+        //        int id_ent = store.CodeEntity(id);
+        //        IEnumerable<object> query = (new object[] { new object[] { id_ent, a_prop, new object[] { 1, rec_type } } })
+        //            .Concat(xel.Elements().Select(subel => // новый вариант
+        //            {
+        //                var prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
+        //                var resource = subel.Attribute(ONames.rdfresource);
+        //                if (resource == null)
+        //                {
+        //                    return new object[] { id_ent, prop, new object[] { 2, subel.Value } };
+        //                }
+        //                else
+        //                {
+        //                    int target = store.CodeEntity(resource.Value);
+        //                    return new object[] { id_ent, prop, new object[] { 1, target } };
+        //                }
 
-                    }));
-                store.Load(query);
+        //            }));
+        //        store.Load(query);
 
-                ri.processed = true; // Это на случай, если будет второй оригинал, он обрабатываться не будет.
-            }
+        //        ri.processed = true; // Это на случай, если будет второй оригинал, он обрабатываться не будет.
+        //    }
         }
 
 
