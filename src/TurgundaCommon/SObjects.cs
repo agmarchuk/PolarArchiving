@@ -95,7 +95,7 @@ namespace Turgunda7
             XElement format = new XElement("record",
                 new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
                 null);
-            var item = Turgunda7.SObjects.Engine.GetItemById("syp2001-p-marchuk_a", format);
+            //var item = Turgunda7.SObjects.Engine.GetItemById("syp2001-p-marchuk_a", format);
 
             // Заплата вычисления выделенного объекта
             string funds_name = "Фонды";
