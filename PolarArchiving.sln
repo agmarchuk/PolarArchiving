@@ -21,6 +21,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertVideo", "old\Convert
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TurgundaCommon", "src\TurgundaCommon\TurgundaCommon.csproj", "{CDA55121-03E1-4B65-916B-82B885EBF355}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.DB", "..\PolarDB\src\Polar.DB\Polar.DB.csproj", "{B196AED7-6035-402E-87E3-797F961C18EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.TripleStore", "..\PolarDB\src\TripleStore\Polar.TripleStore.csproj", "{0396D658-4E43-4084-92C3-312E8F8C1A27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +67,14 @@ Global
 		{CDA55121-03E1-4B65-916B-82B885EBF355}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDA55121-03E1-4B65-916B-82B885EBF355}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDA55121-03E1-4B65-916B-82B885EBF355}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B196AED7-6035-402E-87E3-797F961C18EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B196AED7-6035-402E-87E3-797F961C18EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B196AED7-6035-402E-87E3-797F961C18EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B196AED7-6035-402E-87E3-797F961C18EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0396D658-4E43-4084-92C3-312E8F8C1A27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0396D658-4E43-4084-92C3-312E8F8C1A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0396D658-4E43-4084-92C3-312E8F8C1A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0396D658-4E43-4084-92C3-312E8F8C1A27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -51,10 +51,12 @@ namespace Polar.TripleStore
         public override void StartFillDb(Action<string> turlog)
         {
             //db = new XElement("db");
-            store.Clear();
+            //store.Clear();
         }
         public override void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog)
         {
+            store.Clear();
+
             // Нужно для чтиния в кодировке windows-1251. Нужен также Nuget System.Text.Encoding.CodePages
             var v = CodePagesEncodingProvider.Instance;
             Encoding.RegisterProvider(v);
@@ -182,8 +184,10 @@ namespace Polar.TripleStore
                     return orecord;
                 });
             });
+
             store.Load(objectFlow);
-            
+
+            store.Build();
         }
         public override void Save(string filename)
         {
@@ -194,58 +198,12 @@ namespace Polar.TripleStore
         public override void LoadXFlowUsingRiTable(IEnumerable<XElement> xflow)
         {
             throw new NotImplementedException("in LoadXFlowUsingRiTable");
-        //    int a_prop = store.CodeEntity(ONames.rdftype.NamespaceName + ONames.rdftype.LocalName);
-
-        //    foreach (XElement xel in xflow)
-        //    {
-        //        if (xel.Name == "{http://fogid.net/o/}delete" || xel.Name == "{http://fogid.net/o/}substitute") continue;
-        //        var aboutatt = xel.Attribute(Cassettes.ONames.rdfabout);
-        //        if (aboutatt == null) continue;
-        //        string id = aboutatt.Value;
-        //        // выявим Resource Info
-        //        if (!table_ri.TryGetValue(id, out ResInfo ri)) continue; // если нет, то отбрасываем вариант (это на всякий случай)
-        //        if (ri.removed) continue; // пропускаем уничтоженные
-        //        if (ri.id != id || ri.processed) continue; // это не оригинал или запись уже обрабатывалась
-        //        // Выявляем временную отметку
-        //        DateTime modificationTime_new = DateTime.MinValue;
-        //        XAttribute mt = xel.Attribute("mT");
-        //        if (mt != null) DateTime.TryParse(mt.Value, out modificationTime_new);
-        //        modificationTime_new = modificationTime_new.ToUniversalTime();
-
-        //        if (modificationTime_new != ri.timestamp) continue; // отметка времени не совпала
-
-        //        // Зафиксируем в базе данных
-        //        //db.Add(xel); // старый вариант
-
-        //        //string ent = store.DecodeEntity(1);
-        //        int rec_type = store.CodeEntity("http://fogid.net/o/" + xel.Name.LocalName);
-        //        int id_ent = store.CodeEntity(id);
-        //        IEnumerable<object> query = (new object[] { new object[] { id_ent, a_prop, new object[] { 1, rec_type } } })
-        //            .Concat(xel.Elements().Select(subel => // новый вариант
-        //            {
-        //                var prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
-        //                var resource = subel.Attribute(ONames.rdfresource);
-        //                if (resource == null)
-        //                {
-        //                    return new object[] { id_ent, prop, new object[] { 2, subel.Value } };
-        //                }
-        //                else
-        //                {
-        //                    int target = store.CodeEntity(resource.Value);
-        //                    return new object[] { id_ent, prop, new object[] { 1, target } };
-        //                }
-
-        //            }));
-        //        store.Load(query);
-
-        //        ri.processed = true; // Это на случай, если будет второй оригинал, он обрабатываться не будет.
-        //    }
         }
 
 
         public override void FinishFillDb(Action<string> turlog)
         {
-            store.Build();
+            //store.Build();
         }
 
         private string GetRecordId(object rec)
@@ -265,6 +223,89 @@ namespace Polar.TripleStore
             var tri = (object[])rec;
             return (string)((object[])((object[])tri[2]).Cast<object[]>().FirstOrDefault(pair => (int)pair[0] == 1))[1];
         }
+
+        // =========================== Основные выборки и поиски ===============================
+
+        public override XElement GetItemByIdBasic(string id, bool addinverse)
+        {
+            int cid = store.CodeEntity(id);
+            object[] tri = (object[])store.GetRecord(cid);
+            if (tri == null) return null;
+            object[] pair = ((object[])tri[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == 0);
+            XElement xres = new XElement("record",
+                new XAttribute("id", id), pair==null?null: new XAttribute("type", store.DecodeEntity((int)pair[1])),
+                ((object[])tri[2]).Cast<object[]>().Select(dup =>
+                {
+                    return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                        (string)dup[1]);
+                }),
+                ((object[])tri[1]).Cast<object[]>().Where(dup => (int)dup[0] != 0).Select(dup =>
+                {
+                    return new XElement("direct", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                        new XElement("record", new XAttribute("id", store.DecodeEntity((int)dup[1]))));
+                }),
+                null);
+            if (addinverse)
+            {
+                var inv = store.GetRefers(cid);
+                xres.Add(inv.Cast<object[]>().Select(tr =>
+                {
+                    int c = (int)tr[0];
+                    object[] found = ((object[])tr[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[1] == cid);
+                    return new XElement("inverse", new XAttribute("prop", store.DecodeEntity((int)found[0])),
+                        new XElement("record", new XAttribute("id", store.DecodeEntity(c))));
+                }));
+            }
+            return xres;
+        }
+
+        public override XElement GetItemById(string id, XElement format)
+        {
+            object[] node = (object[])store.GetRecord(store.CodeEntity(id));
+            return GetItemByNode(node, format);
+        }
+        private XElement GetItemByNode(object[] node, XElement format)
+        {
+            if (format == null || format.Name != "record") throw new Exception("Err: strange format");
+            object[] type_dup = ((object[])node[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == 0);
+            XElement xres = new XElement("record", new XAttribute("id", store.Decode((int)node[0])),
+                type_dup==null?null: new XAttribute("type", store.DecodeEntity((int)type_dup[1])),
+                format.Elements().Where(fel => fel.Name == "field" || fel.Name == "direct"|| fel.Name == "inverse")
+                .SelectMany(fel =>
+                {
+                    string prop = fel.Attribute("prop").Value;
+                    int iprop = store.Code(prop);
+                    object[] invs = null;
+                    if (fel.Name == "field")
+                    {
+                        // Предполагаю, что значений может быть несколько
+                        var query = ((object[])node[2]).Cast<object[]>()
+                        .Where(dup => (int)dup[0] == iprop)
+                        .Select(dup =>
+                        {
+                            return new XElement("field", new XAttribute("prop", prop), (string)dup[1]);
+                        });
+                        return query;
+                    }
+                    else
+                    {
+                        return Enumerable.Repeat<XElement>(new XElement("direct"), 1);
+                    }
+                }),
+                //((object[])node[2]).Cast<object[]>().Select(dup =>
+                //{
+                //    return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                //        (string)dup[1]);
+                //}),
+                //((object[])node[1]).Cast<object[]>().Where(dup => (int)dup[0] != 0).Select(dup =>
+                //{
+                //    return new XElement("direct", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                //        new XElement("record", new XAttribute("id", store.DecodeEntity((int)dup[1]))));
+                //}),
+                null);
+            return xres;
+        }
+
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
             var query2 = store.Like(searchstring).Cast<object[]>()
@@ -279,197 +320,12 @@ namespace Polar.TripleStore
             return query2;
         }
 
-        //public XElement GetItemByIdBasic2(string id, bool addinverse)
-        //{
-        //    XElement record = null;
-        //    var query = store.Get_s(id);
-        //    string type = null;
-        //    // сканируем чтобы заполнить переменную type
-        //    foreach (object[] tr in query)
-        //    {
-        //        if ((int)tr[1] == store.Code_rdftype && type == null)
-        //            type = store.DecodeEntity((int)((object[])tr[2])[1]);
-        //    }
-        //    record = new XElement("record",
-        //        new XAttribute("id", id),
-        //        new XAttribute("type", type),
-        //        query.Cast<object[]>()
-        //        .Where(tr => (int)tr[1] != store.Code_rdftype) // пропустить определение типа
-        //        .Select(tr =>
-        //        {
-        //            string prop = store.DecodeEntity((int)tr[1]);
-        //            object[] ob = (object[])tr[2];
-        //            if ((int)ob[0] == 1)
-        //                return new XElement("direct",
-        //                    new XAttribute("prop", prop),
-        //                    new XElement("record", new XAttribute("id", store.DecodeEntity((int)ob[1]))));
-        //            else
-        //                return new XElement("field",
-        //                    new XAttribute("prop", prop), (string)ob[1]);
-        //        }));
-        //    if (addinverse)
-        //    {
-        //        var query_inverse = store.Get_t(id);
-        //        record.Add(
-        //            query_inverse.Cast<object[]>()
-        //            .Select(tr =>
-        //            {
-        //                string prop = store.DecodeEntity((int)tr[1]);
-        //                return new XElement("inverse",
-        //                    new XAttribute("prop", prop),
-        //                    new XElement("record", new XAttribute("id", store.DecodeEntity((int)tr[0]))));
-        //            }));
-        //    }
-        //    return record;
-        //}
-        //public override XElement GetItemByIdBasic(string id, bool addinverse)
-        //{
-        //    var query2 = GetItemByIdBasic2(id, addinverse);
-        //    return query2;
-        //}
-        //private XElement CodeTree(XElement tree)
-        //{
-        //    XElement rformat = new XElement(tree);
-        //    CodeAttributes(rformat);
-        //    return rformat;
-        //}
-        //private XElement DecodeTree(XElement itree)
-        //{
-        //    XElement rformat = new XElement(itree);
-        //    DecodeAttributes(rformat);
-        //    return rformat;
-        //}
-        //private void CodeAttributes(XElement tree)
-        //{
-        //    CodeAtt(tree, "id");
-        //    CodeAtt(tree, "type");
-        //    CodeAtt(tree, "prop");
-        //    foreach (XElement el in tree.Elements()) CodeAttributes(el);
-        //}
-        //private void DecodeAttributes(XElement itree)
-        //{
-        //    DecodeAtt(itree, "id");
-        //    DecodeAtt(itree, "type");
-        //    DecodeAtt(itree, "prop");
-        //    foreach (XElement el in itree.Elements()) DecodeAttributes(el);
-        //}
-        //private void CodeAtt(XElement format, string att_name)
-        //{
-        //    var att = format.Attribute(att_name);
-        //    if (att != null)
-        //    {
-        //        string val = att.Value;
-        //        att.Value = "" + store.CodeEntity(val);
-        //    }
-        //}
-        //private void DecodeAtt(XElement format, string att_name)
-        //{
-        //    var att = format.Attribute(att_name);
-        //    if (att != null)
-        //    {
-        //        string val = att.Value;
-        //        att.Value = store.DecodeEntity(Int32.Parse(val));
-        //    }
-        //}
-
-        //public override XElement GetItemById(string id, XElement format)
-        //{
-        //    // Кодирование идентификатора и формата
-        //    int iid = store.CodeEntity(id);
-        //    XElement iformat = CodeTree(format);
-        //    XElement x2 = GetItemByNode2(iid, store.Get_s(id), iformat);
-        //    // Декодирование результата
-        //    XElement x3 = DecodeTree(x2);
-        //    return x3;
-        //}
-        ///// <summary>
-        ///// Рекурсивная процедура получения дерева результата в кодированной форме. Параметры: id и format кодированы.
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="dtriples">Прямые свойства</param>
-        ///// <param name="format"></param>
-        ///// <returns></returns>
-        //private XElement GetItemByNode2(int id, IEnumerable<object> dtriples, XElement format)
-        //{
-        //    int type = Int32.MinValue;
-        //    foreach (object[] tr in dtriples)
-        //        if ((int)tr[1] == store.Code_rdftype)
-        //            type = (int)((object[])tr[2])[1];
-        //    return new XElement("record",
-        //        new XAttribute("id", id),
-        //        new XAttribute("type", type),
-        //        format.Elements().Where(fel => fel.Name == "field" || fel.Name == "direct" || fel.Name == "inverse")
-        //        .SelectMany(fel =>
-        //        {
-        //            int iprop = Int32.Parse(fel.Attribute("prop").Value);
-        //            if (fel.Name == "field")
-        //            {
-        //                return dtriples.Cast<object[]>()
-        //                    .Where(tr => (int)tr[1] == iprop)
-        //                    .Select(tr => new XElement("field", new XAttribute("prop", iprop),
-        //                        (string)((object[])tr[2])[1]));
-        //            }
-        //            else if (fel.Name == "direct")
-        //            {
-        //                return dtriples.Cast<object[]>()
-        //                    .Where(tr => (int)tr[1] == iprop)
-        //                    .Select(tr =>
-        //                    {
-        //                        int iresource = (int)((object[])tr[2])[1];
-        //                        var sub_dtriples = store.Get_s(iresource);
-        //                        var tt = sub_dtriples.Cast<object[]>()
-        //                            .FirstOrDefault(tri => (int)tri[1] == store.Code_rdftype);
-        //                        if (tt == null) return null;
-        //                        XElement f = fel.Elements("record")
-        //                            .FirstOrDefault(fr =>
-        //                            {
-        //                                XAttribute t_att = fr.Attribute("type");
-        //                                if (t_att == null) return true;
-        //                                return Int32.Parse(t_att.Value) == (int)((object[])tt[2])[1];
-        //                            });
-        //                        if (f == null) return null;
-        //                        return new XElement("direct", new XAttribute("prop", iprop),
-        //                            GetItemByNode2(iresource, sub_dtriples, f));
-        //                    });
-        //            }
-        //            else if (fel.Name == "inverse")
-        //            {
-        //                var itriples = store.Get_t(id);
-        //                var query = itriples.Cast<object[]>()
-        //                    .Where(tr => (int)tr[1] == iprop)
-        //                    .Select(tr =>
-        //                    {
-        //                        int subject = (int)tr[0];
-        //                        var sub_dtriples = store.Get_s(subject);
-        //                        var tt = sub_dtriples.Cast<object[]>()
-        //                            .FirstOrDefault(tri => (int)tri[1] == store.Code_rdftype);
-        //                        // tt не должен быть нулем 
-        //                        if (tt == null) throw new Exception("Err in GetItemByNode2: sub format " + fel);
-        //                        // находим подходящий формат записи
-        //                        XElement f = fel.Elements("record")
-        //                            .FirstOrDefault(fr =>
-        //                            {
-        //                                XAttribute t_att = fr.Attribute("type");
-        //                                if (t_att == null) return true;
-        //                                return Int32.Parse(t_att.Value) == (int)((object[])tt[2])[1];
-        //                            });
-        //                        var x = new XElement("inverse",
-        //                            new XAttribute("prop", iprop),
-        //                            GetItemByNode2(subject, sub_dtriples, f));
-        //                        return x;
-        //                    });
-        //                return query;
-        //            }
-        //            else return new XElement[0];
-        //        }));
-        //}
-
         public override XElement GetItemByIdSpecial(string id)
         {
             return GetItemByIdBasic(id, true);
         }
 
-
+        // ============================== Редактирование ================================
         private XElement RemoveRecord(string id)
         {
             //if (records.TryGetValue(id, out DbNode node))
@@ -561,14 +417,5 @@ namespace Polar.TripleStore
             throw new Exception("Unimplemented method AddUpdate");
         }
 
-        public override XElement GetItemByIdBasic(string id, bool addinverse)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override XElement GetItemById(string id, XElement format)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
