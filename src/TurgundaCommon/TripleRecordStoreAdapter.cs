@@ -23,6 +23,7 @@ namespace Polar.TripleStore
         private Action<string> errors = s => { Console.WriteLine(s); };
         string dbfolder = "D:/";
         int file_no = 0;
+        //internal bool firsttime = false; // Отмечает (вычисляет) ситуацию, когда базу данных обязательно нужно строить.
 
         /// <summary>
         /// Инициирование базы данных
@@ -34,6 +35,7 @@ namespace Polar.TripleStore
             {
                 dbfolder = connectionstring.Substring(4);
             }
+            if (File.Exists(dbfolder + "0.bin")) firsttime = false;
             Func<Stream> GenStream = () =>
                 new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             store = new TripleRecordStore(GenStream, dbfolder, new string[] {
@@ -46,6 +48,7 @@ namespace Polar.TripleStore
                 , "http://fogid.net/o/reflected"
                 , "http://fogid.net/o/in-doc"
             });
+            store.Flush();
         }
         // Загрузка базы данных
         public override void StartFillDb(Action<string> turlog)
@@ -188,6 +191,8 @@ namespace Polar.TripleStore
             store.Load(objectFlow);
 
             store.Build();
+
+            store.Flush();
         }
         public override void Save(string filename)
         {
