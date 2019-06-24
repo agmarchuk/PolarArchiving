@@ -120,7 +120,11 @@ namespace Polar.Cassettes.DocumentStorage
 
         public override string GetPhotoFileName(string u, string s)
         {
-            throw new NotImplementedException();
+            string cass_name = u.Substring(0, u.Length - 26).Substring(7).ToLower();
+            var cass = cassettesToLoad.FirstOrDefault(ci => ci.name.ToLower() == cass_name);
+            string fileName = cass == null ? null : cass.path +
+                    "/documents/" + s + "/" + u.Substring(u.Length - 9);
+            return fileName;
         }
 
         public override string GetVideoFileName(string u)

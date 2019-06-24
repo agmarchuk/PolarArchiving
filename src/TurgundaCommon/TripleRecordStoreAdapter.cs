@@ -281,6 +281,7 @@ namespace Polar.TripleStore
                 {
                     string prop = fel.Attribute("prop").Value;
                     int iprop = store.Code(prop);
+                    int cod = (int)node[0];
                     object[] invs = null;
                     if (fel.Name == "field")
                     {
@@ -293,21 +294,41 @@ namespace Polar.TripleStore
                         });
                         return query;
                     }
+                    else if (fel.Name == "direct")
+                    {
+                        // Предполагаю, что прямых ссылок с данным свойством может быть только одна
+                        // найду соответствующую пару 
+                        object[] dupp = ((object[])node[1]).Cast<object[]>()
+                            .FirstOrDefault(dup => (int)dup[0] == iprop);
+                        if (dupp == null) return new XElement[0];
+                        int itarget = (int)dupp[1];
+                        
+                        return Enumerable.Repeat<XElement>(
+                            new XElement("direct", new XAttribute("prop", prop),
+                            GetItemByNode((object[])store.GetRecord(itarget), fel.Element("record")),
+                            null), 1);
+                    }
                     else
                     {
-                        return Enumerable.Repeat<XElement>(new XElement("direct"), 1);
+                        // Предполагаю, что обратных ссылок с данным свойством может быть много 
+                        // Сначала вычислю группу обратных записей, если еще не вычислена
+                        if (invs == null)
+                        {
+                            invs = store.GetRefers(cod).ToArray(); 
+                            //invs = ((object[])store.GetRefers((int)node[0])).ToArray();
+                        }
+                        // Теперь надо сформировать множество элементов <inverse prop="..." <record ...
+                        // Теоретически можно сгруппировать множество под одним inverse, но я не буду так делать
+                        // здесь нам понадобятся только записи, где есть свойство и таргет
+                        // Внутренний формат:
+                        XElement subformat = fel.Element("record");
+                        return invs.Cast<object[]>().Where(r => ((object[])r[1])
+                            .Cast<object[]>()
+                            .Any(dup => (int)dup[0] == iprop && (int)dup[1] == cod))
+                        .Select(r => new XElement("inverse", new XAttribute("prop", prop),
+                            GetItemByNode((object[])store.GetRecord((int)r[0]), subformat)));
                     }
                 }),
-                //((object[])node[2]).Cast<object[]>().Select(dup =>
-                //{
-                //    return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
-                //        (string)dup[1]);
-                //}),
-                //((object[])node[1]).Cast<object[]>().Where(dup => (int)dup[0] != 0).Select(dup =>
-                //{
-                //    return new XElement("direct", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
-                //        new XElement("record", new XAttribute("id", store.DecodeEntity((int)dup[1]))));
-                //}),
                 null);
             return xres;
         }

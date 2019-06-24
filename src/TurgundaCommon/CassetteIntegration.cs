@@ -56,7 +56,8 @@ namespace CassetteData
             }
             else
             {
-                if (_adapter.firsttime) localstorage.LoadFromCassettesExpress();
+                //if (_adapter.firsttime)
+                    localstorage.LoadFromCassettesExpress();
             }
         }
         // ============== API ==============
