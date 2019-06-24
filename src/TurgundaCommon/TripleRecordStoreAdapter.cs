@@ -48,6 +48,7 @@ namespace Polar.TripleStore
                 , "http://fogid.net/o/reflected"
                 , "http://fogid.net/o/in-doc"
             });
+            if (!firsttime) store.DynaBuild();            
             store.Flush();
         }
         // Загрузка базы данных
