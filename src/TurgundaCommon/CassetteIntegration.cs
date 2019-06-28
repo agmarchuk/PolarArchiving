@@ -56,7 +56,7 @@ namespace CassetteData
             }
             else
             {
-                //if (_adapter.firsttime)
+                //if (_adapter.firsttime) //TODO: закомментарено пока не устранена ошибка
                     localstorage.LoadFromCassettesExpress();
             }
         }
