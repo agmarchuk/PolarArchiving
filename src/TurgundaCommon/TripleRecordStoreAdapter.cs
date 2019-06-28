@@ -194,6 +194,7 @@ namespace Polar.TripleStore
             store.Build();
 
             store.Flush();
+            GC.Collect();
         }
         public override void Save(string filename)
         {
@@ -344,7 +345,8 @@ namespace Polar.TripleStore
                     XElement res = new XElement("record", new XAttribute("id", id), new XAttribute("type", type),
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"), GetRecordName(tri)));
                     return res;
-                }).ToArray();
+                })//.ToArray()
+                ;
             return query2;
         }
 
