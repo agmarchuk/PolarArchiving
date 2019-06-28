@@ -273,6 +273,7 @@ namespace Polar.TripleStore
         private XElement GetItemByNode(object[] node, XElement format)
         {
             if (format == null || format.Name != "record") throw new Exception("Err: strange format");
+            if (node == null || (object[])node[1] == null) { return new XElement("record"); }
             object[] type_dup = ((object[])node[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == 0);
             XElement xres = new XElement("record", new XAttribute("id", store.Decode((int)node[0])),
                 type_dup==null?null: new XAttribute("type", store.DecodeEntity((int)type_dup[1])),

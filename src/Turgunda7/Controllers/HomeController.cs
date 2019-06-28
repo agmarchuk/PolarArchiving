@@ -778,7 +778,7 @@ new XElement("body",
                                         string startdate = Turgunda7.SObjects.GetField(rc, "http://fogid.net/o/from-date");
 
 
-                                        if (rc != null)
+                                        if (rc != null && rc.Attribute("type") != null)
                                         {
                                             string ty = rc.Attribute("type").Value;
                                             string ur = Turgunda7.SObjects.GetField(rc, "http://fogid.net/o/uri");
