@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -14,24 +14,34 @@ namespace TestConsoleApp
         public static void Main5()
         {
             Console.WriteLine("Start Main5");
-            string path = "D:/Home/data/Databases1/";
+            string path = "C:/Home/data/Databases/";
 
             TripleRecordStoreAdapter adapter = new TripleRecordStoreAdapter();
-            adapter.Init("trs:D:/Home/data/Databases1/");
-            bool toload = false;
+            adapter.Init("trs:C:/Home/data/Databases/");
+            bool toload = true;
             if (toload)
             {
                 adapter.StartFillDb(null);
-                adapter.LoadFromCassettesExpress(new string[] { @"D:\Home\FactographProjects\syp_cassettes\SypCassete/meta/SypCassete_current.fog" }, null, null);
+                adapter.LoadFromCassettesExpress(
+                    new string[] { @"C:\home\syp\syp_cassettes\SypCassete/meta/SypCassete_current.fog" }, null, null);
                 adapter.FinishFillDb(null);
             }
 
-            var query = adapter.SearchByName("ìàð÷óê");
+            var query = adapter.SearchByName("Ð¼Ð°Ñ€Ñ‡ÑƒÐº");
 
             foreach (XElement rec in query)
             {
                 Console.WriteLine(rec.ToString());
             }
+
+            var per = adapter.GetItemByIdBasic("syp2001-p-marchuk_a", true);
+            Console.WriteLine(per.ToString());
+
+            var prs2 = adapter.GetItemById("syp2001-p-marchuk_a", new XElement("record",
+                new XAttribute("type", "http://fogid.net/o/person"),
+                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                null));
+            Console.WriteLine(prs2.ToString());
         }
     }
 }
