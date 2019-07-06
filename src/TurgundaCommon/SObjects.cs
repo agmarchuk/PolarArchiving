@@ -23,7 +23,7 @@ namespace Turgunda7
         //private static CassetteData.CassetteIntegration _engine;
         //public static CassetteData.CassetteIntegration Engine { get { return _engine; } }
         private static DbAdapter _engine;
-        public static DbAdapter Engine { get { return _engine; } }
+        //public static DbAdapter Engine { get { return _engine; } }
 
         public static bool Initiated = true;
         private static System.Text.StringBuilder _errors = new System.Text.StringBuilder();
@@ -137,9 +137,21 @@ namespace Turgunda7
             string sid = id.Substring(0, id.Length - "_cassetteId".Length).ToLower();
             string fid = "iiss://" + sid + "@iis.nsk.su";
             // Определяем кассету
-            var cassetteExists = SObjects.Engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
+            var cassetteExists = SObjects._engine.localstorage.connection.cassettesInfo.ContainsKey(fid);
             if (!cassetteExists) { return null; }
-            return SObjects.Engine.localstorage.connection.cassettesInfo[fid];
+            return SObjects._engine.localstorage.connection.cassettesInfo[fid];
+        }
+        public static string GetPhotoFileName(string u, string s)
+        {
+            return _engine.localstorage.GetPhotoFileName(u, s);
+        }
+        public static string GetVideoFileName(string u)
+        {
+            return _engine.localstorage.GetVideoFileName(u);
+        }
+        public static string GetAudioFileName(string u)
+        {
+            return _engine.localstorage.GetAudioFileName(u);
         }
 
         public static IEnumerable<XElement> SearchByName(string searchstring)
@@ -149,6 +161,10 @@ namespace Turgunda7
         public static XElement GetItemById(string id, XElement format)
         {
             lock (saveInDb) { return _engine.GetItemById(id, format); }
+        }
+        public static XElement GetItemByIdBasic(string id, bool addinverse)
+        {
+            lock (saveInDb) { return _engine.GetItemByIdBasic(id, addinverse); }
         }
         public static XElement GetItemByIdSpecial(string id)
         {
@@ -178,6 +194,9 @@ namespace Turgunda7
 
             return xrecord?.Attribute(ONames.rdfabout).Value;
         }
+        public static XElement Delete(string id) { return _engine.Delete(id); }
+        public static XElement Add(XElement record) { return _engine.Add(record); }
+        public static XElement AddUpdate(XElement record) { return _engine.AddUpdate(record); }
         public static void DeleteItem(string id, string username)
         {
             //engine.DeleteRecord(id);
@@ -232,11 +251,12 @@ namespace Turgunda7
             string res = (fd_el == null ? "" : fd_el.Value) + (td_el == null || string.IsNullOrEmpty(td_el.Value) ? "" : "—" + td_el.Value);
             return res;
         }
+        public static IEnumerable<RDFDocumentInfo> GetFogFiles1() { return _engine.localstorage.connection.GetFogFiles1(); }
         public static IEnumerable<XElement> GetCollectionPath(string id)
         {
             //return _getCollectionPath(id);
             System.Collections.Generic.Stack<XElement> stack = new Stack<XElement>();
-            XElement node = Engine.GetItemByIdBasic(id, false);
+            XElement node = _engine.GetItemByIdBasic(id, false);
             if (node == null) return Enumerable.Empty<XElement>();
             stack.Push(node);
             bool ok = GetCP(id, stack);
@@ -250,7 +270,7 @@ namespace Turgunda7
         private static bool GetCP(string id, Stack<XElement> stack)
         {
             if (id == funds_id) return true;
-            XElement tree = Engine.GetItemById(id, formattoparentcollection);
+            XElement tree = _engine.GetItemById(id, formattoparentcollection);
             if (tree == null) return false;
             foreach (var n1 in tree.Elements("inverse"))
             {
@@ -276,16 +296,5 @@ namespace Turgunda7
 
     }
 
-    public class SCompare : IComparer<string>
-    {
-        public int Compare(string s1, string s2)
-        {
-            if (string.IsNullOrEmpty(s1) && string.IsNullOrEmpty(s2)) return 0;
-            if (string.IsNullOrEmpty(s1)) return 1;
-            if (string.IsNullOrEmpty(s2)) return -1;
-            return s1.CompareTo(s2);
-        }
-        public static SCompare comparer = new SCompare();
-    }
-
+  
 }

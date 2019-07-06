@@ -13,7 +13,7 @@ namespace Turgunda7.Controllers
         public ActionResult GetPhoto(string u, string s)
         {
             string filename = "/question.jpg";
-            filename = SObjects.Engine.localstorage.GetPhotoFileName(u, s) + ".jpg";
+            filename = SObjects.GetPhotoFileName(u, s) + ".jpg";
             //return new FilePathResult(filename, "image/jpeg");
             return new PhysicalFileResult(filename, "image/jpeg");
 
@@ -23,43 +23,43 @@ namespace Turgunda7.Controllers
         public ActionResult SearchByName(string ss)
         {
             string name = ss;
-            XElement res = new XElement("sequense", SObjects.Engine.SearchByName(name));
+            XElement res = new XElement("sequense", SObjects.SearchByName(name));
             return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpGet]
         public ActionResult GetItemByIdSpecial(string id)
         {
-            XElement res = SObjects.Engine.GetItemByIdSpecial(id);
+            XElement res = SObjects.GetItemByIdSpecial(id);
             return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpGet]
         public ActionResult GetItemByIdBasic(string id, bool addinverse)
         {
-            XElement res = SObjects.Engine.GetItemByIdBasic(id, addinverse);
+            XElement res = SObjects.GetItemByIdBasic(id, addinverse);
             return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpGet]
         public ActionResult Delete(string id)
         {
-            XElement res = SObjects.Engine.Delete(id);
+            XElement res = SObjects.Delete(id);
             return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpPost]
         public ActionResult GetItemById(string id, string format)
         {
-            XElement res = SObjects.Engine.GetItemById(id, XElement.Parse(format));
+            XElement res = SObjects.GetItemById(id, XElement.Parse(format));
             return new ContentResult { ContentType = "text/xml", Content = res.ToString(SaveOptions.DisableFormatting) };
         }
         [HttpPost]
         public ActionResult Add(XElement record)
         {
-            XElement res = SObjects.Engine.Add(record);
+            XElement res = SObjects.Add(record);
             return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
         [HttpPost]
         public ActionResult AddUpdate(XElement record)
         {
-            XElement res = SObjects.Engine.AddUpdate(record);
+            XElement res = SObjects.AddUpdate(record);
             return new ContentResult { ContentType = "text/xml", Content = res.ToString() };
         }
 

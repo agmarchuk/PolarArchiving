@@ -63,7 +63,7 @@ namespace Turgunda7.Models
             this.typelabel = ModelCommon.OntNames.Where(pair => pair.Key == type_id).Select(pair => pair.Value).FirstOrDefault();
             if (this.typelabel == null) this.typelabel = type_id;
             // Получим портретное х-дерево
-            this.xtree = SObjects.Engine.GetItemById(id, rec_format);
+            this.xtree = SObjects.GetItemById(id, rec_format);
             if (this.xtree == null) return;
             // По дереву вычислим и зафиксируем остальные поля
             // поле идентификатора
@@ -105,7 +105,7 @@ namespace Turgunda7.Models
                 if (mpDocId != null)
                 {
                     string[] doclist =             // Части документа
-                    SObjects.Engine.GetItemById(mpDocId, formatfordoc).Elements("inverse")
+                    SObjects.GetItemById(mpDocId, formatfordoc).Elements("inverse")
                         .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/inDocument")
                         .Select(inv => inv.Element("record"))
                         .Select(rec => new
@@ -133,7 +133,7 @@ namespace Turgunda7.Models
             string type_id;
             // Нам нужен формат.
             XElement f_primitive = new XElement("record");
-            XElement xtree0 = SObjects.Engine.GetItemById(id, f_primitive);
+            XElement xtree0 = SObjects.GetItemById(id, f_primitive);
             if (xtree0 == null) { rec_format = null; return null; }; // Как-то надо поступить с диагностикой ошибок//
             type_id = xtree0.Attribute("type").Value;
             // Теперь установим нужный формат
@@ -335,7 +335,7 @@ namespace Turgunda7.Models
         public void LoadFromDb()
         {
             CalculateFormat();
-            _xtree = SObjects.Engine.GetItemById(eid, _format);
+            _xtree = SObjects.GetItemById(eid, _format);
         }
         public IEnumerable<XElement> GetHeaderFlow()
         {
@@ -748,7 +748,7 @@ namespace Turgunda7.Models
             //type = "http://fogid.net/o/person"; // для отладки
             this.type = type;
             //if (string.IsNullOrEmpty(searchstring)) { _results = new SearchResult[0]; return; }
-            var query = SObjects.Engine.SearchByName(searchstring)
+            var query = SObjects.SearchByName(searchstring)
                 .Select(xres =>
                 {
                     XElement name_el = xres
@@ -793,7 +793,7 @@ namespace Turgunda7.Models
         public PortraitSpecialModel(string id)
         {
             DateTime tt0 = DateTime.Now;
-            XElement record = SObjects.Engine.GetItemByIdSpecial(id);
+            XElement record = SObjects.GetItemByIdSpecial(id);
             if (record == null) return;
             this.id = record.Attribute("id").Value;
             string type_id = record.Attribute("type") == null ? "notype" : record.Attribute("type").Value;

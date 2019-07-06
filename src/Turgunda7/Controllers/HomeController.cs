@@ -47,7 +47,7 @@ namespace Turgunda7.Controllers
             if (nm == null) nm = "Фонды";
             if (nm != null)
             {
-                XElement my_element = SObjects.Engine.SearchByName(nm).FirstOrDefault(x =>
+                XElement my_element = SObjects.SearchByName(nm).FirstOrDefault(x =>
                     x.Elements("field").Any(f => f.Attribute("prop").Value == "http://fogid.net/o/name" && f.Value == nm));
                 if (my_element != null) return Redirect("~/Home/Portrait?id=" + my_element.Attribute("id").Value);
             }
@@ -99,7 +99,7 @@ namespace Turgunda7.Controllers
             if (cassetteInfo.cassette.Owner != new Turgunda7.Models.UserModel(Request).Uuser) return Error("Вам не разрешено добавлять файлы в эту кассету"); //new EmptyResult();
             string dirpath = cassetteInfo.url;
             // Ищем подколлекцию upload и если нет - создаем
-            var c_item = SObjects.Engine.GetItemById(id,
+            var c_item = SObjects.GetItemById(id,
                 new XElement("record",
                     new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
                         new XElement("record", new XAttribute("type", "http://fogid.net/o/collection-member"),
@@ -429,7 +429,7 @@ namespace Turgunda7.Controllers
                 }
             }
             List<Models.Conf> list = new List<Models.Conf>();
-            foreach (var c in SObjects.Engine.localstorage.connection.GetFogFiles1())
+            foreach (var c in SObjects.GetFogFiles1())
             {
                 list.Add(new Models.Conf() { Cass = c.cassette, Editable = c.isEditable, Owner = c.owner,
                     Active = usermodel.ActiveCassette() });

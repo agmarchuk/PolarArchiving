@@ -11,10 +11,10 @@ namespace CassetteData
     {
         //public DStorage localstorage = null;
         private DbAdapter _adapter;
-        private DbAdapter Adapter { get { return _adapter; } }
+        //private DbAdapter Adapter { get { return _adapter; } }
         private CassetteDataRequester requester;
         // Видимо временное решение
-        public string DaraSrc {  get { return requester?.DataSrc; } }
+        //public string DaraSrc {  get { return requester?.DataSrc; } }
 
         public CassetteIntegration(XElement xconfig)
         {

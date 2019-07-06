@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.DB", "..\PolarDB\src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polar.TripleStore", "..\PolarDB\src\TripleStore\Polar.TripleStore.csproj", "{0396D658-4E43-4084-92C3-312E8F8C1A27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OADataService", "src\OADataService\OADataService.csproj", "{C0F2C429-8722-4A81-9CB2-6FDED986FD2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{0396D658-4E43-4084-92C3-312E8F8C1A27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0396D658-4E43-4084-92C3-312E8F8C1A27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0396D658-4E43-4084-92C3-312E8F8C1A27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0F2C429-8722-4A81-9CB2-6FDED986FD2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0F2C429-8722-4A81-9CB2-6FDED986FD2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0F2C429-8722-4A81-9CB2-6FDED986FD2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0F2C429-8722-4A81-9CB2-6FDED986FD2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

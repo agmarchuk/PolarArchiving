@@ -10,6 +10,7 @@ namespace TestConsoleApp
     {
         public static void Main()
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             Main5();
         }
         static void Main1()
