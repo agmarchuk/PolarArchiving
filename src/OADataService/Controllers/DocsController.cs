@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace OADataService.Controllers
 {
-    public class DocController : Controller
+    public class DocsController : Controller
     {
         public IActionResult GetPhoto(string u, string s)
         {
@@ -38,5 +38,17 @@ namespace OADataService.Controllers
         {
             return Content("[125]",  "application/json");
         }
+        [HttpGet("[controller]/xml/{id}")]
+        public ContentResult GetXml(int id)
+        {
+            return Content("<roo><el1>text 1. текст 1</el1><el2 att='attribute 1'></el2></roo>", "text/xml");
+        }
+        [HttpGet("[controller]/pdf/{id}")]
+        public FileStreamResult GetPdf(int id)
+        {
+            string path = @"D:\Home\work\Пономарев_отчет-2017 (1).pdf";
+            return File(System.IO.File.Open(path, FileMode.Open, FileAccess.Read), "application/pdf");
+        }
+
     }
 }

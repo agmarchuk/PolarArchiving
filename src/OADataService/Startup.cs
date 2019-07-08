@@ -42,7 +42,19 @@ namespace OADataService
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            //app.UseMvc();
+
+            System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
+            CassettesConfiguration conf = new CassettesConfiguration(xconfig);
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                  name: "default",
+                  template: "{controller=Home}/{action=Index}/{id?}"
+                );
+            });
+
         }
     }
 }
