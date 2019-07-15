@@ -8,10 +8,10 @@ namespace TestConsoleApp
 {
     partial class Program
     {
-        public static void Main()
+        public static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Main5();
+            Main6(args);
         }
         static void Main1()
         {

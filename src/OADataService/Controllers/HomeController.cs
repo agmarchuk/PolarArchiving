@@ -12,9 +12,15 @@ namespace OADataService.Controllers
         public IActionResult Index()
         {
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
+            string message = "OK! ";// + CassettesConfiguration.CassDirPath("iiss://SypCassete@iis.nsk.su");
             cr.Content = 
-@"<html><head><meta charset='utf-8'/></head><body><h1>Сервис работает!</h1>
-<div>Порт: 51055</div>
+@"<html><head><meta charset='utf-8'/></head>
+<body>
+<h1>Сервис работает!</h1>
+<div>" + message + @"</div>
+<pre>
+" + CassettesConfiguration.look + @"
+</pre>
 </body></html>";
             return cr;
         }

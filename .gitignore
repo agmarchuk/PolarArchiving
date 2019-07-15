@@ -307,3 +307,4 @@ __pycache__/
 /src/CDService/wwwroot/ApplicationProfile.xml
 /src/Turgunda7/*.bin
 /src/TestConsoleApp/config.xml
+/src/TestConsoleApp/*.png

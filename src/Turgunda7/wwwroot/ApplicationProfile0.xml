@@ -252,6 +252,8 @@
       <field prop="http://fogid.net/o/name" />
       <field prop="http://fogid.net/o/description" />
       <field prop="http://fogid.net/o/from-date" />
+      <field prop="http://fogid.net/o/uri" />
+      <field prop="http://fogid.net/o/docmetainfo" />
       <inverse prop="http://fogid.net/o/forDocument" attname="uri" invisible="true">
         <record type="http://fogid.net/o/FileStore">
           <field prop="http://fogid.net/o/uri" />
