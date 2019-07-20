@@ -17,7 +17,7 @@ namespace CassetteData
         public CassetteDataRequester(string src)
         {
             _dataSrc = src;
-            if (src != null) host_port_contr = src + (src[src.Length - 1] != '/' ? "/" : "") + "Serv/"; 
+            if (src != null) host_port_contr = src + (src[src.Length - 1] != '/' ? "/" : "") + "Db/"; 
         }
         public string Ping()
         {

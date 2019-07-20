@@ -17,6 +17,12 @@ namespace OADataService.Controllers
         //}
         // Формат результата: <results>...</results>
         [HttpGet]
+        public ContentResult Ping()
+        {
+            return Content("Pong", "text/plain");
+        }
+
+        [HttpGet]
         public ContentResult SearchByName(string ss, string tt)
         {
             XElement results = new XElement("results");

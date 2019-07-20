@@ -59,12 +59,18 @@ namespace Turgunda7.Controllers
         public ActionResult GetPhoto(string u, string s)
         {
             string filename = "/question.jpg";
-            filename = SObjects.GetPhotoFileName(u, s) + ".jpg";
-            if (s == "normal" && !System.IO.File.Exists(filename))
-                filename = SObjects.GetPhotoFileName(u, "medium") + ".jpg";
-            //return new FilePathResult(filename, "image/jpeg");
-            return new PhysicalFileResult(filename, "image/jpeg");
-
+            if (true)
+            {
+                return Redirect($"http://localhost:51056/Docs/GetPhoto?u={u}&s={s}");
+            }
+            else
+            {
+                filename = SObjects.GetPhotoFileName(u, s) + ".jpg";
+                if (s == "normal" && !System.IO.File.Exists(filename))
+                    filename = SObjects.GetPhotoFileName(u, "medium") + ".jpg";
+                //return new FilePathResult(filename, "image/jpeg");
+                return new PhysicalFileResult(filename, "image/jpeg");
+            }
         }
         //public FilePathResult GetVideo(string u, string ext)
         //{

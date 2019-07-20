@@ -25,18 +25,18 @@ namespace OADataService.Controllers
             string uniquename = u.Split(':', '/').Aggregate((acc, s) => acc + s);
             return PhysicalFile(path, "application/octet-stream", uniquename + path.Substring(lastpoint));
         }
-        [HttpGet("docs/GetImage")]
-        public IActionResult GetImage(string u, string m)
+        [HttpGet("docs/GetPhoto")]
+        public IActionResult GetPhoto(string u, string s)
         {
             //Console.WriteLine("GetImage?u=" + u);
             var cass_dir = CassettesConfiguration.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
             string subpath;
-            string method = m;
+            string method = s;
             if (method == null) subpath = "/originals";
-            else if (method == "s") subpath = "/documents/small";
-            else if (method == "m") subpath = "/documents/medium";
+            else if (method == "small") subpath = "/documents/small";
+            else if (method == "medium") subpath = "/documents/medium";
             else subpath = "/documents/normal"; // (method == "n")
             string path = cass_dir + subpath + last10 + ".jpg";
             return PhysicalFile(path, "image/jpg");
@@ -60,13 +60,6 @@ namespace OADataService.Controllers
             return PhysicalFile(path, "video/" + path.Substring(lastpoint + 1));
         }
 
-        public IActionResult GetPhoto(string u, string s)
-        {
-            string filename = @"C:\Users\SSYP\Pictures\Arc.jpg";
-            //filename = Turgunda7.SObjects.Engine.localstorage.GetPhotoFileName(u, s) + ".jpg";
-            return new FileStreamResult(new FileStream(filename, FileMode.Open, FileAccess.Read), "image/jpeg");
-                //(filename, System.IO.FileAccess.Read), "image/jpeg");
-        }
         [HttpGet("[controller]/html/{id}")]
         public IActionResult GetHtml(int id)
         {

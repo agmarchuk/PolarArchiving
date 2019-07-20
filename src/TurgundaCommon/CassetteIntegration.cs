@@ -23,11 +23,16 @@ namespace CassetteData
             localstorage.Init(xconfig);
 
             string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
-            if (connectionstring.StartsWith("trs:"))
+
+            if (connectionstring == null)
+            {
+                _adapter = new NextEraAdapter();
+            }
+            else if (connectionstring.StartsWith("trs:"))
             {
                 _adapter = new TripleRecordStoreAdapter();
             }
-            else if (connectionstring == null || connectionstring.StartsWith("ts:"))
+            else if (connectionstring.StartsWith("ts:"))
             {
                 _adapter = new TripleStoreAdapter();//  XmlDbAdapter();
             }
@@ -38,10 +43,6 @@ namespace CassetteData
             else if (connectionstring.StartsWith("sxml:"))
             {
                 _adapter = new SimpleDbAdapter();
-            }
-            else
-            {
-                _adapter = new NextEraAdapter();
             }
 
             localstorage.InitAdapter(_adapter);
