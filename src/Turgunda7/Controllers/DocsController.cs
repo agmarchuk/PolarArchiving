@@ -59,9 +59,9 @@ namespace Turgunda7.Controllers
         public ActionResult GetPhoto(string u, string s)
         {
             string filename = "/question.jpg";
-            if (true)
+            if (SObjects.OADataUri != null)
             {
-                return Redirect($"http://localhost:51056/Docs/GetPhoto?u={u}&s={s}");
+                return Redirect(SObjects.OADataUri + $"docs/GetPhoto?u={u}&s={s}");
             }
             else
             {

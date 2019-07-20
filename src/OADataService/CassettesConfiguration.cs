@@ -35,7 +35,7 @@ namespace OADataService
                 .Select(lc => 
                 {
                     string cassPath = lc.Value;
-                    XAttribute write_att = lc.Attribute("wtite");
+                    XAttribute write_att = lc.Attribute("write");
                     string name = cassPath.Split('/', '\\').Last();
                     return new CassInfo() { name = name, path = cassPath,
                         writable = (write_att != null && (write_att.Value == "yes" || write_att.Value == "true")) };
@@ -115,7 +115,7 @@ namespace OADataService
                 Console.OutputEncoding = System.Text.Encoding.UTF8;
                 Console.WriteLine(look);
                 XElement xrec = adapter.GetItemByIdBasic("syp2001-p-marchuk_a", true);
-                Console.WriteLine(xrec.ToString());
+                if (xrec != null) Console.WriteLine(xrec.ToString());
                 
             }
         }

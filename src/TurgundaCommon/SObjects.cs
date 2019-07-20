@@ -31,6 +31,7 @@ namespace Turgunda7
         public static XElement xconfig = null;
         public static void SaveConfig() { xconfig.Save(path + "wwwroot/config.xml"); }
         public static void SaveAccounts() { accounts.Save(path + "wwwroot/accounts.xml"); }
+        public static string OADataUri = null; 
 
         // Выделенный объект, это надо будет сделать как-то подругому
         public static string funds_id = null;

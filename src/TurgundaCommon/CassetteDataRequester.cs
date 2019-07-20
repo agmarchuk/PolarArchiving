@@ -17,17 +17,18 @@ namespace CassetteData
         public CassetteDataRequester(string src)
         {
             _dataSrc = src;
-            if (src != null) host_port_contr = src + (src[src.Length - 1] != '/' ? "/" : "") + "Db/"; 
+            if (src != null) host_port_contr = src + (src[src.Length - 1] != '/' ? "/" : "");
+            Turgunda7.SObjects.OADataUri = host_port_contr;
         }
         public string Ping()
         {
-            WebRequest request = WebRequest.Create(host_port_contr + "Ping");
+            WebRequest request = WebRequest.Create(host_port_contr + "db/Ping");
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             return "Pong";
         }
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            string requeststring = host_port_contr + "SearchByName?ss=" + searchstring;
+            string requeststring = host_port_contr + "db/SearchByName?ss=" + searchstring;
             XElement result = AskByRequest(requeststring);
             return result.Elements();
         }
@@ -43,13 +44,13 @@ namespace CassetteData
 
         public override XElement GetItemByIdBasic(string id, bool addinverse)
         {
-            string requeststring = host_port_contr + "GetItemByIdBasic?id=" + id + "&addinverse=" + addinverse.ToString();
+            string requeststring = host_port_contr + "db/GetItemByIdBasic?id=" + id + "&addinverse=" + addinverse.ToString();
             XElement result = AskByRequest(requeststring);
             return result;
         }
         public override XElement GetItemById(string id, XElement format)
         {
-            string requeststring = host_port_contr + "GetItemById";
+            string requeststring = host_port_contr + "db/GetItemById";
             WebRequest request = WebRequest.Create(requeststring);
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
