@@ -22,7 +22,7 @@ namespace OADataService
         }
         private static CassInfo[] cassettes;
         private static FogInfo[] fogs;
-        private DbAdapter adapter = null;
+        private static DbAdapter adapter = null;
 
         public static string look = "";
 
@@ -119,6 +119,20 @@ namespace OADataService
                 
             }
         }
+        public static IEnumerable<XElement> SearchByName(string ss)
+        {
+            return adapter.SearchByName(ss);
+        }
+        public static XElement GetItemByIdBasic(string id, bool addinverse)
+        {
+            return adapter.GetItemByIdBasic(id, addinverse);
+        }
+        public static XElement GetItemById(string id, XElement format)
+        {
+            return adapter.GetItemById(id, format);
+        }
+
+
         private (string owner, string prefix, string counter)  ReadFogAttributes(string pth)
         {
             string owner = null;

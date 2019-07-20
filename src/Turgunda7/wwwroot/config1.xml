@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
-  <!--<database connectionstring="xml:"/>-->
+  <database connectionstring="xml:"/>
+
+  <LoadCassette>C:\Home\syp\syp_cassettes\SypCassete</LoadCassette>
+
   <!--Parameters extappbinpath="C:/Home/bin/" newcassettesdirpath="C:/Home/FactographProjects/newcassettes/">
   </Parameters-->
   <params appname="Открытый архив СО РАН (редактирующее приложение)"></params>

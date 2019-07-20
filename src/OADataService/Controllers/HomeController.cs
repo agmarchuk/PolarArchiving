@@ -21,6 +21,10 @@ namespace OADataService.Controllers
 <pre>
 " + CassettesConfiguration.look + @"
 </pre>
+<form method='post' action='/db/GetItemById'>
+  <input type='text' name='id' />
+  <textarea name='format' />
+</form>
 </body></html>";
             return cr;
         }

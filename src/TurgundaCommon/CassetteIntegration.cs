@@ -18,11 +18,12 @@ namespace CassetteData
 
         public CassetteIntegration(XElement xconfig)
         {
-            localstorage = new DStorage1();
+            //localstorage = new DStorage1();
+            localstorage = new DStorage2();
             localstorage.Init(xconfig);
 
             string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
-            if (connectionstring == null || connectionstring.StartsWith("trs:"))
+            if (connectionstring.StartsWith("trs:"))
             {
                 _adapter = new TripleRecordStoreAdapter();
             }
@@ -37,6 +38,10 @@ namespace CassetteData
             else if (connectionstring.StartsWith("sxml:"))
             {
                 _adapter = new SimpleDbAdapter();
+            }
+            else
+            {
+                _adapter = new NextEraAdapter();
             }
 
             localstorage.InitAdapter(_adapter);
