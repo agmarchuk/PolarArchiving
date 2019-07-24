@@ -18,7 +18,7 @@ namespace Polar.Cassettes.DocumentStorage
             public XElement xel; 
             public List<XElement> inverse; 
         }
-        private XElement db = null;
+        private XElement db = new XElement("db");
         private Dictionary<string, DbNode> records = null;
         private Action<string> errors = s => { Console.WriteLine(s); };
         /// <summary>
@@ -27,7 +27,7 @@ namespace Polar.Cassettes.DocumentStorage
         /// <param name="connectionstring">префикс варианта базы данных xml:, больше в connectionstring ничего не существенно </param>
         public override void Init(string connectionstring) {  }
         // Загрузка базы данных
-        public override void StartFillDb(Action<string> turlog)
+        public override void StartFillDb(Action<string> turlog) 
         {
             db = new XElement("db");
         }
@@ -334,6 +334,11 @@ namespace Polar.Cassettes.DocumentStorage
             }
             Add(record);
             return record;
+        }
+
+        public override XElement PutItem(XElement record)
+        {
+            throw new NotImplementedException();
         }
     }
 }

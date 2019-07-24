@@ -356,6 +356,25 @@ namespace Polar.TripleStore
         }
 
         // ============================== Редактирование ================================
+        private object CodeRecord(XElement rec)
+        {
+            string id = rec.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about").Value;
+            string tp = "http://fogid.net/o/" + rec.Name.LocalName;
+            int cid = store.CodeEntity(id);
+            return new object[] { cid,
+                Enumerable.Repeat<object[]>(new object[] {0, store.CodeEntity(tp)}, 1)
+                    .Concat(rec.Elements().Where(el => el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource") != null)
+                        .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName),
+                                store.CodeEntity(el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource").Value) })).ToArray(),
+                rec.Elements().Where(el => el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource") == null)
+                        .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName), el.Value }).ToArray()
+            };
+        }
+        public override XElement PutItem(XElement record)
+        {
+            store.PutRecord(CodeRecord(record));
+            return record;
+        }
         private XElement RemoveRecord(string id)
         {
             //if (records.TryGetValue(id, out DbNode node))

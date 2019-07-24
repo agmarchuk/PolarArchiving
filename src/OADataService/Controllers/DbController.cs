@@ -45,5 +45,12 @@ namespace OADataService.Controllers
             XElement result = CassettesConfiguration.GetItemById(id, XElement.Parse(format));
             return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
         }
+        [HttpPost]
+        public ContentResult PutItem(string item)
+        {
+            XElement xitem = XElement.Parse(item);
+            XElement result = CassettesConfiguration.PutItem(xitem);
+            return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
+        }
     }
 }

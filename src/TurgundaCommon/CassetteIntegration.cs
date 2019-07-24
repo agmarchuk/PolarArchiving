@@ -18,8 +18,15 @@ namespace CassetteData
 
         public CassetteIntegration(XElement xconfig)
         {
-            //localstorage = new DStorage1();
-            localstorage = new DStorage2();
+            if (xconfig.Element("Net") == null)
+            {
+                localstorage = new DStorage1();
+
+            }
+            else
+            {
+                localstorage = new DStorage2();
+            }
             localstorage.Init(xconfig);
 
             string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
@@ -88,6 +95,12 @@ namespace CassetteData
             if (requester != null) return requester.GetItemByIdSpecial(id);
             return _adapter.GetItemByIdSpecial(id);
         }
+        public override XElement PutItem(XElement item)
+        {
+            if (requester != null) return requester.PutItem(item);
+            return _adapter.PutItem(item);
+        }
+        // остальные буду изничтожать
         public override XElement Delete(string id)
         {
             if (requester != null) return requester.Delete(id);
@@ -135,5 +148,6 @@ namespace CassetteData
         {
             throw new NotImplementedException();
         }
+
     }
 }

@@ -65,6 +65,23 @@ namespace CassetteData
             XElement result = XElement.Load(dataStream);
             return result;
         }
+        public override XElement PutItem(XElement item)
+        {
+            string requeststring = host_port_contr + "db/PutItem";
+            WebRequest request = WebRequest.Create(requeststring);
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            string contentstring = "item=" + System.Web.HttpUtility.UrlEncode(item.ToString(SaveOptions.DisableFormatting));
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(contentstring);
+            request.ContentLength = buffer.Length;
+            Stream requStream = request.GetRequestStream();
+            requStream.Write(buffer, 0, buffer.Length);
+
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Stream dataStream = response.GetResponseStream();
+            XElement result = XElement.Load(dataStream);
+            return result;
+        }
 
         public override XElement Add(XElement record)
         {
@@ -118,5 +135,6 @@ namespace CassetteData
         {
             throw new NotImplementedException();
         }
+
     }
 }

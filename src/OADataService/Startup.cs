@@ -46,6 +46,7 @@ namespace OADataService
 
             System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
             CassettesConfiguration conf = new CassettesConfiguration(xconfig);
+            conf.Test();
 
             app.UseMvc(routes =>
             {

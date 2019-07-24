@@ -308,3 +308,5 @@ __pycache__/
 /src/Turgunda7/*.bin
 /src/TestConsoleApp/config.xml
 /src/TestConsoleApp/*.png
+/src/OADataService/wwwroot/config1.xml
+/src/OADataService/wwwroot/config.xml

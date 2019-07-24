@@ -141,5 +141,10 @@ namespace Polar.Cassettes.DocumentStorage
         {
             throw new Exception("29492");
         }
+
+        public override XElement PutItem(XElement record)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

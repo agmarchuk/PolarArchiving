@@ -29,6 +29,8 @@ namespace Polar.Cassettes.DocumentStorage
         // Полная (для Add) или неполная (для AddUpdate) записи. Идентификатор обязателен.
         public abstract XElement Add(XElement record);
         public abstract XElement AddUpdate(XElement record);
+        // Заменяет предыдущие 3. Помещает запись в базу данных, если у нее нет идентификатора, то генерирует его. Возвращает зафиксированную запись
+        public abstract XElement PutItem(XElement record);
 
         private const string fogi = "{http://fogid.net/o/}";
         private const string fog = "http://fogid.net/o/";

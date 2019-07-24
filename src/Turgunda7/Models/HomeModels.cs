@@ -134,7 +134,8 @@ namespace Turgunda7.Models
             // Нам нужен формат.
             XElement f_primitive = new XElement("record");
             XElement xtree0 = SObjects.GetItemById(id, f_primitive);
-            if (xtree0 == null) { rec_format = null; return null; }; // Как-то надо поступить с диагностикой ошибок//
+            // Проверка на существование решения или формата
+            if (xtree0 == null || xtree0.Attribute("id")==null || xtree0.Attribute("type") == null) { rec_format = null; return null; }; // Как-то надо поступить с диагностикой ошибок//
             type_id = xtree0.Attribute("type").Value;
             // Теперь установим нужный формат
             XElement xformat = ModelCommon.formats.Elements("record")

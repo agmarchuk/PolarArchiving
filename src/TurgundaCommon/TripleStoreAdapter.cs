@@ -487,5 +487,10 @@ namespace Polar.Cassettes.DocumentStorage
             //return record;
             throw new Exception("Unimplemented method AddUpdate");
         }
+
+        public override XElement PutItem(XElement record)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

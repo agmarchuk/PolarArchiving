@@ -173,6 +173,11 @@ namespace Turgunda7
         }
 
         // ============== Редактирование базы данных ===============
+        public static XElement PutItem(XElement record)
+        {
+            lock (saveInDb) { return _engine.PutItem(record); }
+        }
+
         public static string AddInvRelation(string eid, string prop, string rtype, string username)
         {
             int pos = rtype.LastIndexOf('/');
@@ -233,7 +238,8 @@ namespace Turgunda7
             {
                 item_corrected = new XElement(item);
                 item_corrected.Add(new XAttribute("owner", username), new XAttribute("mT", DateTime.Now.ToUniversalTime().ToString("u")));
-                item_corrected = _engine.localstorage.EditCommand(item_corrected);
+                //item_corrected = _engine.localstorage.EditCommand(item_corrected);
+                item_corrected = PutItem(item_corrected);
             }
             //Log("PutItemToDb ok?");
             return item_corrected;
