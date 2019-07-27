@@ -23,7 +23,7 @@ namespace Turgunda7
         //private static CassetteData.CassetteIntegration _engine;
         //public static CassetteData.CassetteIntegration Engine { get { return _engine; } }
         private static DbAdapter _engine;
-        //public static DbAdapter Engine { get { return _engine; } }
+        public static DbAdapter Engine { get { return _engine; } }
 
         public static bool Initiated = true;
         private static System.Text.StringBuilder _errors = new System.Text.StringBuilder();
@@ -239,6 +239,22 @@ namespace Turgunda7
                 item_corrected = new XElement(item);
                 item_corrected.Add(new XAttribute("owner", username), new XAttribute("mT", DateTime.Now.ToUniversalTime().ToString("u")));
                 //item_corrected = _engine.localstorage.EditCommand(item_corrected);
+                if (!tocreateid)
+                {
+                    string id = item.Attribute(Polar.Cassettes.ONames.rdfabout).Value;
+                    XElement xold = GetItemByIdBasic(id, false);
+                    foreach (XElement d in xold.Elements("direct"))
+                    {
+                        string prop = d.Attribute("prop").Value;
+                        int last_slash = prop.LastIndexOf('/');
+                        string pr = prop.Substring(last_slash + 1);
+                        if (item_corrected.Elements().All(e => e.Name != pr))
+                        {
+                            item_corrected.Add(new XElement("{" + prop.Substring(0, last_slash) + "}" + pr,
+                                new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource", d.Element("record").Attribute("id").Value)));
+                        }
+                    }
+                }
                 item_corrected = PutItem(item_corrected);
             }
             //Log("PutItemToDb ok?");

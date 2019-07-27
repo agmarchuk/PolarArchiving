@@ -127,12 +127,11 @@ namespace OADataService
             XElement x = XElement.Parse(@"
 <person xmlns='http://fogid.net/o/' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' owner='tester'
 >
-<name xml:lang='ru'>Аааков Шестьдесят Восьмой</name>
+<name xml:lang='ru'>Пупкин Первый</name>
 </person>
     ");
-            //  rdf:about='Cassette_test20180311_tester_636565276468061094_1062'
-            var result = PutItem(x);
-            Console.WriteLine(result.ToString());
+            //var result = PutItem(x);
+            //Console.WriteLine(result.ToString());
 
             foreach (XElement rec in SearchByName("Аааков"))
             {
@@ -167,7 +166,7 @@ namespace OADataService
             if (owner == null) return new XElement("error", "no owner attribute");
 
             // Проверим и изменим отметку времени
-            string mT = DateTime.UtcNow.ToString();
+            string mT = DateTime.Now.ToUniversalTime().ToString("u");
             XAttribute mT_att = item.Attribute("mT");
             if (mT_att == null) item.Add(new XAttribute("mT", mT));
             else  mT_att.Value = mT;
@@ -181,6 +180,7 @@ namespace OADataService
 
             // Если фог не загружен, то загрузить его
             if (fi.fog == null) fi.fog = XElement.Load(fi.pth);
+
 
             // читаем или формируем идентификатор
             string id = item.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value;
