@@ -13,8 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\PolarDB\src\TripleStore\Polar.TripleStore.csproj" />
-    <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
-    <ProjectReference Include="..\TurgundaCommon\TurgundaCommon.csproj" />
   </ItemGroup>
 
 </Project>

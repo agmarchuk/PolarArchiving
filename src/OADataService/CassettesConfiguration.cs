@@ -7,7 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 
 using Polar.TripleStore;
-using Polar.Cassettes.DocumentStorage;
+//using Polar.Cassettes.DocumentStorage;
 
 namespace OADataService
 {
@@ -22,7 +22,7 @@ namespace OADataService
         }
         private static CassInfo[] cassettes;
         private static FogInfo[] fogs;
-        private static DbAdapter adapter = null;
+        private static DAdapter adapter = null;
 
         public static string look = "";
 
@@ -44,6 +44,16 @@ namespace OADataService
 
             // Формирую список фог-документов
             List<FogInfo> fogs_list = new List<FogInfo>();
+            // Прямое попадание в список фогов из строчек конфигуратора
+            foreach (var fogname in xconfig.Elements("LoadFog").Select(el => el.Value))
+            {
+                fogs_list.Add(new FogInfo()
+                {
+                    pth = fogname,
+                    writable = false
+                });
+            }
+            // Сбор фогов из кассет
             for (int i = 0; i < cassettes.Length; i++)
             {
                 // В каждой кассете есть фог-элемент meta/имякассеты_current.fog, в нем есть владелец и может быть запрет на запись в виде

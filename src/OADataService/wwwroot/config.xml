@@ -1,11 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <config>
   <database connectionstring="trs:C:\Home\data\Databases\OADataService\" />
   <!--<Net src="http://localhost:51056" />-->
 
-  <LoadCassette write="yes">C:\Home\FactographProjects\CassTest20190726</LoadCassette>
-  <!--
-  syp2001-p-marchuk_a идентификатор Марчука
-  -->
+  
+  <!--<LoadCassette write="yes">C:\Home\FactographProjects\CassTest20190726</LoadCassette>
+  syp2001-p-marchuk_a идентификатор Марчука-->
+  
+ 
+ <LoadFog>C:\home\dev2019\PolarArchiving\src\TestDataGenerators\PhototekaXElement.fog</LoadFog>
 
 </config>

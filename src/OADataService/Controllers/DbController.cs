@@ -37,12 +37,14 @@ namespace OADataService.Controllers
             bool ai = addinverse.HasValue ? addinverse.Value: false;
             //if (addinverse == null) ai = false;
             XElement result = CassettesConfiguration.GetItemByIdBasic(id, ai);
+            if (result == null) result = new XElement("error");
             return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
         }
         [HttpPost]
         public ContentResult GetItemById(string id, string format)
         {
             XElement result = CassettesConfiguration.GetItemById(id, XElement.Parse(format));
+            if (result == null) result = new XElement("error");
             return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
         }
         [HttpPost]
