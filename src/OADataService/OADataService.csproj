@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PolarDB\src\TripleStore\Polar.TripleStore.csproj" />
+    <ProjectReference Include="..\OAData\OAData.csproj" />
   </ItemGroup>
 
 </Project>

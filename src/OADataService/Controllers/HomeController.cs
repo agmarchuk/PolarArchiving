@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
+using OAData;
+
 namespace OADataService.Controllers
 {
     public class HomeController : Controller
@@ -12,14 +14,14 @@ namespace OADataService.Controllers
         public IActionResult Index()
         {
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
-            string message = "OK! ";// + CassettesConfiguration.CassDirPath("iiss://SypCassete@iis.nsk.su");
+            string message = "OK! ";// + OAData.CassDirPath("iiss://SypCassete@iis.nsk.su");
             cr.Content = 
 @"<html><head><meta charset='utf-8'/></head>
 <body>
 <h1>Сервис работает!</h1>
 <div>" + message + @"</div>
 <pre>
-" + CassettesConfiguration.look + @"
+" + OAData.OAData.look + @"
 </pre>
 <form method='post' action='/db/GetItemById'>
   <input type='text' name='id' ></input>

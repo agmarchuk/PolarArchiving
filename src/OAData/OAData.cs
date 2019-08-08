@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
-using Polar.TripleStore;
-//using Polar.Cassettes.DocumentStorage;
+using OAData.Adapters;
 
-namespace OADataService
+namespace OAData
 {
-    public class CassettesConfiguration
+    public class OAData
     {
         public static string CassDirPath(string uri)
         {
@@ -27,7 +26,7 @@ namespace OADataService
         public static string look = "";
 
         private XElement xconfig = null;
-        public CassettesConfiguration(XElement xconfig)
+        public OAData(XElement xconfig)
         {
             this.xconfig = xconfig;
             // Кассеты перечислены через элементы LoadCassette. Имена кассе в файловой системе должны сравниваться по lower case
@@ -45,12 +44,19 @@ namespace OADataService
             // Формирую список фог-документов
             List<FogInfo> fogs_list = new List<FogInfo>();
             // Прямое попадание в список фогов из строчек конфигуратора
-            foreach (var fogname in xconfig.Elements("LoadFog").Select(el => el.Value))
+            foreach (var lf in xconfig.Elements("LoadFog"))
             {
+                string fogname = lf.Value;
+                int lastpoint = fogname.LastIndexOf('.');
+                if (lastpoint == -1) throw new Exception("Err in fog file name construction");
+                string ext = fogname.Substring(lastpoint).ToLower();
+                bool writable = (lf.Attribute("writable")?.Value == "true" || lf.Attribute("write")?.Value == "yes") ?
+                    true : false;
                 fogs_list.Add(new FogInfo()
                 {
+                    vid = ext,
                     pth = fogname,
-                    writable = false
+                    writable = writable
                 });
             }
             // Сбор фогов из кассет
@@ -68,7 +74,7 @@ namespace OADataService
                 {
                     //cassette = cass,
                     pth = pth,
-                    fog = null,
+                    fogx = null,
                     owner = atts.owner,
                     writable = true //cass.writable,
                     //prefix = atts.prefix,
@@ -88,7 +94,7 @@ namespace OADataService
                     {
                         //cassette = cass,
                         pth = fi.FullName,
-                        fog = null,
+                        fogx = null,
                         owner = attts.owner,
                         //writable = cass.writable,
                         //prefix = attts.prefix,
@@ -112,8 +118,9 @@ namespace OADataService
                 if (toload)
                 {
                     adapter.StartFillDb(null);
-                    adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
-                        null, null);
+                    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
+                    //    null, null);
+                    adapter.FillDb(fogs, null);
                     adapter.FinishFillDb(null);
                 }
             }
@@ -189,7 +196,7 @@ namespace OADataService
             if (fi == null) return new XElement("error", "no writable fog for request");
 
             // Если фог не загружен, то загрузить его
-            if (fi.fog == null) fi.fog = XElement.Load(fi.pth);
+            if (fi.fogx == null) fi.fogx = XElement.Load(fi.pth);
 
 
             // читаем или формируем идентификатор
@@ -197,16 +204,16 @@ namespace OADataService
             XElement element = null; // запись с пришедшим идентификатором
             if (id == null)
             {
-                XAttribute counter_att = fi.fog.Attribute("counter");
+                XAttribute counter_att = fi.fogx.Attribute("counter");
                 int counter = Int32.Parse(counter_att.Value);
-                id = fi.fog.Attribute("prefix").Value + counter;
+                id = fi.fogx.Attribute("prefix").Value + counter;
                 // внедряем
                 item.Add(new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about", id));
                 counter_att.Value = "" + (counter + 1);
             }
             else
             {
-                element = fi.fog.Elements().FirstOrDefault(el => 
+                element = fi.fogx.Elements().FirstOrDefault(el => 
                     el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value == id);
             }
 
@@ -218,10 +225,10 @@ namespace OADataService
                 element.Remove();
             }
             XElement nitem = new XElement(item);
-            fi.fog.Add(nitem);
+            fi.fogx.Add(nitem);
 
             // Сохраняем файл
-            fi.fog.Save(fi.pth);
+            fi.fogx.Save(fi.pth);
 
             // Сохраняем в базе данных
             adapter.PutItem(nitem);
@@ -254,21 +261,5 @@ namespace OADataService
             return (owner, prefix, counter);
         }
     }
-    internal class CassInfo
-    {
-        public string name;
-        public string path;
-        public string owner;
-        public bool writable = false;
-    }
-    internal class FogInfo
-    {
-        //public CassInfo cassette;
-        public string pth; // координата файла
-        public XElement fog = null;
-        public string owner;
-        //public string prefix;
-        //public int counter; // -1 - отсутствует
-        public bool writable;
-    }
+
 }

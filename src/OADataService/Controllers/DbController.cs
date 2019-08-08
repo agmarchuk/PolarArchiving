@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 
+using OAData;
+
 namespace OADataService.Controllers
 {
     public class DbController : Controller
@@ -26,7 +28,7 @@ namespace OADataService.Controllers
         public ContentResult SearchByName(string ss, string tt)
         {
             XElement results = new XElement("results");
-            IEnumerable<XElement> query = CassettesConfiguration.SearchByName(ss);
+            IEnumerable<XElement> query = OAData.OAData.SearchByName(ss);
             if (tt != null) query = query.Where(x => x.Attribute("type")?.Value == tt);
             foreach (XElement result in query) results.Add(result);
             return Content(results.ToString(), "text/xml", System.Text.Encoding.UTF8);
@@ -36,14 +38,14 @@ namespace OADataService.Controllers
         {
             bool ai = addinverse.HasValue ? addinverse.Value: false;
             //if (addinverse == null) ai = false;
-            XElement result = CassettesConfiguration.GetItemByIdBasic(id, ai);
+            XElement result = OAData.OAData.GetItemByIdBasic(id, ai);
             if (result == null) result = new XElement("error");
             return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
         }
         [HttpPost]
         public ContentResult GetItemById(string id, string format)
         {
-            XElement result = CassettesConfiguration.GetItemById(id, XElement.Parse(format));
+            XElement result = OAData.OAData.GetItemById(id, XElement.Parse(format));
             if (result == null) result = new XElement("error");
             return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
         }
@@ -51,7 +53,7 @@ namespace OADataService.Controllers
         public ContentResult PutItem(string item)
         {
             XElement xitem = XElement.Parse(item);
-            XElement result = CassettesConfiguration.PutItem(xitem);
+            XElement result = OAData.OAData.PutItem(xitem);
             return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
         }
     }

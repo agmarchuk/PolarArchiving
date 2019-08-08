@@ -1,8 +1,8 @@
 using System.Xml.Linq;
 
-namespace Polar.TripleStore
+namespace OAData.Adapters
 {
-    public class XNames
+    public class ONames
     {
         public static XName rdfabout = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about";
         public static XName rdfresource = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource";

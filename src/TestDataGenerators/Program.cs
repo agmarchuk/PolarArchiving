@@ -19,19 +19,12 @@ namespace TestDataGenerators
             Console.WriteLine("Start TestDataGenerators");
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            Phototeka.PhototekaRecordFlow rflow = new Phototeka.PhototekaRecordFlow(100_000);
+            int npersons = 10_000;
+            Phototeka.PhototekaRecordFlow rflow = new Phototeka.PhototekaRecordFlow(npersons);
             Console.WriteLine(rflow.GenerateAll().Count());
             sw.Stop();
             Console.WriteLine($"duration={sw.ElapsedMilliseconds}");
 
-            string binpath = root+"phototeka.bin";
-
-            sw.Restart();
-            rflow.SaveFlowToSequence(rflow.GenerateAll(), binpath);
-            sw.Stop();
-            Console.WriteLine($"duration={sw.ElapsedMilliseconds}");
-
-            sw.Restart();
             PType tp_Arc = new PTypeUnion(
                 new NamedType("field", new PTypeRecord(
                     new NamedType("prop", new PType(PTypeEnumeration.sstring)),
@@ -49,18 +42,26 @@ namespace TestDataGenerators
                 new NamedType("typ", new PType(PTypeEnumeration.sstring)),
                 new NamedType("arcs", new PTypeSequence(tp_Arc))
                 );
-            UniversalSequenceBase sequ = new UniversalSequenceBase(tp_Record,
-                File.Open(binpath, FileMode.OpenOrCreate, FileAccess.ReadWrite));
-            sequ.Scan((off, obj) => true);
-            sw.Stop();
-            Console.WriteLine($"Scanning... duration={sw.ElapsedMilliseconds}");
+
+            // string binpath = root+"phototeka.bin";
+            // sw.Restart();
+            // rflow.SaveFlowToSequence(rflow.GenerateAll(), binpath);
+            // sw.Stop();
+            // Console.WriteLine($"duration={sw.ElapsedMilliseconds}");
+
+            // sw.Restart();
+            // UniversalSequenceBase sequ = new UniversalSequenceBase(tp_Record,
+            //     File.Open(binpath, FileMode.OpenOrCreate, FileAccess.ReadWrite));
+            // sequ.Scan((off, obj) => true);
+            // sw.Stop();
+            // Console.WriteLine($"Scanning... duration={sw.ElapsedMilliseconds}");
 
             //sw.Restart();
             //rflow.SaveFlowToXml(rflow.GenerateAll(), root + "phototeka.xml");
             //sw.Stop();
             //Console.WriteLine($"duration={sw.ElapsedMilliseconds}");
 
-            string filexmlpath = root + "phototekaXElement.fog";
+            string filexmlpath = root + "phototeka.fogx";
 
             FileStream filexml = File.Open(filexmlpath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             sw.Restart();
@@ -74,7 +75,7 @@ namespace TestDataGenerators
             //sw.Stop();
             //Console.WriteLine($"Scanning... duration={sw.ElapsedMilliseconds}");
 
-            string ptpath = "phototeka.pol";
+            string ptpath = "phototeka.fogp";
 
             FileStream ptextfile = File.Open(ptpath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             sw.Restart();

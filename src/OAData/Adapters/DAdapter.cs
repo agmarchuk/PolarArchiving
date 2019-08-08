@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 //using Fogid.Cassettes;
 
-namespace Polar.TripleStore
+namespace OAData.Adapters
 {
     abstract public class DAdapter
     {
@@ -19,6 +19,7 @@ namespace Polar.TripleStore
         // ============== Загрузка базы данных ===============
         public abstract void StartFillDb(Action<string> turlog);
         public abstract void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog);
+        public abstract void FillDb(IEnumerable<FogInfo> fogflow, Action<string> turlog);
         public abstract void FinishFillDb(Action<string> turlog);
         
         // ============== Редактирование базы данных ============= Возвращают итоговый (или исходный для Delete) вариант записи
@@ -32,14 +33,14 @@ namespace Polar.TripleStore
         private static Func<string, string> ConvertId = id => id;
         public static Func<XElement, XElement> ConvertXElement = xel =>
         {
-            if (xel.Name == "delete" || xel.Name == XNames.fogi + "delete") return new XElement(XNames.fogi + "delete",
+            if (xel.Name == "delete" || xel.Name == ONames.fogi + "delete") return new XElement(ONames.fogi + "delete",
                 new XAttribute("id", ConvertId(xel.Attribute("id").Value)));
-            else if (xel.Name == "substitute" || xel.Name == XNames.fogi + "substitute") return new XElement(XNames.fogi + "substitute",
+            else if (xel.Name == "substitute" || xel.Name == ONames.fogi + "substitute") return new XElement(ONames.fogi + "substitute",
                 new XAttribute("old-id", ConvertId(xel.Attribute("old-id").Value)),
                 new XAttribute("new-id", ConvertId(xel.Attribute("new-id").Value)));
             else
             {
-                string id = ConvertId(xel.Attribute(XNames.rdfabout).Value);
+                string id = ConvertId(xel.Attribute(ONames.rdfabout).Value);
                 XAttribute mt_att = xel.Attribute("mT");
                 XElement iisstore = xel.Element("iisstore");
                 if (iisstore != null)
@@ -55,16 +56,16 @@ namespace Polar.TripleStore
                     if (att_contenttype != null) xel.Add(new XElement("contenttype", att_contenttype.Value));
                     if (docmetainfo != "") xel.Add(new XElement("docmetainfo", docmetainfo));
                 }
-                XElement xel1 = new XElement(XName.Get(xel.Name.LocalName, XNames.fog),
-                    new XAttribute(XNames.rdfabout, ConvertId(xel.Attribute(XNames.rdfabout).Value)),
+                XElement xel1 = new XElement(XName.Get(xel.Name.LocalName, ONames.fog),
+                    new XAttribute(ONames.rdfabout, ConvertId(xel.Attribute(ONames.rdfabout).Value)),
                     mt_att == null ? null : new XAttribute("mT", mt_att.Value),
                     xel.Elements()
                     .Where(sub => sub.Name.LocalName != "iisstore")
-                    .Select(sub => new XElement(XName.Get(sub.Name.LocalName, XNames.fog),
+                    .Select(sub => new XElement(XName.Get(sub.Name.LocalName, ONames.fog),
                         sub.Value,
                         sub.Attributes()
-                        .Select(att => att.Name == XNames.rdfresource ?
-                            new XAttribute(XNames.rdfresource, ConvertId(att.Value)) :
+                        .Select(att => att.Name == ONames.rdfresource ?
+                            new XAttribute(ONames.rdfresource, ConvertId(att.Value)) :
                             new XAttribute(att)))));
                 return xel1;
             }
@@ -79,7 +80,7 @@ namespace Polar.TripleStore
         {
             foreach (XElement xelement in xflow)
             {
-                if (xelement.Name == XNames.fogi + "delete")
+                if (xelement.Name == ONames.fogi + "delete")
                 {
                     count_delete++;
                     XAttribute att = xelement.Attribute("id");
@@ -105,7 +106,7 @@ namespace Polar.TripleStore
                         table_ri.Add(id, new ResInfo(id) { removed = true });
                     }
                 }
-                else if (xelement.Name == XNames.fogi + "substitute")
+                else if (xelement.Name == ONames.fogi + "substitute")
                 {
                     count_substitute++;
                     XAttribute att_old = xelement.Attribute("old-id");
@@ -157,7 +158,7 @@ namespace Polar.TripleStore
                 }
                 else
                 {
-                    XAttribute idAtt = xelement.Attribute(XNames.rdfabout);
+                    XAttribute idAtt = xelement.Attribute(ONames.rdfabout);
                     if (idAtt == null) continue;
                     string id = idAtt.Value;
                     if (id == "") continue;

@@ -29,6 +29,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OADataService", "src\OAData
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestDataGenerators", "src\TestDataGenerators\TestDataGenerators.csproj", "{4E8D896A-5CC8-4C39-98DC-7D9481765C34}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OAData", "src\CassettesConfiguration\OAData.csproj", "{92EA8301-1DBB-4B8E-9DA2-12435DED1AFD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestCC", "src\TestCC\TestCC.csproj", "{51A43D84-8AAD-4F3F-984D-E6ED85631244}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +91,14 @@ Global
 		{4E8D896A-5CC8-4C39-98DC-7D9481765C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E8D896A-5CC8-4C39-98DC-7D9481765C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E8D896A-5CC8-4C39-98DC-7D9481765C34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92EA8301-1DBB-4B8E-9DA2-12435DED1AFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92EA8301-1DBB-4B8E-9DA2-12435DED1AFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92EA8301-1DBB-4B8E-9DA2-12435DED1AFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92EA8301-1DBB-4B8E-9DA2-12435DED1AFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A43D84-8AAD-4F3F-984D-E6ED85631244}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A43D84-8AAD-4F3F-984D-E6ED85631244}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A43D84-8AAD-4F3F-984D-E6ED85631244}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A43D84-8AAD-4F3F-984D-E6ED85631244}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

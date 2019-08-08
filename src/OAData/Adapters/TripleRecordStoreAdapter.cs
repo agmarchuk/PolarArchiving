@@ -6,11 +6,9 @@ using System.Text;
 //using System.Text.Encodings;
 using System.Xml.Linq;
 
-//using Polar.Cassettes;
-//using Polar.Cassettes.DocumentStorage;
-//using Polar.TripleStore;
+using Polar.TripleStore;
 
-namespace Polar.TripleStore
+namespace OAData.Adapters
 {
     /// <summary>
     /// База данных на основе TripleStore-построения. База данных объединяет записи fog-документов
@@ -58,6 +56,164 @@ namespace Polar.TripleStore
             //db = new XElement("db");
             //store.Clear();
         }
+        // Новая реализация загрузки базы данных
+        public override void FillDb(IEnumerable<FogInfo> fogflow, Action<string> turlog)
+        {
+            // Пока каждый раз чистим базу данных
+            store.Clear();
+
+            // Готовим битовый массив для отметки того, что хеш id уже "попадал" в этот бит
+            int rang = 24; // пока предполагается, что число записей (много) меньше 16 млн.
+            int mask = ~((-1) << rang);
+            int ba_volume = mask + 1;
+            System.Collections.BitArray bitArr = new System.Collections.BitArray(ba_volume);
+            // Хеш-функция будет ограничена rang разрядами, массив и функция нужны только временно
+            Func<string, int> Hash = s => s.GetHashCode() & mask;
+            // Словарь, фиксирующий максимальную дату для заданного идентификатора, первая запись не учитывается
+            Dictionary<string, DateTime> lastDefs = new Dictionary<string, DateTime>();
+
+            // Первый проход сканирования фог-файлов. В этом проходе определяется набор повторно определенных записей и
+            // формируется словарь lastDefs
+            foreach (FogInfo fi in fogflow)
+            {
+                // Чтение фога
+                if (fi.vid == ".fog")
+                {
+                    fi.fogx = XElement.Load(fi.pth);
+                    foreach (XElement xrec in fi.fogx.Elements())
+                    {
+                        XElement record = ConvertXElement(xrec);
+                        // Обработаем "странные" delete и replace
+                        if (record.Name == ONames.fogi + "delete")
+                        {
+                            string idd = record.Attribute("id").Value;
+                            // Если нет атрибута mT, временная отметка устанавливается максимальной, чтобы "забить" другие отметки
+                            string mTvalue = record.Attribute("mT") == null ? DateTime.MaxValue.ToString() : record.Attribute("mT").Value;
+                            CheckAndSet(bitArr, Hash, lastDefs, idd, mTvalue);
+                            continue;
+                        }
+                        if (record.Name == ONames.fogi + "substitute") continue; // пока не обрабатываем
+
+                        string id = record.Attribute(ONames.rdfabout).Value;
+                        CheckAndSet(bitArr, Hash, lastDefs, id, record.Attribute("mT")?.Value);
+                    }
+                    fi.fogx = null;
+                }
+                else if (fi.vid == ".fogp")
+                {
+
+                }
+            }
+
+            // Второй проход сканирования фог-файлов. В этом проходе, для каждого фога формируется поток записей в 
+            // объектном представлении, потом этот поток добавляется в store
+            foreach (FogInfo fi in fogflow)
+            {
+                // Чтение фога
+                if (fi.vid == ".fog" || fi.vid == ".fogx")
+                {
+                    fi.fogx = XElement.Load(fi.pth);
+                    IEnumerable<object> flow = fi.fogx.Elements()
+                    .Select(xrec => ConvertXElement(xrec))
+                    // Обработаем delete и replace. delete доминирует (по времени), но в выходной поток ничего не попадает
+                    // substitute - не обрабатываем
+                    .Where(record => record.Name != ONames.fogi + "delete" &&
+                            record.Name != ONames.fogi + "substitute")
+                    // Отфильтруем записи с малыми временами. т.е. если идентификатор есть в словаре, но он меньше.
+                    // Если он больше, то не фильтруем, а словарный вход корректируем
+                    .Where(record =>
+                    {
+                        string id = record.Attribute(ONames.rdfabout).Value;
+                        if (lastDefs.ContainsKey(id))
+                        {
+                            DateTime mT = DateTime.MinValue;
+                            string mTvalue = record.Attribute("mT")?.Value;
+                            if (mTvalue != null) mT = DateTime.Parse(mTvalue);
+                            DateTime last = lastDefs[id];
+                            if (mT < last) return false; // пропускаем
+                            else if (mT == last) return true; // берем
+                            else // if(mT > last) // берем и корректируем last
+                            {
+                                lastDefs.Remove(id);
+                                lastDefs.Add(id, mT);
+                                return true;
+                            }
+                        }
+                        return true;
+                    })
+                    .Select(record =>
+                    {
+                        string id = record.Attribute(ONames.rdfabout).Value;
+                        int rec_type = store.CodeEntity(ONames.fog + record.Name.LocalName);
+                        int id_ent = store.CodeEntity(id);
+                        object[] orecord = new object[] {
+                        id_ent,
+                        (new object[] { new object[] { 0, rec_type } }).Concat(
+                        record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
+                            .Select(subel =>
+                            {
+                                int prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
+                                return new object[] { prop, store.CodeEntity(subel.Attribute(ONames.rdfresource).Value) };
+                            })).ToArray()
+                        ,
+                        record.Elements().Where(el => el.Attribute(ONames.rdfresource) == null)
+                            .Select(subel =>
+                            {
+                                int prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
+                                return new object[] { prop, subel.Value };
+                            })
+                            .ToArray()
+                        };
+                        return orecord;
+                    });
+                    store.Load(flow);
+                    
+                    fi.fogx = null;
+                }
+                else if (fi.vid == ".fogp")
+                {
+
+                }
+            }
+            store.Build();
+            store.Flush();
+            GC.Collect();
+        }
+        /// <summary>
+        /// Если идентификатор еще не отмеченный, то отметим его, если идентификатор уже отмеченный, то поместим значение mT в словарь
+        /// </summary>
+        /// <param name="bitArr"></param>
+        /// <param name="Hash"></param>
+        /// <param name="lastDefs"></param>
+        /// <param name="id"></param>
+        /// <param name="mTval">отметка времени. null - минимальное время</param>
+        private static void CheckAndSet(System.Collections.BitArray bitArr, Func<string, int> Hash, Dictionary<string, DateTime> lastDefs, string id, string mTval)
+        {
+            int code = Hash(id);
+            if (bitArr.Get(code))
+            {
+                // Добавляем пару в словарь
+                DateTime mT = DateTime.MinValue;
+                if (mTval != null) { mT = DateTime.Parse(mTval); }
+                if (lastDefs.TryGetValue(id, out DateTime last))
+                {
+                    if (mT > last)
+                    {
+                        lastDefs.Remove(id);
+                        lastDefs.Add(id, mT);
+                    }
+                }
+                else
+                {
+                    lastDefs.Add(id, mT);
+                }
+            }
+            else
+            {
+                bitArr.Set(code, true);
+            }
+        }
+
         public override void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog)
         {
             store.Clear();
@@ -91,30 +247,7 @@ namespace Polar.TripleStore
                         || record.Name == "{http://fogid.net/o/}substitute"
                         ) continue;
                     string id = record.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about").Value;
-                    int code = Hash(id);
-                    if (bitArr.Get(code))
-                    {
-                        // Добавляем пару в словарь
-                        XAttribute mT_att = record.Attribute("mT");
-                        DateTime mT = DateTime.MinValue;
-                        if (mT_att != null) { mT = DateTime.Parse(mT_att.Value); }
-                        if (lastDefs.TryGetValue(id, out DateTime last))
-                        {
-                            if (mT > last)
-                            {
-                                lastDefs.Remove(id);
-                                lastDefs.Add(id, mT);
-                            }
-                        }
-                        else
-                        {
-                            lastDefs.Add(id, mT);
-                        }
-                    }
-                    else
-                    {
-                        bitArr.Set(code, true);
-                    }
+                    CheckAndSet(bitArr, Hash, lastDefs, id, record.Attribute("mT")?.Value);
                 }
             }
 
@@ -169,14 +302,14 @@ namespace Polar.TripleStore
                     object[] orecord = new object[] {
                         id_ent,
                         (new object[] { new object[] { 0, rec_type } }).Concat(
-                        record.Elements().Where(el => el.Attribute(XNames.rdfresource) != null)
+                        record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
                             .Select(subel =>
                             {
                                 int prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
-                                return new object[] { prop, store.CodeEntity(subel.Attribute(XNames.rdfresource).Value) };
+                                return new object[] { prop, store.CodeEntity(subel.Attribute(ONames.rdfresource).Value) };
                             })).ToArray()
                         ,
-                        record.Elements().Where(el => el.Attribute(XNames.rdfresource) == null)
+                        record.Elements().Where(el => el.Attribute(ONames.rdfresource) == null)
                             .Select(subel =>
                             {
                                 int prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
@@ -195,6 +328,8 @@ namespace Polar.TripleStore
             store.Flush();
             GC.Collect();
         }
+
+
         public override void LoadXFlowUsingRiTable(IEnumerable<XElement> xflow)
         {
             throw new NotImplementedException("in LoadXFlowUsingRiTable");

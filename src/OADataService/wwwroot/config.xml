@@ -4,10 +4,12 @@
   <!--<Net src="http://localhost:51056" />-->
 
   
-  <!--<LoadCassette write="yes">C:\Home\FactographProjects\CassTest20190726</LoadCassette>
-  syp2001-p-marchuk_a идентификатор Марчука-->
+  <LoadCassette write="yes">C:\Home\FactographProjects\CassTest20190726</LoadCassette>
+
+syp2001-p-marchuk_a идентификатор Марчука
   
  
- <LoadFog>C:\home\dev2019\PolarArchiving\src\TestDataGenerators\PhototekaXElement.fog</LoadFog>
+  <!--<LoadFog>C:\home\dev2019\PolarArchiving\src\TestDataGenerators\phototeka.fogx</LoadFog>-->
+  <!--<LoadFog>C:\home\dev2019\PolarArchiving\src\TestDataGenerators\phototeka.fogp</LoadFog>-->
 
 </config>

@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using OAData;
+
 namespace OADataService
 {
     public class Startup
@@ -45,7 +47,7 @@ namespace OADataService
             //app.UseMvc();
 
             System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
-            CassettesConfiguration conf = new CassettesConfiguration(xconfig);
+            OAData.OAData conf = new OAData.OAData(xconfig);
             conf.Test();
 
             app.UseMvc(routes =>

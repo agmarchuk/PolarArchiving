@@ -310,3 +310,5 @@ __pycache__/
 /src/TestConsoleApp/*.png
 /src/OADataService/wwwroot/config1.xml
 /src/OADataService/wwwroot/config.xml
+/src/TestDataGenerators/*.fogx
+/src/TestDataGenerators/*.fogp
