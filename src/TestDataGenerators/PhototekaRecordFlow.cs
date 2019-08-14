@@ -93,7 +93,7 @@ namespace Phototeka
         }
         private string LocalName(string name)
         {
-            int pos = name.LastIndexOf('/');
+            int pos = name.LastIndexOf("/");
             string lname = name.Substring(pos + 1);
             return lname;
         }
@@ -149,7 +149,7 @@ namespace Phototeka
         }
         private XName ToXName(string name)
         {
-            int pos = name.LastIndexOf('/');
+            int pos = name.LastIndexOf("/");
             string lname = name.Substring(pos + 1);
             return XName.Get(lname, name.Substring(0, pos + 1));
         }

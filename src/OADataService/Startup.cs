@@ -47,14 +47,14 @@ namespace OADataService
             //app.UseMvc();
 
             System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
-            OAData.OAData conf = new OAData.OAData(xconfig);
+            OAData.OADB conf = new OAData.OADB(xconfig);
             conf.Test();
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                   name: "default",
-                  template: "{controller=Home}/{action=Index}/{id?}"
+                  template: "{controller=Home}/{action=Test}/{id?}"
                 );
             });
 

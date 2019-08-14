@@ -11,7 +11,7 @@ namespace OADataService.Controllers
     public class HomeController : Controller
     {
         //public IActionResult Index() { return View(); }
-        public IActionResult Index()
+        public IActionResult Index0()
         {
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             string message = "OK! ";// + OAData.CassDirPath("iiss://SypCassete@iis.nsk.su");
@@ -21,7 +21,7 @@ namespace OADataService.Controllers
 <h1>Сервис работает!</h1>
 <div>" + message + @"</div>
 <pre>
-" + OAData.OAData.look + @"
+" + OAData.OADB.look + @"
 </pre>
 <form method='post' action='/db/GetItemById'>
   <input type='text' name='id' ></input>
@@ -29,6 +29,10 @@ namespace OADataService.Controllers
 </form>
 </body></html>";
             return cr;
+        }
+        public ActionResult Test()
+        {
+            return View();
         }
 
     }

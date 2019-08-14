@@ -10,7 +10,7 @@ using OAData.Adapters;
 
 namespace OAData
 {
-    public class OAData
+    public class OADB
     {
         public static string CassDirPath(string uri)
         {
@@ -19,14 +19,14 @@ namespace OAData
             if (pos < 8) throw new Exception("Err: 22234");
             return cassettes.FirstOrDefault(c => c.name == uri.Substring(7, pos - 7))?.path;
         }
-        private static CassInfo[] cassettes;
-        private static FogInfo[] fogs;
+        private static CassInfo[] cassettes = null;
+        private static FogInfo[] fogs = null;
         private static DAdapter adapter = null;
 
         public static string look = "";
 
         private XElement xconfig = null;
-        public OAData(XElement xconfig)
+        public OADB(XElement xconfig)
         {
             this.xconfig = xconfig;
             // Кассеты перечислены через элементы LoadCassette. Имена кассе в файловой системе должны сравниваться по lower case
@@ -52,12 +52,17 @@ namespace OAData
                 string ext = fogname.Substring(lastpoint).ToLower();
                 bool writable = (lf.Attribute("writable")?.Value == "true" || lf.Attribute("write")?.Value == "yes") ?
                     true : false;
+                var atts = ReadFogAttributes(fogname);
                 fogs_list.Add(new FogInfo()
                 {
                     vid = ext,
                     pth = fogname,
-                    writable = writable
+                    writable = writable && atts.prefix != null && atts.counter != null,
+                    owner = atts.owner,
+                    prefix = atts.prefix,
+                    counter = atts.counter == null ? -1 : Int32.Parse(atts.counter)
                 });
+                
             }
             // Сбор фогов из кассет
             for (int i = 0; i < cassettes.Length; i++)
@@ -125,6 +130,10 @@ namespace OAData
                 }
             }
         }
+        public void Close()
+        {
+            adapter.Close();
+        }
         public void Test()
         { 
             // Испытаем
@@ -173,6 +182,10 @@ namespace OAData
         public static XElement GetItemById(string id, XElement format)
         {
             return adapter.GetItemById(id, format);
+        }
+        public static IEnumerable<XElement> GetAll()
+        {
+            return adapter.GetAll();
         }
         public static XElement PutItem(XElement item)
         {

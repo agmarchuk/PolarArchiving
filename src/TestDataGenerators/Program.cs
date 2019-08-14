@@ -19,7 +19,7 @@ namespace TestDataGenerators
             Console.WriteLine("Start TestDataGenerators");
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            int npersons = 10_000;
+            int npersons = 10;
             Phototeka.PhototekaRecordFlow rflow = new Phototeka.PhototekaRecordFlow(npersons);
             Console.WriteLine(rflow.GenerateAll().Count());
             sw.Stop();

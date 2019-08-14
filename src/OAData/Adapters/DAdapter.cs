@@ -9,12 +9,14 @@ namespace OAData.Adapters
 {
     abstract public class DAdapter
     {
-        public abstract void Init(string connectionstring); 
+        public abstract void Init(string connectionstring);
+        public abstract void Close();
         // ============== Основные методы доступа к БД =============
         public abstract IEnumerable<XElement> SearchByName(string searchstring);
         public abstract XElement GetItemByIdBasic(string id, bool addinverse);
         public abstract XElement GetItemById(string id, XElement format);
         //public abstract XElement GetItemByIdSpecial(string id);
+        public abstract IEnumerable<XElement> GetAll();
 
         // ============== Загрузка базы данных ===============
         public abstract void StartFillDb(Action<string> turlog);
@@ -34,7 +36,10 @@ namespace OAData.Adapters
         public static Func<XElement, XElement> ConvertXElement = xel =>
         {
             if (xel.Name == "delete" || xel.Name == ONames.fogi + "delete") return new XElement(ONames.fogi + "delete",
-                new XAttribute("id", ConvertId(xel.Attribute("id").Value)));
+                xel.Attribute("id") != null ?
+                    new XAttribute(ONames.rdfabout, ConvertId(xel.Attribute("id").Value)) :
+                    new XAttribute(xel.Attribute(ONames.rdfabout)),
+                xel.Attribute("mT") == null ? null : new XAttribute(xel.Attribute("mT")));
             else if (xel.Name == "substitute" || xel.Name == ONames.fogi + "substitute") return new XElement(ONames.fogi + "substitute",
                 new XAttribute("old-id", ConvertId(xel.Attribute("old-id").Value)),
                 new XAttribute("new-id", ConvertId(xel.Attribute("new-id").Value)));

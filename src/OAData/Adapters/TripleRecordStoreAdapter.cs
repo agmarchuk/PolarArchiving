@@ -23,6 +23,10 @@ namespace OAData.Adapters
         string dbfolder = "D:/";
         int file_no = 0;
         internal bool firsttime = true; // Отмечает (вычисляет) ситуацию, когда базу данных обязательно нужно строить.
+        // Важные коды
+        private int cod_rdftype = 0;
+        private int cod_name;
+        private int cod_delete;
 
         /// <summary>
         /// Инициирование базы данных
@@ -39,6 +43,7 @@ namespace OAData.Adapters
                 new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             store = new TripleRecordStore(GenStream, dbfolder, new string[] {
                 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                , "http://fogid.net/o/delete"
                 , "http://fogid.net/o/name"
                 , "http://fogid.net/o/age"
                 , "http://fogid.net/o/person"
@@ -47,8 +52,19 @@ namespace OAData.Adapters
                 , "http://fogid.net/o/reflected"
                 , "http://fogid.net/o/in-doc"
             });
+
+            // Вычисление "важных" кодов
+            cod_rdftype = store.CodeEntity("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"); // Зафиксирован? 0;
+            cod_delete = store.CodeEntity("http://fogid.net/o/delete");
+            cod_name = store.CodeEntity("http://fogid.net/o/name");
+
             if (!firsttime) store.DynaBuild();            
             store.Flush();
+        }
+        public override void Close()
+        {
+            store.Flush();
+            store.Close();
         }
         // Загрузка базы данных
         public override void StartFillDb(Action<string> turlog)
@@ -148,7 +164,7 @@ namespace OAData.Adapters
                         int id_ent = store.CodeEntity(id);
                         object[] orecord = new object[] {
                         id_ent,
-                        (new object[] { new object[] { 0, rec_type } }).Concat(
+                        (new object[] { new object[] { cod_rdftype, rec_type } }).Concat(
                         record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
                             .Select(subel =>
                             {
@@ -301,7 +317,7 @@ namespace OAData.Adapters
                     int id_ent = store.CodeEntity(id);
                     object[] orecord = new object[] {
                         id_ent,
-                        (new object[] { new object[] { 0, rec_type } }).Concat(
+                        (new object[] { new object[] { cod_rdftype, rec_type } }).Concat(
                         record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
                             .Select(subel =>
                             {
@@ -349,14 +365,14 @@ namespace OAData.Adapters
         private string GetRecordType(object rec)
         {
             var tri = (object[])rec;
-            object[] tduple = (object[])(((object[])tri[1]).FirstOrDefault(pair => (int)((object[])pair)[0] == 0));
+            object[] tduple = (object[])(((object[])tri[1]).FirstOrDefault(pair => (int)((object[])pair)[0] == cod_rdftype));
             if (tduple == null) return null;
             return store.DecodeEntity((int)tduple[1]);
         }
         private string GetRecordName(object rec)
         {
             var tri = (object[])rec;
-            return (string)((object[])((object[])tri[2]).Cast<object[]>().FirstOrDefault(pair => (int)pair[0] == 1))[1];
+            return (string)((object[])((object[])tri[2]).Cast<object[]>().FirstOrDefault(pair => (int)pair[0] == cod_name))[1];
         }
 
         // =========================== Основные выборки и поиски ===============================
@@ -366,7 +382,7 @@ namespace OAData.Adapters
             int cid = store.CodeEntity(id);
             object[] tri = (object[])store.GetRecord(cid);
             if (tri == null) return null;
-            object[] pair = ((object[])tri[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == 0);
+            object[] pair = ((object[])tri[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == cod_rdftype);
             XElement xres = new XElement("record",
                 new XAttribute("id", id), pair==null?null: new XAttribute("type", store.DecodeEntity((int)pair[1])),
                 ((object[])tri[2]).Cast<object[]>().Select(dup =>
@@ -374,7 +390,7 @@ namespace OAData.Adapters
                     return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
                         (string)dup[1]);
                 }),
-                ((object[])tri[1]).Cast<object[]>().Where(dup => (int)dup[0] != 0).Select(dup =>
+                ((object[])tri[1]).Cast<object[]>().Where(dup => (int)dup[0] != cod_rdftype).Select(dup =>
                 {
                     return new XElement("direct", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
                         new XElement("record", new XAttribute("id", store.DecodeEntity((int)dup[1]))));
@@ -403,7 +419,7 @@ namespace OAData.Adapters
         {
             if (format == null || format.Name != "record") throw new Exception("Err: strange format");
             if (node == null || (object[])node[1] == null) { return new XElement("record"); }
-            object[] type_dup = ((object[])node[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == 0);
+            object[] type_dup = ((object[])node[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == cod_rdftype);
             XElement xres = new XElement("record", new XAttribute("id", store.Decode((int)node[0])),
                 type_dup==null?null: new XAttribute("type", store.DecodeEntity((int)type_dup[1])),
                 format.Elements().Where(fel => fel.Name == "field" || fel.Name == "direct"|| fel.Name == "inverse")
@@ -477,6 +493,32 @@ namespace OAData.Adapters
                 ;
             return query2;
         }
+        public override IEnumerable<XElement> GetAll()
+        {
+            var query = store.GetRecords()
+                .Cast<object[]>()
+                .Select(tri => // Это базовая тройка записи: ид, массив прямых ссылок, массив полей
+                {
+                    string id = store.DecodeEntity((int)tri[0]);
+                    // Типовая пара среди прямых ссылок (свойство rdf:type закодировано как cod_rdftype
+                    object[] pair = ((object[])tri[1]).Cast<object[]>().FirstOrDefault(dup => (int)dup[0] == cod_rdftype);
+                    XElement xres = new XElement("record",
+                        new XAttribute("id", id), pair == null ? null : new XAttribute("type", store.DecodeEntity((int)pair[1])),
+                        ((object[])tri[2]).Cast<object[]>().Select(dup =>
+                        {
+                            return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                                (string)dup[1]);
+                        }),
+                        ((object[])tri[1]).Cast<object[]>().Where(dup => (int)dup[0] != cod_rdftype).Select(dup =>
+                        {
+                            return new XElement("direct", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                                new XElement("record", new XAttribute("id", store.DecodeEntity((int)dup[1]))));
+                        }),
+                        null);
+                    return xres;
+                });
+            return query;
+        }
 
 
         // ============================== Редактирование ================================
@@ -486,7 +528,7 @@ namespace OAData.Adapters
             string tp = "http://fogid.net/o/" + rec.Name.LocalName;
             int cid = store.CodeEntity(id);
             return new object[] { cid,
-                Enumerable.Repeat<object[]>(new object[] {0, store.CodeEntity(tp)}, 1)
+                Enumerable.Repeat<object[]>(new object[] {cod_rdftype, store.CodeEntity(tp)}, 1)
                     .Concat(rec.Elements().Where(el => el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource") != null)
                         .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName),
                                 store.CodeEntity(el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource").Value) })).ToArray(),
@@ -499,5 +541,6 @@ namespace OAData.Adapters
             store.PutRecord(CodeRecord(record));
             return record;
         }
+
     }
 }

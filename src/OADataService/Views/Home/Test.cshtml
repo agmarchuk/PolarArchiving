@@ -1,0 +1,41 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Test</title>
+</head>
+<body>
+    <h3>== Тестирование сервиса OADataService ==</h3>
+    <h4>Get Ping</h4>
+    <form method="get" action="/db/Ping">
+        <input type="submit" />
+    </form>
+    <hr />
+    <h4>Get SearchByName</h4>
+    <form method="get" action="/db/SearchByName">
+        <input type="text" placeholder="имя" name="ss" />
+        <input type="text" placeholder="тип" name="tt" />
+        <input type="submit" />
+    </form>
+    <hr />
+    <h4>Get GetItemByIdBasic</h4>
+    <form method="get" action="/db/GetItemByIdBasic">
+        <input type="text" placeholder="id" name="id" />
+        обратные:<input type="checkbox" name="addinverse" />
+        <input type="submit" />
+    </form>
+    <hr />
+    <h4>Post GetItemById</h4>
+    <form method="post" action="/db/GetItemById">
+        <input type="text" placeholder="id" name="id" />
+        обратные:<textarea name="format"></textarea>
+        <input type="submit" />
+    </form>
+    <hr />
+</body>
+</html>

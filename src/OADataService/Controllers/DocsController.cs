@@ -15,7 +15,7 @@ namespace OADataService.Controllers
         [HttpGet("docs/GetDoc")]
         public IActionResult GetDoc(string u)
         {
-            var cass_dir = OAData.OAData.CassDirPath(u);
+            var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
             string dirpath = cass_dir + "/originals/" + last10.Substring(0, 6);
@@ -31,7 +31,7 @@ namespace OADataService.Controllers
         public IActionResult GetPhoto(string u, string s)
         {
             //Console.WriteLine("GetImage?u=" + u);
-            var cass_dir = OAData.OAData.CassDirPath(u);
+            var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
             string subpath;
@@ -47,7 +47,7 @@ namespace OADataService.Controllers
         public IActionResult GetVideo(string u)
         {
             //Console.WriteLine("GetVideo?u=" + u);
-            var cass_dir = OAData.OAData.CassDirPath(u);
+            var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
             string dirpath = cass_dir + "/documents/medium/" + last10.Substring(0, 6);

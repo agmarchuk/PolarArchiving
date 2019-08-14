@@ -102,5 +102,10 @@ namespace OpenArchiveMVC.App_Code
         {
             throw new NotImplementedException();
         }
+
+        public override XElement PutItem(XElement record)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
