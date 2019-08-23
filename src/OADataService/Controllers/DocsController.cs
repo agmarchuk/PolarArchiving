@@ -36,8 +36,8 @@ namespace OADataService.Controllers
             string last10 = u.Substring(u.Length - 10);
             string subpath;
             string method = s;
-            if (method == null) subpath = "/originals";
-            else if (method == "small") subpath = "/documents/small";
+            //if (method == null) subpath = "/originals";
+            if (method == "small") subpath = "/documents/small";
             else if (method == "medium") subpath = "/documents/medium";
             else subpath = "/documents/normal"; // (method == "n")
             string path = cass_dir + subpath + last10 + ".jpg";

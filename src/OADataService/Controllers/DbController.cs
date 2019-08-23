@@ -16,6 +16,12 @@ namespace OADataService.Controllers
         {
             return Content("Pong", "text/plain");
         }
+        [HttpGet]
+        public ContentResult GetConfig()
+        {
+            XElement result = OAData.OADB.XConfig;
+            return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
+        }
 
         [HttpGet]
         public ContentResult SearchByName(string ss, string tt)
@@ -47,6 +53,13 @@ namespace OADataService.Controllers
         {
             XElement xitem = XElement.Parse(item);
             XElement result = OAData.OADB.PutItem(xitem);
+            return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
+        }
+        [HttpPost]
+        public ContentResult UpdateItem(string item)
+        {
+            XElement xitem = XElement.Parse(item);
+            XElement result = OAData.OADB.UpdateItem(xitem);
             return Content(result.ToString(), "text/xml", System.Text.Encoding.UTF8);
         }
     }

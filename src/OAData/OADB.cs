@@ -25,10 +25,12 @@ namespace OAData
 
         public static string look = "";
 
-        private XElement xconfig = null;
+        private static XElement _xconfig = null;
+        public static XElement XConfig { get { return _xconfig; } }
+
         public OADB(XElement xconfig)
         {
-            this.xconfig = xconfig;
+            _xconfig = xconfig;
             // Кассеты перечислены через элементы LoadCassette. Имена кассе в файловой системе должны сравниваться по lower case
             cassettes = xconfig.Elements("LoadCassette")
                 .Select(lc =>
@@ -128,8 +130,12 @@ namespace OAData
                     adapter.FillDb(fogs, null);
                     adapter.FinishFillDb(null);
                 }
+
+                // Логфайл элементов Put()
+                putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
             }
         }
+        private static string putlogfilename = null;
         public void Close()
         {
             adapter.Close();
@@ -186,6 +192,36 @@ namespace OAData
         public static IEnumerable<XElement> GetAll()
         {
             return adapter.GetAll();
+        }
+        public static XElement UpdateItem(XElement item)
+        {
+            string id = item.Attribute(ONames.rdfabout)?.Value;
+            if (id == null)
+            {  // точно не апдэйт
+                return PutItem(item);
+            }
+            else
+            { // возможно update
+                XElement old = adapter.GetItemByIdBasic(id, false);
+                if (old == null) return PutItem(item);
+                // добавляем старые, которых нет
+                XElement nitem = new XElement(item);
+                // новые свойства. TODO: Языковые варианты опущены!
+                string[] props = nitem.Elements().Select(el => el.Name.LocalName).ToArray();
+                nitem.Add(old.Elements()
+                .Select(el =>
+                {
+                    string prop = el.Attribute("prop").Value;
+                    int pos = prop.LastIndexOf('/');
+                    XName subel_name = XName.Get(prop.Substring(pos + 1), prop.Substring(0, pos));
+                    if (props.Contains(prop.Substring(pos + 1))) return null;
+                    XElement subel = new XElement(subel_name);
+                    if (el.Name == "field") subel.Add(el.Value);
+                    else if (el.Name == "direct") subel.Add(new XAttribute(ONames.rdfresource, el.Element("record").Attribute("id").Value));
+                    return subel;
+                }));
+                return PutItem(nitem);
+            }
         }
         public static XElement PutItem(XElement item)
         {
@@ -246,6 +282,14 @@ namespace OAData
             // Сохраняем в базе данных
             adapter.PutItem(nitem);
 
+            // Сохраняем в логе
+            using (Stream log = File.Open(putlogfilename, FileMode.Append, FileAccess.Write))
+            {
+                TextWriter tw = new StreamWriter(log, System.Text.Encoding.UTF8);
+                tw.WriteLine(nitem.ToString());
+                tw.Close();
+            }
+
             return new XElement(nitem);
         }
 
@@ -270,7 +314,7 @@ namespace OAData
                     }
                 }
             }
-            Console.WriteLine($"ReadFogAttributes({pth}) : {owner} {prefix} {counter} ");
+            //Console.WriteLine($"ReadFogAttributes({pth}) : {owner} {prefix} {counter} ");
             return (owner, prefix, counter);
         }
     }
