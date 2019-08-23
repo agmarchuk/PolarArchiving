@@ -102,7 +102,8 @@ namespace OAData.Adapters
                         // Обработаем "странные" delete и replace
                         if (record.Name == ONames.fogi + "delete")
                         {
-                            string idd = record.Attribute("id").Value;
+                            string idd = record.Attribute(ONames.rdfabout)?.Value;
+                            if (idd == null) idd = record.Attribute("id").Value;
                             // Если нет атрибута mT, временная отметка устанавливается максимальной, чтобы "забить" другие отметки
                             string mTvalue = record.Attribute("mT") == null ? DateTime.MaxValue.ToString() : record.Attribute("mT").Value;
                             CheckAndSet(bitArr, Hash, lastDefs, idd, mTvalue);
@@ -448,10 +449,14 @@ namespace OAData.Adapters
                             .FirstOrDefault(dup => (int)dup[0] == iprop);
                         if (dupp == null) return new XElement[0];
                         int itarget = (int)dupp[1];
-                        
+                        object[] target_node = (object[])store.GetRecord(itarget);
+                        if (target_node == null) return new XElement[0]; // цели нет!
+                        string rec_type = GetRecordType(target_node);
+                        var rec_format = fel.Elements("record").FirstOrDefault(r => r.Attribute("type")?.Value == rec_type);
+                        if (rec_format == null) rec_format = fel.Element("record");
                         return Enumerable.Repeat<XElement>(
                             new XElement("direct", new XAttribute("prop", prop),
-                            GetItemByNode((object[])store.GetRecord(itarget), fel.Element("record")),
+                            GetItemByNode(target_node, rec_format),
                             null), 1);
                     }
                     else
