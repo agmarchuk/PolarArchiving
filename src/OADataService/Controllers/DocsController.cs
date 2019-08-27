@@ -30,7 +30,6 @@ namespace OADataService.Controllers
         [HttpGet("docs/GetPhoto")]
         public IActionResult GetPhoto(string u, string s)
         {
-            //Console.WriteLine("GetImage?u=" + u);
             var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
@@ -61,6 +60,22 @@ namespace OADataService.Controllers
             //string uniquename = u.Split(':', '/').Aggregate((acc, s) => acc + s);
             return PhysicalFile(path, "video/" + path.Substring(lastpoint + 1));
         }
+        [HttpGet("[controller]/GetPdf")]
+        public IActionResult GetPdf(string u)
+        {
+            var cass_dir = OAData.OADB.CassDirPath(u);
+            if (cass_dir == null) return NotFound();
+            string last10 = u.Substring(u.Length - 10);
+            string dirpath = cass_dir + "/originals/" + last10.Substring(0, 6);
+            System.IO.DirectoryInfo dinfo = new DirectoryInfo(dirpath);
+            var finfo = dinfo.GetFiles(last10.Substring(6) + ".*").LastOrDefault();
+            if (finfo == null) return NotFound();
+            string path = finfo.FullName;
+            int lastpoint = path.LastIndexOf('.');
+            string uniquename = u.Split(':', '/').Aggregate((acc, s) => acc + s);
+            //return PhysicalFile(path, "application/octet-stream", uniquename + path.Substring(lastpoint));
+            return File(System.IO.File.Open(path, FileMode.Open, FileAccess.Read), "application/pdf", uniquename);
+        }
 
         [HttpGet("[controller]/html/{id}")]
         public IActionResult GetHtml(int id)
@@ -78,12 +93,6 @@ namespace OADataService.Controllers
         public ContentResult GetXml(int id)
         {
             return Content("<roo><el1>text 1. текст 1</el1><el2 att='attribute 1'></el2></roo>", "text/xml");
-        }
-        [HttpGet("[controller]/pdf/{id}")]
-        public FileStreamResult GetPdf(int id)
-        {
-            string path = @"D:\Home\work\Пономарев_отчет-2017 (1).pdf";
-            return File(System.IO.File.Open(path, FileMode.Open, FileAccess.Read), "application/pdf");
         }
 
         public FileStreamResult Download(string filename)
