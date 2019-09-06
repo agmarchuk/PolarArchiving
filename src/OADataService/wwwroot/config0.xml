@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+  <database connectionstring="trs:D:/Home/data/Databases/OADataService/" />
+
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
+  <!--
+  Мой id=syp2001-p-marchuk_a
+  http://localhost:51056/db/SearchByName?ss=марчук
+  http://localhost:51056/db/GetItemByIdBasic?id=syp2001-p-marchuk_a&addinverse=true
+  
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypUsers</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2012_1</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2012_mag</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2012_Tikhonova</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2013</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2011</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2011video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2013Users</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2013video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2014</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2014conf_video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2014Users</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2014video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2015</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2015Bratus</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2015conf_video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2015Users</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2015video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2016</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2016Users</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2016video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2016video2</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2017</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2017Users</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2017video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2018</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2018Users</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2018video</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2019</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp2019photos</LoadCassette>
+  -->
+</config>
