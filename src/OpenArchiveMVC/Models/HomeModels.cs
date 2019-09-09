@@ -78,7 +78,19 @@ namespace OpenArchiveMVC.Models
                 .Select((XElement inv) => inv.Element("record").Element("direct").Element("record")).ToArray();
             string fund_id = funds.First().Attribute("id").Value;
 
-            comparedates = new Turgunda7.SCompare();
+        comparedates = new SCompare();
+
+    }
+        internal class SCompare : IComparer<string>
+        {
+            public int Compare(string s1, string s2)
+            {
+                if (string.IsNullOrEmpty(s1) && string.IsNullOrEmpty(s2)) return 0;
+                if (string.IsNullOrEmpty(s1)) return 1;
+                if (string.IsNullOrEmpty(s2)) return -1;
+                return s1.CompareTo(s2);
+            }
+            public static SCompare comparer = new SCompare();
         }
 
         public string fund = null, context = null, person = null, org = null, coll = null, geo = null, fdate = null, tdate = null;
