@@ -2,8 +2,9 @@
 <config>
   <database connectionstring="trs:D:/Home/data/Databases/OADataService/" />
 
-  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
+  <LoadCassette>E:\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
   <!--
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
   Мой id=syp2001-p-marchuk_a
   http://localhost:51056/db/SearchByName?ss=марчук
   http://localhost:51056/db/GetItemByIdBasic?id=syp2001-p-marchuk_a&addinverse=true
