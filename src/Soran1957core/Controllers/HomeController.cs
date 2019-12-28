@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Soran1957core.Models;
+
+namespace Soran1957core.Controllers
+{
+    public class HomeController : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult P()
+        {
+            ContentResult cr = new ContentResult() { ContentType = "text/html" };
+            XElement html = new XElement("html",
+                new XElement("head", 
+                    new XElement("meta", new XAttribute("charset", "utf-8")),
+                    new XElement("link", new XAttribute("src", "/Styles.css")),
+                    null),
+                new XElement("body",
+                    new XElement("img", new XAttribute("src", "/logo1.jpg")),
+                    new XElement("div", 
+
+                        new XElement("h1", "Привет!"),
+                        null)));
+            cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
+            return cr;
+        }
+
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+    }
+}

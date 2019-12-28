@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestCC", "src\TestCC\TestCC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OAData", "src\OAData\OAData.csproj", "{F9E98E0E-C3C3-4E4A-80CA-3F702DF3CDD8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soran1957core", "src\Soran1957core\Soran1957core.csproj", "{165AE219-3F7C-4AFA-85F9-16BA4978FA4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{F9E98E0E-C3C3-4E4A-80CA-3F702DF3CDD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9E98E0E-C3C3-4E4A-80CA-3F702DF3CDD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9E98E0E-C3C3-4E4A-80CA-3F702DF3CDD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{165AE219-3F7C-4AFA-85F9-16BA4978FA4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{165AE219-3F7C-4AFA-85F9-16BA4978FA4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{165AE219-3F7C-4AFA-85F9-16BA4978FA4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{165AE219-3F7C-4AFA-85F9-16BA4978FA4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
