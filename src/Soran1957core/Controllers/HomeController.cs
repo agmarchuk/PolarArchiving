@@ -11,6 +11,7 @@ namespace Soran1957core.Controllers
 {
     public class HomeController : Controller
     {
+        public static string tilda = null;
         public IActionResult Index()
         {
             return View();
@@ -23,17 +24,21 @@ namespace Soran1957core.Controllers
 
         public IActionResult P()
         {
+            if (tilda == null) tilda = HttpContext.Request.PathBase;
             ContentResult cr = new ContentResult() { ContentType = "text/html" };
             XElement html = new XElement("html",
                 new XElement("head", 
                     new XElement("meta", new XAttribute("charset", "utf-8")),
-                    new XElement("link", new XAttribute("src", "/Styles.css")),
+                    new XElement("link", new XAttribute("src", tilda + "/Styles.css")),
                     null),
                 new XElement("body",
+                    new XElement("img", new XAttribute("src", tilda + "/logo1.jpg")),
                     new XElement("img", new XAttribute("src", "/logo1.jpg")),
+                    new XElement("img", new XAttribute("src", "logo1.jpg")),
+                    new XElement("img", new XAttribute("src", "/soran1957/logo1.jpg")),
                     new XElement("div", 
 
-                        new XElement("h1", "Привет!"),
+                        new XElement("h1", $"Привет: {tilda}!"),
                         null)));
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
