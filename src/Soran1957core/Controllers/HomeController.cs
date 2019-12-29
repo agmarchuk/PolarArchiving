@@ -41,7 +41,7 @@ namespace Soran1957core.Controllers
 
                         new XElement("h1", $"Привет: {tilda}!"),
                         null)));
-            //html = Pager.ConstructPage(HttpContext);
+            html = Pager.ConstructPage(HttpContext);
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
         }
