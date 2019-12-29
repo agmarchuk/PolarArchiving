@@ -32,14 +32,16 @@ namespace Soran1957core.Controllers
                     new XElement("link", new XAttribute("src", tilda + "/Styles.css")),
                     null),
                 new XElement("body",
+                    new XElement("img", new XAttribute("src", tilda + "/logo2.gif")),
                     new XElement("img", new XAttribute("src", tilda + "/logo1.jpg")),
-                    new XElement("img", new XAttribute("src", "/logo1.jpg")),
-                    new XElement("img", new XAttribute("src", "logo1.jpg")),
-                    new XElement("img", new XAttribute("src", "/soran1957/logo1.jpg")),
+                    new XElement("img", new XAttribute("src", tilda + "/tmp_foto.jpg")),
+                    new XElement("img", new XAttribute("src", tilda + "/logo4.gif")),
+                    new XElement("img", new XAttribute("src", tilda + "/tmp_foto.jpg")),
                     new XElement("div", 
 
                         new XElement("h1", $"Привет: {tilda}!"),
                         null)));
+            //html = Pager.ConstructPage(HttpContext);
             cr.Content = "<!DOCTYPE html>\n" + html.ToString(); // (SaveOptions.DisableFormatting);
             return cr;
         }
