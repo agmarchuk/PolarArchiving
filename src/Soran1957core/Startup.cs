@@ -53,6 +53,11 @@ namespace Soran1957core
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            //string tilda = HttpContext.Request.PathBase;
+            System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
+            OAData.OADB conf = new OAData.OADB(xconfig);
+            StaticObjects.look = OAData.OADB.look;
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
