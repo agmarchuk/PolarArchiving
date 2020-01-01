@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -296,6 +297,10 @@ namespace OAData
 
         private (string owner, string prefix, string counter)  ReadFogAttributes(string pth)
         {
+            // Нужно для чтиния в кодировке windows-1251. Нужен также Nuget System.Text.Encoding.CodePages
+            var v = System.Text.CodePagesEncodingProvider.Instance;
+            System.Text.Encoding.RegisterProvider(v);
+
             string owner = null;
             string prefix = null;
             string counter = null;

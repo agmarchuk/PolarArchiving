@@ -78,6 +78,76 @@ namespace OAData.Adapters
             // Пока каждый раз чистим базу данных
             store.Clear();
 
+            DateTime tt0 = DateTime.Now;
+            // Нулевой проход сканирования фог-файлов. Строим таблицу строка-строка с соответствием идентификатору
+            // идентификатора оригинала или null.
+            Dictionary<string, string> substitutes = new Dictionary<string, string>();
+            foreach (FogInfo fi in fogflow)
+            {
+                // Чтение фога
+                if (fi.vid == ".fog")
+                {
+                    fi.fogx = XElement.Load(fi.pth);
+                    foreach (XElement xrec in fi.fogx.Elements())
+                    {
+                        XElement record = ConvertXElement(xrec);
+
+                        string id = record.Attribute(ONames.rdfabout)?.Value;
+
+                        // Обработаем delete и replace
+                        if (record.Name == ONames.fogi + "delete")
+                        {
+                            string idd = record.Attribute(ONames.rdfabout)?.Value;
+                            if (idd == null) idd = record.Attribute("id").Value;
+                            if (substitutes.ContainsKey(idd))
+                            {
+                                substitutes.Remove(idd);
+                            }
+                            substitutes.Add(idd, null);
+                            continue;
+                        }
+                        if (record.Name == ONames.fogi + "substitute")
+                        {
+                            string idold = record.Attribute("old-id").Value;
+                            string idnew = record.Attribute("new-id").Value;
+                            // может old-id уже уничтожен, огда ничего не менять
+                            if (substitutes.TryGetValue(idold, out string value))
+                            {
+                                if (value == null) continue;
+                                substitutes.Remove(idold);
+                            }
+                            // иначе заменить в любом случае
+                            substitutes.Add(idold, idnew);
+                            continue;
+                        }
+                    }
+                }
+            }
+            // Функция, добирающаяся до последнего определения или это и есть последнее
+            Func<string, string> original = null;
+            original = id => 
+            {
+                if (substitutes.TryGetValue(id, out string idd))
+                {
+                    if (idd == null) return id;
+                    return original(idd);
+                }
+                return id;
+            };
+            // Обработаем словарь, формируя новый 
+            Dictionary<string, string> orig_ids = new Dictionary<string, string>();
+            foreach (var pair in substitutes)
+            {
+                string key = pair.Key;
+                string value = pair.Value;
+                if (value != null) value = original(value);
+                orig_ids.Add(key, value);
+            }
+            DateTime tt1 = DateTime.Now;
+            int mils = (tt1 - tt0).Milliseconds;
+            Console.WriteLine($"duration={mils}");
+
+
             // Готовим битовый массив для отметки того, что хеш id уже "попадал" в этот бит
             int rang = 24; // пока предполагается, что число записей (много) меньше 16 млн.
             int mask = ~((-1) << rang);
@@ -109,8 +179,10 @@ namespace OAData.Adapters
                             CheckAndSet(bitArr, Hash, lastDefs, idd, mTvalue);
                             continue;
                         }
-                        if (record.Name == ONames.fogi + "substitute") continue; // пока не обрабатываем
-
+                        if (record.Name == ONames.fogi + "substitute")
+                        {
+                            continue;
+                        }
                         string id = record.Attribute(ONames.rdfabout).Value;
                         CheckAndSet(bitArr, Hash, lastDefs, id, record.Attribute("mT")?.Value);
                     }
@@ -121,7 +193,7 @@ namespace OAData.Adapters
 
                 }
             }
-
+            
             // Второй проход сканирования фог-файлов. В этом проходе, для каждого фога формируется поток записей в 
             // объектном представлении, потом этот поток добавляется в store
             foreach (FogInfo fi in fogflow)
@@ -133,9 +205,13 @@ namespace OAData.Adapters
                     IEnumerable<object> flow = fi.fogx.Elements()
                     .Select(xrec => ConvertXElement(xrec))
                     // Обработаем delete и replace. delete доминирует (по времени), но в выходной поток ничего не попадает
-                    // substitute - не обрабатываем
+                    // substitute (Может наод orig_ids?) - не обрабатываем
                     .Where(record => record.Name != ONames.fogi + "delete" &&
                             record.Name != ONames.fogi + "substitute")
+
+                    // Отфильтруем все записи, попавшие в substitutes
+                    .Where(record => !orig_ids.ContainsKey(record.Attribute(ONames.rdfabout).Value))
+                    
                     // Отфильтруем записи с малыми временами. т.е. если идентификатор есть в словаре, но он меньше.
                     // Если он больше, то не фильтруем, а словарный вход корректируем
                     .Where(record =>
@@ -161,6 +237,8 @@ namespace OAData.Adapters
                     .Select(record =>
                     {
                         string id = record.Attribute(ONames.rdfabout).Value;
+                        // Корректируем идентификатор
+                        if (orig_ids.TryGetValue(id, out string idd)) id = idd;
                         int rec_type = store.CodeEntity(ONames.fog + record.Name.LocalName);
                         int id_ent = store.CodeEntity(id);
                         object[] orecord = new object[] {
@@ -170,7 +248,9 @@ namespace OAData.Adapters
                             .Select(subel =>
                             {
                                 int prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
-                                return new object[] { prop, store.CodeEntity(subel.Attribute(ONames.rdfresource).Value) };
+                                string resource = subel.Attribute(ONames.rdfresource).Value;
+                                if (orig_ids.TryGetValue(resource, out string res)) if (res != null) resource = res;
+                                return new object[] { prop, store.CodeEntity(resource) };
                             })).ToArray()
                         ,
                         record.Elements().Where(el => el.Attribute(ONames.rdfresource) == null)
