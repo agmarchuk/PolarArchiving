@@ -22,7 +22,7 @@ namespace OAData
         }
         private static CassInfo[] cassettes = null;
         private static FogInfo[] fogs = null;
-        private static DAdapter adapter = null;
+        public static DAdapter adapter = null;
 
         public static string look = "";
 
@@ -135,6 +135,14 @@ namespace OAData
                 // Логфайл элементов Put()
                 putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
             }
+        }
+        public static void Load()
+        {
+            adapter.StartFillDb(null);
+            //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
+            //    null, null);
+            adapter.FillDb(fogs, null);
+            adapter.FinishFillDb(null);
         }
         private static string putlogfilename = null;
         public void Close()
