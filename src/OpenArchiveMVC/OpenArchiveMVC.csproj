@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
-    <ProjectReference Include="..\Turgunda7\Turgunda7.csproj" />
+    <!--<ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
+    <ProjectReference Include="..\Turgunda7\Turgunda7.csproj" />-->
   </ItemGroup>
 
 </Project>
