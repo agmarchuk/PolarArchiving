@@ -46,9 +46,10 @@ namespace OADataService
             app.UseHttpsRedirection();
             //app.UseMvc();
 
-            System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
-            OAData.OADB conf = new OAData.OADB(xconfig);
-            conf.Test();
+            //System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
+            //OAData.OADB conf = new OAData.OADB(xconfig);
+            //conf.Test();
+            StaObject.Init(env.ContentRootPath + "/wwwroot/"); 
 
             app.UseMvc(routes =>
             {

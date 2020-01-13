@@ -13,26 +13,26 @@ namespace OAData
 {
     public class OADB
     {
-        public static string CassDirPath(string uri)
-        {
-            if (!uri.StartsWith("iiss://")) throw new Exception("Err: 22233");
-            int pos = uri.IndexOf('@', 7);
-            if (pos < 8) throw new Exception("Err: 22234");
-            return cassettes.FirstOrDefault(c => c.name == uri.Substring(7, pos - 7))?.path;
-        }
         private static CassInfo[] cassettes = null;
         private static FogInfo[] fogs = null;
         public static DAdapter adapter = null;
 
         public static string look = "";
 
+        private static string path;
         private static XElement _xconfig = null;
         public static XElement XConfig { get { return _xconfig; } }
 
-        public OADB(XElement xconfig)
+        public static void Init(string pth)
         {
+            path = pth;
+            Init();
+        }
+        public static void Init()
+        { 
+            XElement xconfig = XElement.Load(path + "config.xml");
             _xconfig = xconfig;
-            // Кассеты перечислены через элементы LoadCassette. Имена кассе в файловой системе должны сравниваться по lower case
+            // Кассеты перечислены через элементы LoadCassette. Имена кассет в файловой системе должны сравниваться по lower case
             cassettes = xconfig.Elements("LoadCassette")
                 .Select(lc =>
                 {
@@ -120,20 +120,30 @@ namespace OAData
             string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
             if (connectionstring != null)
             {
-                adapter = new TripleRecordStoreAdapter();
-                adapter.Init(connectionstring);
-                bool toload = true;
-                if (toload)
+                string pre = connectionstring.Substring(0, connectionstring.IndexOf(':'));
+                if (pre == "trs")
                 {
-                    adapter.StartFillDb(null);
-                    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
-                    //    null, null);
-                    adapter.FillDb(fogs, null);
-                    adapter.FinishFillDb(null);
+                    adapter = new TripleRecordStoreAdapter();
                 }
+                else if (pre == "xml")
+                {
+                    adapter = new XmlDbAdapter();
+                }
+                adapter.Init(connectionstring);
+                //bool toload = false;
+                //if (toload)
+                //{
+                //    adapter.StartFillDb(null);
+                //    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
+                //    //    null, null);
+                //    adapter.FillDb(fogs, null);
+                //    adapter.FinishFillDb(null);
+                //}
+                if (pre == "xml") Load();
 
                 // Логфайл элементов Put()
-                putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
+                //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
+                putlogfilename = path + "logfile_put.txt";
             }
         }
         public static void Load()
@@ -144,10 +154,23 @@ namespace OAData
             adapter.FillDb(fogs, null);
             adapter.FinishFillDb(null);
         }
+        public static void Reload()
+        {
+            Close();
+            Init();
+            Load();
+        }
         private static string putlogfilename = null;
-        public void Close()
+        public static void Close()
         {
             adapter.Close();
+        }
+        public static string CassDirPath(string uri)
+        {
+            if (!uri.StartsWith("iiss://")) throw new Exception("Err: 22233");
+            int pos = uri.IndexOf('@', 7);
+            if (pos < 8) throw new Exception("Err: 22234");
+            return cassettes.FirstOrDefault(c => c.name == uri.Substring(7, pos - 7))?.path;
         }
         public void Test()
         { 
@@ -303,7 +326,7 @@ namespace OAData
         }
 
 
-        private (string owner, string prefix, string counter)  ReadFogAttributes(string pth)
+        private static (string owner, string prefix, string counter)  ReadFogAttributes(string pth)
         {
             // Нужно для чтиния в кодировке windows-1251. Нужен также Nuget System.Text.Encoding.CodePages
             var v = System.Text.CodePagesEncodingProvider.Instance;

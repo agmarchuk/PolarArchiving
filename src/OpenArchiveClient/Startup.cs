@@ -40,8 +40,8 @@ namespace OpenArchiveClient
             app.UseStaticFiles();
 
             // Можно обойтись без принудительной загрузки вначале, только надо проверить инициированность(?)
-            System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
-            OAData.OADB conf = new OAData.OADB(xconfig);
+            //System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
+            //OAData.OADB conf = new OAData.OADB(xconfig);
             // Достаточно инициирования
             SObs.Init(env.ContentRootPath);
             // А это загрузка

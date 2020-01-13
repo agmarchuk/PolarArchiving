@@ -17,6 +17,18 @@ namespace OADataService.Controllers
             return Content("Pong", "text/plain");
         }
         [HttpGet]
+        public ContentResult Load()
+        {
+            OAData.OADB.Load();
+            return Content("Loaded", "text/plain");
+        }
+        [HttpGet]
+        public ContentResult Reload()
+        {
+            OAData.OADB.Reload();
+            return Content("Reloaded", "text/plain");
+        }
+        [HttpGet]
         public ContentResult GetConfig()
         {
             XElement result = OAData.OADB.XConfig;

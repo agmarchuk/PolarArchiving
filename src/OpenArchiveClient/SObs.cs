@@ -24,6 +24,9 @@ namespace OpenArchiveClient
                 System.IO.File.Copy(_path + "wwwroot/config0.xml", configpath);
             }
             _config = XElement.Load(configpath);
+
+            OAData.OADB.Init(_path + "wwwroot/");
+
             if (OAData.OADB.adapter != null) CalculateConstants();
             _initiated = true;
         }
