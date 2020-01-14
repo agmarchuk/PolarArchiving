@@ -12,7 +12,7 @@ namespace OpenArchiveClient.Controllers
         {
             var requ = Request;
             // Можно обойтись без принудительной загрузки вначале, только надо проверить инициированность(?)
-            if (OAData.OADB.adapter != null) OAData.OADB.adapter.Close();
+            //if (OAData.OADB.adapter != null) OAData.OADB.adapter.Close();
             //System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load("wwwroot/config.xml");
             //OAData.OADB conf = new OAData.OADB(xconfig);
             OAData.OADB.Reload();

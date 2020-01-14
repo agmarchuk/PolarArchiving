@@ -130,15 +130,19 @@ namespace OAData
                     adapter = new XmlDbAdapter();
                 }
                 adapter.Init(connectionstring);
-                //bool toload = false;
-                //if (toload)
-                //{
-                //    adapter.StartFillDb(null);
-                //    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
-                //    //    null, null);
-                //    adapter.FillDb(fogs, null);
-                //    adapter.FinishFillDb(null);
-                //}
+                bool toload = false;
+                if (toload)
+                {
+                    adapter.StartFillDb(null);
+                    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
+                    //    null, null);
+                    adapter.FillDb(fogs, null);
+                    adapter.FinishFillDb(null);
+                }
+                else
+                {
+                    
+                }
                 if (pre == "xml") Load();
 
                 // Логфайл элементов Put()
