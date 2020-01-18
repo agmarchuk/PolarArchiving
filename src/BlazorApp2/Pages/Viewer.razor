@@ -1,0 +1,28 @@
+﻿@page "/viewer"
+@using System.Xml.Linq
+@using BlazorApp2.Data
+@inject ViewerService VService
+
+<h3>Viewer</h3>
+<input @bind="searchstring" />
+<button class="btn btn-primary" @onclick="SearchAsync">Click me</button>
+
+<div>This component demonstrates fetching data from a service.</div>
+
+<div>
+    @xresult
+</div>
+
+@code {
+    private string searchstring { get; set; }
+    private XElement xresult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        xresult = await VService.GetItemAsync("пупкин");
+    }
+    private async Task SearchAsync()
+    {
+        xresult = await VService.GetItemAsync(searchstring);
+    }
+}
