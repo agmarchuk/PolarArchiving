@@ -34,6 +34,11 @@ namespace BlazorApp1
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // app.UseCors(policy =>
+            //     policy.WithOrigins("http://localhost:5000", "https://localhost:5001")
+            //     .AllowAnyMethod()
+            //     //.WithHeaders(HeaderNames.ContentType, HeaderNames.Authorization)
+            //     .AllowCredentials());
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -49,6 +54,8 @@ namespace BlazorApp1
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            OAData.OADB.Init(env.ContentRootPath);
 
             app.UseEndpoints(endpoints =>
             {
