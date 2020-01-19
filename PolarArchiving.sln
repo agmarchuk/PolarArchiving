@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turgunda6", "old\Turgunda6\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp2", "src\BlazorApp2\BlazorApp2.csproj", "{F49074E3-BC71-4B19-A8B8-B1A16EB22FDF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1", "BlazorApp1\BlazorApp1.csproj", "{9C352EB7-055D-4BEB-8659-1D999DADBB9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{F49074E3-BC71-4B19-A8B8-B1A16EB22FDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F49074E3-BC71-4B19-A8B8-B1A16EB22FDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F49074E3-BC71-4B19-A8B8-B1A16EB22FDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C352EB7-055D-4BEB-8659-1D999DADBB9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C352EB7-055D-4BEB-8659-1D999DADBB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C352EB7-055D-4BEB-8659-1D999DADBB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C352EB7-055D-4BEB-8659-1D999DADBB9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
