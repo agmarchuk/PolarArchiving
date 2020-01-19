@@ -27,7 +27,7 @@ namespace OpenArchiveClient
 
             OAData.OADB.Init(_path + "wwwroot/");
 
-            //if (OAData.OADB.adapter != null) CalculateConstants();
+            if (OAData.OADB.adapter != null) CalculateConstants();
             _initiated = true;
         }
 

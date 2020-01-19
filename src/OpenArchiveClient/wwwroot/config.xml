@@ -1,44 +1,75 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
-  <database connectionstring="trs:D:/Home/data/Databases/OADataService/" />
 
-  <LoadCassette>F:\syp\syp_cassettes\SypCassete</LoadCassette>
+  <!--<database dbname="openarchive5" connectionstring="net:http://localhost:49197/"/>-->
 
-  <!--
-  <LoadCassette>F:\syp\syp_cassettes\SypCassete</LoadCassette>
-  Мой id=syp2001-p-marchuk_a
-  http://localhost:51056/db/SearchByName?ss=марчук
-  http://localhost:51056/db/GetItemByIdBasic?id=syp2001-p-marchuk_a&addinverse=true
-  
-  <LoadCassette>F:\syp\syp_cassettes\SypUsers</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp_2012_1</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp_2012_mag</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp_2012_Tikhonova</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp_2013</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2011</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2011video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2013Users</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2013video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2014</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2014conf_video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2014Users</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2014video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2015</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2015Bratus</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2015conf_video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2015Users</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2015video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2016</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2016Users</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2016video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2016video2</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2017</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2017Users</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2017video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2018</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2018Users</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2018video</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2019</LoadCassette>
-  <LoadCassette>F:\syp\syp_cassettes\Syp2019photos</LoadCassette>
-  -->
+  <database dbname="pa" connectionstring="trs:C:/WinApps/PolarDatabases/PolarOpenArchive3dev/"/>
+
+  <LoadCassette write="no">H:\home\OA\Ad</LoadCassette>
+  <LoadCassette write="no">H:\home\OA\Xc</LoadCassette>
+  <LoadCassette write="no">H:\home\OA\Xu</LoadCassette>
+  <LoadCassette write="no">H:\home\OA\Xc1</LoadCassette>
+  <LoadCassette write="no">H:\home\OA\Xu1</LoadCassette>
+  <LoadCassette write="no">H:\home\OA\Xu2</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Ba</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\L5</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\La</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Ly</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Ns</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Po</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Rs</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Ru</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Th</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Ti</LoadCassette>
+  <LoadCassette regime="nodata" write="no">H:\home\OA\Rs</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\Bm</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\F1</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\F2</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\F3</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\Ft</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\G1</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\G2</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\Kv</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\L1</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\Mr</LoadCassette>
+  <LoadCassette regime="nodata" write="no">F:\home\OA\R1</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\F4</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\F5</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\Hp</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\L2</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\L3</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\L4</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\Sa</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\Ta</LoadCassette>
+  <LoadCassette regime="nodata" write="no">G:\home\OA\Vo</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Oh</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Is</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Zc</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Z1</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Z2</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Kl</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\F6</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Ci</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\Os</LoadCassette>
+  <LoadCassette regime="nodata" write="no">J:\home\OA\L6</LoadCassette>
+  <LoadCassette regime="nodata" write="no">K:\home\OA\F7</LoadCassette>
+  <LoadCassette regime="nodata" write="no">K:\home\OA\Z3</LoadCassette>
+
+
+  <LoadCassette>E:\FactographProjects\PA_cassettes\da1</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_cassettes\da2</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\gi_pharchive</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\kbrd2010</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\PA_database201012</LoadCassette>
+
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\PA_folder_collections</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\PA_folders01-20</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\PA_folders24-59</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\PA_folders60-99</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\PA_folders100-111</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\RAS_57</LoadCassette>
+  <LoadCassette regime="nodata">E:\FactographProjects\PA_cassettes\SBRAS_2009_12</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_cassettes\w100531</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_cassettes\PA_Users</LoadCassette>
+
 </config>
