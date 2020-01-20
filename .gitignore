@@ -312,3 +312,4 @@ __pycache__/
 /src/OADataService/wwwroot/config.xml
 /src/TestDataGenerators/*.fogx
 /src/TestDataGenerators/*.fogp
+/BlazorApp1/wwwroot/config.xml
