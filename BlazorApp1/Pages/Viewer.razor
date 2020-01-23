@@ -1,69 +1,249 @@
 ﻿@page "/viewer"
+@page "/viewer/{idd}"
 @using System.Xml.Linq
 @using BlazorApp1.Data
 @inject ViewerService VService
 
-<h3>Viewer</h3>
-<form onsubmit="return false;" action="">
+<h3>Viewer @Idd</h3>
+<form onsubmit="return false" action="">
     <input type="text" @bind="searchstring" />
     <input type="submit" @onclick="SearchAsync" value="Искать" />
-    <button @onclick="SearchAsync">Искать</button>
+    @*<button @onclick="SearchAsync">Искать</button>*@
 </form>
 
-@if (xresult != null) foreach (XElement elem in xresult.Elements())
+@if (searchresult != null) foreach (XElement elem in searchresult.Elements())
     {
         string tp = elem.Attribute("type").Value;
-        string label;
-        if (labels.TryGetValue(tp, out label)) { }
-        else label = tp;
+        string label = GetLabel(tp);
+        //if (labels.TryGetValue(tp, out label)) { }
+        //else label = tp;
         string id = elem.Attribute("id").Value;
         //string name = elem.Elements("record")
         //    .Where((XElement r) => r.Name == "field")
         //    .FirstOrDefault()?.Value;
         string name = elem.Value;
 <div>
-    @*<span>@label</span> <a href="portrait?id=@id">@name</a>*@
-    @*<span>@label</span> <a @onclick:preventDefault @onclick='Portrait' href="">@name</a>*@
-    <span>@label</span> <a @onclick:preventDefault @onclick='@(e => UpdatePortrait(e, id))' href="">@name</a>
+    <span>@label</span> <a @onclick:preventDefault @onclick='@(e => UpdatePortrait(e, id))' href="viewer/@id">@name</a>
 </div>
     }
 @if (xtree != null)
 {
-    <p />
-    <div>
-        Портрет!!! @xtree.ToString();
-    </div>
+    string tp = xtree.Attribute("type").Value;
+    string label = GetLabel(tp);
+    //if (labels.TryGetValue(tp, out label)) { }
+    //else label = tp;
+    string id = xtree.Attribute("id").Value;
+    //string name = xtree.Elements("field")
+    //    .Where((XElement f) => f.Attribute("prop").Value == "http://fogid.net/o/name")
+    //    .FirstOrDefault()?.Value;
+    var names = xtree.Elements()
+        .Where(x => x.Name == "field" && x.Attribute("prop").Value == "http://fogid.net/o/name")
+        .Select(x => x.Value);
+    var notnames = xtree.Elements()
+        .Where(x => (x.Name == "field" && x.Attribute("prop").Value != "http://fogid.net/o/name") ||
+            x.Name == "direct");
+    var inverse_groups = xtree.Elements("inverse")
+        .GroupBy(x => x.Attribute("prop").Value);
+    // Делаем цикл по группам
+    @*foreach (var inv in inverse_groups)
+    {
+        string invprop = inv.Key;
+
+        var resource_arr = inv.Select(x => x.Element("record").Attribute("prop").Value).ToArray();
+        for (int i=0; i< resource_arr.Length; i++)
+        {
+            <div>part @i</div>
+        }
+    }*@
+<table>
+    <tr>
+        @*тип айтема*@
+        <td class="zag" colspan="2">@label</td>
+    </tr>
+    @*поля имени*@
+    @foreach (string nm in names)
+    {
+        <tr>
+            <td></td>
+            <td>@nm</td>
+        </tr>
+    }
+    @*поля и прямые*@
+    @foreach (XElement fd in notnames)
+    {
+        string prop = fd.Attribute("prop").Value;
+
+        if (fd.Name == "field")
+        {
+            if (!string.IsNullOrEmpty(fd.Value))
+            {
+                <tr>
+                    <td class="nazv">@GetLabel(prop)</td>
+                    <td>
+                        @fd.Value
+                    </td>
+                </tr>
+            }
+        }
+        else // direct
+        {
+            string resource = fd.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource").Value;
+            XElement resource_elem = VService.GetItemByIdBasic(resource, false);
+            string rid = resource_elem.Attribute("id").Value;
+            string nm = resource_elem.Elements("field")?
+                .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")
+                .Value;
+            <tr>
+                <td class="nazv">@GetLabel(prop)</td>
+                <td>
+                    <a href="item/@(rid)">@nm</a>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan="2">
+            </td>
+        </tr>
+    }
+    @*обратные, поля и прямые*@
+    @foreach (var g in inverse_groups)
+    {
+        var p = GetInvLabel(g.Key);
+        var ids = g.Select(x => x.Element("record").Attribute("id").Value).ToArray();
+        <tr>
+            @*название отношения*@
+            <td class="zag" colspan="2">@p</td>
+        </tr>
+        for (int i = 0; i < ids.Length; i++)
+        {
+            // rec - запись отношения
+            XElement rec = VService.GetItemByIdBasic(ids[i], false);
+            if (rec != null)
+            {
+                // Сначала ссылки, но не та по которой пришли
+                var drects = rec.Elements("direct")
+                    .Where(d => d.Attribute("prop").Value != g.Key)
+                    .Select(d => d.Element("record"));
+                foreach (var r in drects)
+                {
+                    // идентификатор и запись "цели" прямых ссылок
+                    string iid = r.Attribute("id").Value;
+                    XElement target_rec = VService.GetItemByIdBasic(iid, false);
+                    var nms = target_rec.Elements()
+                        .Where(x => x.Name == "field" && x.Attribute("prop").Value == "http://fogid.net/o/name");
+                    var notnms = target_rec.Elements()
+                        .Where(x => (x.Name == "field" && x.Attribute("prop").Value != "http://fogid.net/o/name") ||
+                            x.Name == "direct");
+
+                    <tr>
+                        <td></td>
+                        <td>
+                            @foreach (var pair in nms.Select((x, nom) => new { x, nom }))
+                            {
+                                if (pair.nom == 0)
+                                {
+                                    <a href="Viewer/@iid">@pair.x.Value</a>
+                                }
+                                else
+                                {
+                                    <span>@pair.x.Value</span>
+                                }
+                            }
+                            @foreach (var y in notnms)
+                            {
+                                <span>@y.Value</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                // Сначала ссылки, но не та по которой пришли
+                var fields = rec.Elements("field");
+                foreach (var field in fields)
+                {
+                    string prop = field.Attribute("prop").Value;
+                    string val = field.Value;
+                    if (!string.IsNullOrEmpty(val))
+                    {
+                        <tr>
+                            <td class="nazv">@GetLabel(prop)</td>
+                            <td>@field.Value</td>
+                        </tr>
+                    }
+                }
+            }
+            else
+            {
+                <tr>
+                    <td></td>
+                    <td>elements @(rec.Elements().Count())</td>
+                </tr>
+            }
+        }
+
+    }
+    <tr>
+        <td class="nazv"></td>
+        <td></td>
+    </tr>
+</table>
+    <p/>
+    <pre>@xtree.ToString();</pre>
 
 }
 
 @code {
-    private string searchstring { get; set; }
-    private XElement xresult;
+    [Parameter]
+    public string Idd { get; set; }
 
-    private Dictionary<string, string> labels = new KeyValuePair<string, string>[]
+    private string searchstring { get; set; } = "";
+    private XElement searchresult;
+
+    private Func<string, string> GetLabel = onto =>
     {
-        new KeyValuePair<string, string>("http://fogid.net/o/person", "персона"),
-        new KeyValuePair<string, string>("http://fogid.net/o/org-sys", "орг"),
-        new KeyValuePair<string, string>("http://fogid.net/o/document", "док"),
-        new KeyValuePair<string, string>("http://fogid.net/o/photo-doc", "фото"),
-        new KeyValuePair<string, string>("http://fogid.net/o/collection", "коллекция"),
-            }.ToDictionary(x => x.Key, x => x.Value);
+        string lab;
+        if (! BlazorStatics.OntNames.TryGetValue(onto, out lab))
+        {
+            lab = onto;
+        }
+        return lab;
+    };
+    private Func<string, string> GetInvLabel = onto =>
+    {
+        string lab;
+        if (! BlazorStatics.InvOntNames.TryGetValue(onto, out lab))
+        {
+            lab = onto;
+        }
+        return lab;
+    };
 
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    xresult = await VService.GetItemAsync("пупкин");
-    //}
     private async Task SearchAsync()
     {
-        xresult = await VService.SearchAsync(searchstring);
+        searchresult = await VService.SearchAsync(searchstring);
     }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Idd != null)
+        {
+            await UpdatePortrait(null, Idd);
+        }
+    }
+
     XElement xtree = null;
 
     private async Task UpdatePortrait(MouseEventArgs e, string id)
     {
-        searchstring = null;
-        xresult = null;
+        searchstring = "";
+        searchresult = null;
         xtree = await VService.GetItemAsync(id);
+    }
+
+    private void Doit()
+    {
+
+        //ParameterView.FromDictionary()
     }
 
 }

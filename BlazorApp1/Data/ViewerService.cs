@@ -15,8 +15,12 @@ namespace BlazorApp1.Data
         }
         public Task<XElement> GetItemAsync(string id)
         {
-            var q = OAData.OADB.GetItemByIdBasic(id, false);
+            var q = OAData.OADB.GetItemByIdBasic(id, true);
             return Task.FromResult(q);
+        }
+        public XElement GetItemByIdBasic(string id, bool addinverse)
+        {
+            return OAData.OADB.GetItemByIdBasic(id, addinverse);
         }
     }
 }

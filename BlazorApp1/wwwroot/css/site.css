@@ -2,7 +2,18 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    /*background: #faf3dc;*/
 }
+
+.nazv {
+    background: #faf3dc;
+    font-size:smaller;
+}
+
+.zag {
+    background: #E0F0E0; 
+}
+
 
 a, .btn-link {
     color: #0366d6;
