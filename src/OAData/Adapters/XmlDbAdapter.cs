@@ -137,8 +137,9 @@ namespace OAData.Adapters
             if (records.TryGetValue(id, out node))
             {
                 XElement xel = node.xel;
+                if (xel == null) return null;
                 string type = xel.Name.NamespaceName + xel.Name.LocalName;
-                return new XElement("record", new XAttribute("id", id),
+                XElement xresult = new XElement("record", new XAttribute("id", id),
                     new XAttribute("type", type),
                     xel.Elements()
                     .Select<XElement, XElement>(el => 
@@ -160,7 +161,8 @@ namespace OAData.Adapters
                     node.inverse
                     .Select(inv => new XElement("inverse", new XAttribute("prop", inv.Name.NamespaceName + inv.Name.LocalName),
                         new XElement("record", new XAttribute("id", inv.Parent.Attribute(ONames.rdfabout).Value)))) :
-                    null); 
+                    null);
+                return xresult;
             }
             return null;
         }
