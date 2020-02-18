@@ -2,10 +2,10 @@
 <config>
 
   <!--<database dbname="openarchive5" connectionstring="net:http://localhost:49197/"/>-->
-  
+
   <database dbname="pa" connectionstring="trs:C:/WinApps/PolarDatabases/PolarOpenArchive3dev/"/>
 
-  <!--<LoadCassette write="no">H:\home\OA\Ad</LoadCassette>
+  <LoadCassette write="no">H:\home\OA\Ad</LoadCassette>
   <LoadCassette write="no">H:\home\OA\Xc</LoadCassette>
   <LoadCassette write="no">H:\home\OA\Xu</LoadCassette>
   <LoadCassette write="no">H:\home\OA\Xc1</LoadCassette>
@@ -53,7 +53,7 @@
   <LoadCassette regime="nodata" write="no">J:\home\OA\Os</LoadCassette>
   <LoadCassette regime="nodata" write="no">J:\home\OA\L6</LoadCassette>
   <LoadCassette regime="nodata" write="no">K:\home\OA\F7</LoadCassette>
-  <LoadCassette regime="nodata" write="no">K:\home\OA\Z3</LoadCassette>-->
+  <LoadCassette regime="nodata" write="no">K:\home\OA\Z3</LoadCassette>
 
 
   <LoadCassette>E:\FactographProjects\PA_cassettes\da1</LoadCassette>
