@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using SGraph;
 
 namespace Soran1957core
 {
@@ -170,8 +171,8 @@ namespace Soran1957core
                         new XElement("tr", new XAttribute("valign", "top"),
                             new XElement("td", null),
                             new XElement("td", new XAttribute("colspan", "2"), "(c) Фотоархив Сибирского отделения Российской академии наук")),
-                        new XElement("tr", new XAttribute("valign", "top"),
-                            new XElement("td", new XAttribute("colspan", "3"), StaticObjects.look)),
+                        //new XElement("tr", new XAttribute("valign", "top"),
+                        //    new XElement("td", new XAttribute("colspan", "3"), StaticObjects.look)),
                         null)));
 
             return html;
@@ -179,12 +180,12 @@ namespace Soran1957core
 
         private static void BuildItem(XElement centralPanel, XElement rightPanel, string v)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
-        private static void BuildSearchResults(XElement centralPanel, XElement rightPanel, string searchstring, string sdirection)
+        private static void BuildSearchResults1(XElement centralPanel, XElement rightPanel, string searchstring, string sdirection)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
         /*
        private void BuildItem(XElement centralPanel, XElement rightPanel, string id)
@@ -640,10 +641,11 @@ namespace Soran1957core
            }
            return null;
        }
+*/
 
-       private void BuildSearchResults(XElement centralPanel, XElement rightPanel, string searchstring, string sdirection)
+       private static void BuildSearchResults(XElement centralPanel, XElement rightPanel, string searchstring, string sdirection)
        {
-           SGraph.LOG.StartTimer();
+           //SGraph.LOG.StartTimer();
            string ss = searchstring.ToLower();
            var cl_def = StaticModels.sDataModel.OntologyModel.GetOntologyNode(sdirection) as SGraph.ROntologyClassDefinition;
            if (cl_def == null) return;
@@ -681,7 +683,7 @@ namespace Soran1957core
 
                CompositionElement[] celements =
                    qu.Take(80).Select(nd => new CompositionElement(nd)).ToArray();
-               centralPanel.Add(CompositionElement.ListOfDocs(celements, "pageListDoc", Request["pageListDoc"], Request.Url, null));
+               //TODO: centralPanel.Add(CompositionElement.ListOfDocs(celements, "pageListDoc", Request["pageListDoc"], Request.Url, null));
            }
            else
            {
@@ -704,8 +706,7 @@ namespace Soran1957core
                    .Select(nd => new XElement("div",
                        new XElement("a", new XAttribute("href", "?id=" + nd.Id), nd.Name()))));
            }
-           SGraph.LOG.WriteLine("search time=" + SGraph.LOG.LookTimer().Milliseconds + " ms");
        }
-*/
+
     }
 }

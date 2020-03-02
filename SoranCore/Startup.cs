@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Session;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Soran1957core
+namespace SoranCore
 {
     public class Startup
     {
@@ -31,8 +32,22 @@ namespace Soran1957core
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            services.AddDistributedMemoryCache();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSession(options =>
+            {
+                // Set a short timeout for easy testing.
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                // Make the session cookie essential
+                options.Cookie.IsEssential = true;
+            });
+            //services.AddSession(options =>
+            //{
+            //    options.Cookie.Name = ".AdventureWorks.Session";
+            //    options.IdleTimeout = TimeSpan.FromSeconds(10);
+            //    options.Cookie.IsEssential = true;
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,20 +66,16 @@ namespace Soran1957core
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
             app.UseCookiePolicy();
 
-            //string tilda = HttpContext.Request.PathBase;
-            //System.Xml.Linq.XElement xconfig = System.Xml.Linq.XElement.Load(env.ContentRootPath + "/wwwroot/config.xml");
-            //OAData.OADB conf = new OAData.OADB(xconfig);
-            //StaticObjects.look = OAData.OADB.look;
-            OAData.OADB.Init(env.ContentRootPath + "/wwwroot/");
-            OAData.OADB.Load();
+            
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=P}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

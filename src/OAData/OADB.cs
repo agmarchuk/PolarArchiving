@@ -221,6 +221,32 @@ namespace OAData
         {
             return adapter.GetItemByIdBasic(id, addinverse);
         }
+
+        /// <summary>
+        /// Делает портрет айтема, годный для простого преобразования в html-страницу или ее часть.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static XElement GetBasicPortrait(string id)
+        {
+            XElement tree = GetItemByIdBasic(id, true);
+            return new XElement("record", new XAttribute(tree.Attribute("id")), new XAttribute(tree.Attribute("type")),
+                tree.Elements().Where(el => el.Name == "field" || el.Name == "direct")
+                .Select(el =>
+                {
+                    if (el.Name == "field") return new XElement(el);
+                    string prop = el.Attribute("prop").Value;
+                    string target = el.Element("record").Attribute("id").Value;
+                    XElement tr = GetItemByIdBasic(target, false);
+                    return new XElement("direct", new XAttribute("prop", prop),
+                        new XElement("record",
+                            new XAttribute(tr.Attribute("id")),
+                            new XAttribute(tr.Attribute("type")),
+                            tr.Elements()));
+                }),
+                null);
+        }
+
         public static XElement GetItemById(string id, XElement format)
         {
             return adapter.GetItemById(id, format);

@@ -1,0 +1,120 @@
+﻿@model IndexModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<table width="100%" style="table-layout:fixed;">
+    <colgroup>
+        <col width="150" />
+        <col width="100%" />
+        <col width="410" />
+    </colgroup>
+    <tr valign="top">
+        <td />
+        <td>
+            <div id="logo" style="" width="500" height="99">
+                <a href=""><img src="~/img/logo2.gif" width="391" height="61" vspace="12" alt="СО РАН с 1957 года" border="0" /></a>
+            </div>
+        </td>
+        <td>
+            <div id="login" style="">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                        <td class="text_arial_small">имя: </td>
+                        <td width="40%"><input type="text" class="form_login" /></td>
+                        <td class="text_arial_small">пароль: </td>
+                        <td width="40%"><input type="password" class="form_login" /></td>
+                        <td><input type="image" width="19" height="19" src="~/img/btn_login.gif" /></td>
+                    </tr>
+                    <tr>
+                        <td />
+                        <td colspan="4" class="text_arial_small"><a>регистрация</a> | <a>забыли пароль?</a></td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+    <tr valign="top">
+        <td rowspan="2">
+            <div id="menu" style="">
+                <a href="?id=w20070417_7_1744"><img src="~/img/i_home.gif" width="10" height="10" hspace="4" border="0" alt="Главная страница"></a>
+                <a href="mailto:pavl@iis.nsk.su?subject=soran1957.ru%20 PA_folders24-59_0003_0896"><img src="~/img/i_mail.gif" width="10" height="10" hspace="11" border="0" alt="Написать письмо"></a>
+                <br>
+                <hr noshade="1" size="1" color="#cccccc">
+                <div class="text_menu">
+                    <div class="p_menu">
+                        <a href="?id=w20070417_7_1744"><b>Начало</b></a>
+                        <hr noshade="1" size="3" color="#cccccc">
+                        <a href="?id=w20070417_3_6186"><b>СО РАН</b></a>
+                        <hr noshade="1" size="3" color="#cccccc">
+                        <a href="?id=w20070417_4_1010"><b>Первичные фотоматериалы</b></a>
+                        <hr noshade="1" size="3" color="#cccccc">
+                        <a href="?id=newspaper_cassetteId"><b>Архив газет "За науку в Сибири"</b></a>
+                        <hr noshade="1" size="3" color="#cccccc">
+                        <a href="?id=w20070417_3_4658"><b>О проекте</b></a>
+                        <hr noshade="1" size="3" color="#cccccc">
+                        <a href="?id=usefullLinks"><b>Полезные ссылки</b></a>
+                    </div>
+                </div>
+                <hr noshade="1" size="3" color="#cccccc">
+            </div>
+        </td>
+        <td>
+            <div id="search" style="">
+                <form action="">
+                    <input type="hidden" name="p" value="search">
+                    <input type="hidden" name="tp" value="@Model.TabDirection">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <tbody>
+                            <tr>
+                                <td class='search_option@(Model.TabDirection=="photo-doc"?"_s":"")'>
+                                    <a href="?sdirection=photo-doc">Фотографии</a>
+                                </td>
+                                <td class="search_option@(Model.TabDirection=="person"?"_s":"")">
+                                    <a href="?sdirection=person">Персоны</a>
+                                </td>
+                                <td class="search_option@(Model.TabDirection=="org-sys"?"_s":"")">
+                                    <a href="?sdirection=org-sys">Организации</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" height="55">
+                        <tbody>
+                            <tr>
+                                <td width="100%" class="search_form">
+                                    <input name="searchstring" type="text" class="form_search">
+                                </td>
+                                <td class="search_form">
+                                    <input type="image" width="63" height="19" src="~/img/btn_search.gif" style="margin-right:5px;">
+                                </td>
+                            </tr>
+                            <tr valign="top">
+                                <td colspan="2" class="search_form">
+                                    <input type="checkbox" id="search_all" disabled="disabled" style="border:0px solid #036;">
+                                    <label for="search_all">искать по отдельным словам</label> | <a>расширенный поиск</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </td>
+
+        <td></td>
+    </tr>
+    <tr>
+        <td valign="top">
+            @if (Model.SearchResults != null)
+            {
+                <span>Здесь должны быть результаты!</span>
+            }
+
+            Центральная панель
+
+        </td>
+        <td valign="top">@Model.TabDirection</td>
+    </tr>
+    <tr valign="top"><td colspan="3"><hr></td></tr>
+    <tr valign="top"><td></td><td colspan="2">(c) Фотоархив Сибирского отделения Российской академии наук</td></tr>
+</table>
