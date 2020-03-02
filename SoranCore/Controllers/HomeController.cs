@@ -30,7 +30,11 @@ namespace SoranCore.Controllers
             string p = HttpContext.Request.Query["p"].FirstOrDefault();
             if (p == "search")
             {
-                model.SearchResults = new XElement[] { new XElement("div", "SearchResults") };
+                model.SearchResults =  new List<object[]>()
+                {
+                    new object[3],
+                    new object[3],
+                };
             }
 
             return View(model);

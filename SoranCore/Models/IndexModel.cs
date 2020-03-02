@@ -12,7 +12,7 @@ namespace SoranCore.Models
     {
         private string sdirection = "person";
         public string TabDirection { get { return sdirection; } set { sdirection = value; } }
-        private IEnumerable<XElement> _sresults = null;
-        public IEnumerable<XElement> SearchResults { get { return _sresults; } set { _sresults = value; } }
+        private IEnumerable<object[]> _sresults = null;
+        public IEnumerable<object[]> SearchResults { get { return _sresults; } set { _sresults = value; } }
     }
 }

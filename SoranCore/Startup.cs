@@ -69,7 +69,7 @@ namespace SoranCore
             app.UseSession();
             app.UseCookiePolicy();
 
-            
+            StaticObjects.Init(env.ContentRootPath + "/wwwroot/");
 
             app.UseMvc(routes =>
             {
