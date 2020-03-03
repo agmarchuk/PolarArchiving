@@ -12,7 +12,9 @@ namespace SoranCore.Models
     {
         private string sdirection = "person";
         public string TabDirection { get { return sdirection; } set { sdirection = value; } }
+        // Поиск дает две строки: id и name
         private IEnumerable<object[]> _sresults = null;
         public IEnumerable<object[]> SearchResults { get { return _sresults; } set { _sresults = value; } }
+        // Портрет состоит из идентификатора, типа, множества полей, множества прямых ссылок, множества обратных полей.
     }
 }

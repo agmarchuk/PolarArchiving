@@ -30,11 +30,24 @@ namespace SoranCore.Controllers
             string p = HttpContext.Request.Query["p"].FirstOrDefault();
             if (p == "search")
             {
-                model.SearchResults =  new List<object[]>()
+                string searchstring = HttpContext.Request.Query["searchstring"].FirstOrDefault();
+                IEnumerable<XElement> query = OAData.OADB.SearchByName(searchstring);
+                var list = new List<object[]>();
+                foreach (XElement el in query)
                 {
-                    new object[3],
-                    new object[3],
-                };
+                    string t = el.Attribute("type").Value;
+                    string name = el.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
+                    if (t == "http://fogid.net/o/person")
+                    {
+                        list.Add(new object[] { el.Attribute("id").Value, name });
+                    }
+                }
+                model.SearchResults = list;
+            }
+            else // Построение портрета
+            {
+                string id = HttpContext.Request.Query["id"].FirstOrDefault();
+
             }
 
             return View(model);

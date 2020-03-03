@@ -3,7 +3,7 @@
   <!--<database connectionstring="trs:C:/Home/data/Databases/OADataService/" />-->
   <database connectionstring="xml:"/>
 
-  <LoadCassette>E:\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
   <!--
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypUsers</LoadCassette>
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2012_1</LoadCassette>

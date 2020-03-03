@@ -3,7 +3,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-<table width="100%" style="table-layout:fixed;">
+<table width="100%" style="table-layout:fixed;" border="1">
     <colgroup>
         <col width="150" />
         <col width="100%" />
@@ -103,14 +103,20 @@
 
         <td></td>
     </tr>
-    <tr>
-        <td valign="top">
+    <tr valign="top">
+        <td>
             @if (Model.SearchResults != null)
             {
-                <span>Здесь должны быть результаты!</span>
+                foreach (object[] ob in Model.SearchResults)
+                {
+                    <div>
+                        <a href="?id=@(ob[0])">@(ob[1])</a>
+                    </div>
+                }
             }
 
             Центральная панель
+
 
         </td>
         <td valign="top">@Model.TabDirection</td>
