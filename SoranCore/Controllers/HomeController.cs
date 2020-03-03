@@ -28,6 +28,7 @@ namespace SoranCore.Controllers
             HttpContext.Session.SetString("sdirection", sdir);
 
             string p = HttpContext.Request.Query["p"].FirstOrDefault();
+            string id = HttpContext.Request.Query["id"].FirstOrDefault();
             if (p == "search")
             {
                 string searchstring = HttpContext.Request.Query["searchstring"].FirstOrDefault();
@@ -44,9 +45,43 @@ namespace SoranCore.Controllers
                 }
                 model.SearchResults = list;
             }
-            else // Построение портрета
+            else if (id != null) // Построение портрета
             {
-                string id = HttpContext.Request.Query["id"].FirstOrDefault();
+                List<object[]> fields_list = new List<object[]>();
+                List<object[]> naming_list = new List<object[]>();
+                List<object[]> description_list = null;
+                List<object[]> doclist_list = new List<object[]>();
+                //SGraph.SNode portraitphoto = null;
+                List<object[]> firstfaces_list = new List<object[]>();
+                List<object[]> participants_list = new List<object[]>();
+                List<object[]> orgchilds_list = new List<object[]>();
+                List<object[]> titles_list = new List<object[]>();
+                List<object[]> works_list = null;
+                List<object[]> org_events_list = null;
+                List<object[]> incollection_list = null;
+                List<object[]> reflections_list = null;
+                List<object[]> authors_list = null;
+                List<object[]> archive_list = null;
+                var xtree = OAData.OADB.GetItemByIdBasic(id, true);
+                //model.Name = xtree.Elements("field").Where(f => f.Attribute("prop").Value == "http://fogid.net/o/name").FirstOrDefault()?.Value;
+                foreach (XElement el in xtree.Elements("field"))
+                {
+                    string prop = el.Attribute("prop").Value;
+                    if (prop == "http://fogid.net/o/name") model.Name = el.Value;
+                    else if (prop == "http://fogid.net/o/from-date") model.StartDate = el.Value;
+                    else if (prop == "http://fogid.net/o/to-date") model.EndDate = el.Value;
+                    else if (prop == "http://fogid.net/o/description") model.Description = el.Value;
+                }
+                foreach (XElement el in xtree.Elements("inverse"))
+                {
+                    string prop = el.Attribute("prop").Value;
+                    if (prop == "http://fogid.net/o/reflected")
+                    {
+                        string source = el.Element("record").Attribute("id").Value;
+                        XElement relation = OAData.OADB.GetItemByIdBasic(source, false);
+
+                    }
+                }
 
             }
 

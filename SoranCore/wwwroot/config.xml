@@ -4,8 +4,8 @@
   <database connectionstring="xml:"/>
 
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
-  <!--
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypUsers</LoadCassette>
+  <!--
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2012_1</LoadCassette>
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2012_mag</LoadCassette>
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\Syp_2012_Tikhonova</LoadCassette>

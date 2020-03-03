@@ -16,5 +16,11 @@ namespace SoranCore.Models
         private IEnumerable<object[]> _sresults = null;
         public IEnumerable<object[]> SearchResults { get { return _sresults; } set { _sresults = value; } }
         // Портрет состоит из идентификатора, типа, множества полей, множества прямых ссылок, множества обратных полей.
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+        public string Description { get; set; }
+
     }
 }

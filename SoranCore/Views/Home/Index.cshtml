@@ -3,7 +3,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-<table width="100%" style="table-layout:fixed;" border="1">
+<table width="100%" style="table-layout:fixed;" border="0">
     <colgroup>
         <col width="150" />
         <col width="100%" />
@@ -114,10 +114,30 @@
                     </div>
                 }
             }
+            else
+            {
+                <h2>@Model.Name</h2>
+                <div>
+                    @if (Model.StartDate != null)
+                    {
+                        <span>@Model.StartDate</span>
+                    }
+                    @if (Model.EndDate != null)
+                    {
+                        <span>-@Model.EndDate</span>
+                    }
+                </div>
+                <div>
+                    @if (Model.Description != null)
+                    {
+                        <span>@Model.Description</span>
+                    }
+                </div>
 
-            Центральная панель
+                <hr />
 
 
+            }
         </td>
         <td valign="top">@Model.TabDirection</td>
     </tr>
