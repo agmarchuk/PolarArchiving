@@ -47,42 +47,31 @@ namespace SoranCore.Controllers
             }
             else if (id != null) // Построение портрета
             {
-                List<object[]> fields_list = new List<object[]>();
-                List<object[]> naming_list = new List<object[]>();
-                List<object[]> description_list = null;
-                List<object[]> doclist_list = new List<object[]>();
-                //SGraph.SNode portraitphoto = null;
-                List<object[]> firstfaces_list = new List<object[]>();
-                List<object[]> participants_list = new List<object[]>();
-                List<object[]> orgchilds_list = new List<object[]>();
-                List<object[]> titles_list = new List<object[]>();
-                List<object[]> works_list = null;
-                List<object[]> org_events_list = null;
-                List<object[]> incollection_list = null;
-                List<object[]> reflections_list = null;
-                List<object[]> authors_list = null;
-                List<object[]> archive_list = null;
-                var xtree = OAData.OADB.GetItemByIdBasic(id, true);
-                //model.Name = xtree.Elements("field").Where(f => f.Attribute("prop").Value == "http://fogid.net/o/name").FirstOrDefault()?.Value;
-                foreach (XElement el in xtree.Elements("field"))
+                // Сначала надо выяснить тип сущности, для этого запрашиваем ее без формата
+                XElement xrec = OAData.OADB.GetItemByIdBasic(id, false);
+                model.Id = xrec.Attribute("id").Value;
+                model.Type = xrec.Attribute("type").Value;
+                // Заодно вычислим важные поля
+                foreach (XElement el in xrec.Elements("field"))
                 {
                     string prop = el.Attribute("prop").Value;
                     if (prop == "http://fogid.net/o/name") model.Name = el.Value;
                     else if (prop == "http://fogid.net/o/from-date") model.StartDate = el.Value;
                     else if (prop == "http://fogid.net/o/to-date") model.EndDate = el.Value;
                     else if (prop == "http://fogid.net/o/description") model.Description = el.Value;
+                    else if (prop == "http://fogid.net/o/uri") model.Uri = el.Value;
                 }
-                foreach (XElement el in xtree.Elements("inverse"))
+
+                // Теперь определим формат для этого типа
+                if (model.Formats.ContainsKey(model.Type))
                 {
-                    string prop = el.Attribute("prop").Value;
-                    if (prop == "http://fogid.net/o/reflected")
-                    {
-                        string source = el.Element("record").Attribute("id").Value;
-                        XElement relation = OAData.OADB.GetItemByIdBasic(source, false);
-
-                    }
+                    XElement format = model.Formats[model.Type];
+                    model.XRecord = OAData.OADB.GetItemById(id, format);
                 }
-
+                else
+                {
+                    model.XRecord = xrec;
+                }
             }
 
             return View(model);

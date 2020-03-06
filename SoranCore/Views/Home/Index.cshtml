@@ -1,6 +1,18 @@
-﻿@model IndexModel
+﻿@using System.Linq
+@using System.Xml.Linq
+@model IndexModel
 @{
     ViewData["Title"] = "Home Page";
+
+    XElement[] titles = null;
+
+    if (Model != null && Model.XRecord != null)
+    {
+        titles = Model.XRecord.Elements("inverse")
+            .Where(i => i.Attribute("prop").Value == "has-title")
+            .Select(i => i.Element("record"))
+            .ToArray();
+    }
 }
 
 <table width="100%" style="table-layout:fixed;" border="0">
@@ -105,7 +117,8 @@
     </tr>
     <tr valign="top">
         <td>
-            @if (Model.SearchResults != null)
+            @if (Model == null) { }
+            else if (Model.SearchResults != null)
             {
                 foreach (object[] ob in Model.SearchResults)
                 {
@@ -114,8 +127,10 @@
                     </div>
                 }
             }
+            else if (Model.Id == null) { }
             else
             {
+                <div>[@Model.Type]</div>
                 <h2>@Model.Name</h2>
                 <div>
                     @if (Model.StartDate != null)
@@ -136,10 +151,42 @@
 
                 <hr />
 
+                @foreach (XElement inv in Model.XRecord.Elements("inverse").Where(i => i.Attribute("prop").Value == "http://fogid.net/o/reflected"))
+                {
+                    XElement doc = inv.Element("record").Element("direct").Element("record");
+                    string iid = doc.Attribute("id").Value;
+                    string tp = doc.Attribute("type").Value;
+                    string nm = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
+                    string ur = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/uri")?.Value;
+                    string dt = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/from-date")?.Value;
+
+                    <div style="float:left;width:126px;height:150px;font-size:10px;">
+                        <table align="center">
+                            <tr><td><a href="?id=@iid"><img src="/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
+                            <tr><td align="center">@dt</td></tr>
+                        </table>
+                        
+                    </div>
+
+                }
+
 
             }
         </td>
-        <td valign="top">@Model.TabDirection</td>
+
+        <!-- =========================== Правая панель ======================== -->
+        <td valign="top">
+            @if (titles != null && titles.Count() > 0)
+            {
+                <h2>Титулы</h2>
+                <ul>
+                    @foreach (XElement tit in titles)
+                    {
+                        <li>@tit.Value</li>
+                    }
+                </ul>
+            }
+        </td>
     </tr>
     <tr valign="top"><td colspan="3"><hr></td></tr>
     <tr valign="top"><td></td><td colspan="2">(c) Фотоархив Сибирского отделения Российской академии наук</td></tr>
