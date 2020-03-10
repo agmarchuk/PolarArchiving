@@ -148,7 +148,8 @@ namespace OAData.Adapters
                         string prop = el.Name.NamespaceName + el.Name.LocalName;
                         if (resource == null)
                         {
-                            return new XElement("field", new XAttribute("prop", prop), el.Value);
+                            XAttribute xlang = el.Attribute("{http://www.w3.org/XML/1998/namespace}lang");
+                            return new XElement("field", new XAttribute("prop", prop), xlang==null?null: new XAttribute(xlang), el.Value);
                         }
                         else
                         {
@@ -387,7 +388,9 @@ namespace OAData.Adapters
                         .Select(subel =>
                         {
                             XName prop = subel.Name;
-                            return new XElement(prop, subel.Value);
+                            XAttribute lg = subel.Attribute("{http://www.w3.org/XML/1998/namespace}lang");
+                            XElement res = new XElement(prop, subel.Value, lg==null?null: new XAttribute(lg));
+                            return res;
                         }),
                     record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
                         .Select(subel =>

@@ -313,3 +313,4 @@ __pycache__/
 /src/TestDataGenerators/*.fogx
 /src/TestDataGenerators/*.fogp
 /BlazorApp1/wwwroot/config.xml
+/SoranCore/wwwroot/config.xml

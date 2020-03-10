@@ -29,6 +29,7 @@ namespace SoranCore.Controllers
 
             string p = HttpContext.Request.Query["p"].FirstOrDefault();
             string id = HttpContext.Request.Query["id"].FirstOrDefault();
+            XElement xrec = null;
             if (p == "search")
             {
                 string searchstring = HttpContext.Request.Query["searchstring"].FirstOrDefault();
@@ -45,25 +46,33 @@ namespace SoranCore.Controllers
                 }
                 model.SearchResults = list;
             }
-            else if (id != null) // Построение портрета
+            else if (id != null && (xrec = OAData.OADB.GetItemByIdBasic(id, false)) != null) // Построение портрета
             {
                 // Сначала надо выяснить тип сущности, для этого запрашиваем ее без формата
-                XElement xrec = OAData.OADB.GetItemByIdBasic(id, false);
                 model.Id = xrec.Attribute("id").Value;
                 model.Type = xrec.Attribute("type").Value;
                 // Заодно вычислим важные поля
-                foreach (XElement el in xrec.Elements("field"))
-                {
-                    string prop = el.Attribute("prop").Value;
-                    if (prop == "http://fogid.net/o/name") model.Name = el.Value;
-                    else if (prop == "http://fogid.net/o/from-date") model.StartDate = el.Value;
-                    else if (prop == "http://fogid.net/o/to-date") model.EndDate = el.Value;
-                    else if (prop == "http://fogid.net/o/description") model.Description = el.Value;
-                    else if (prop == "http://fogid.net/o/uri") model.Uri = el.Value;
-                }
+                //foreach (XElement el in xrec.Elements("field"))
+                //{
+                //    string prop = el.Attribute("prop").Value;
+                //    if (prop == "http://fogid.net/o/name") model.Name = el.Value;
+                //    else if (prop == "http://fogid.net/o/from-date") model.StartDate = el.Value;
+                //    else if (prop == "http://fogid.net/o/to-date") model.EndDate = el.Value;
+                //    else if (prop == "http://fogid.net/o/description") model.Description = el.Value;
+                //    else if (prop == "http://fogid.net/o/uri") model.Uri = el.Value;
+                //}
+                model.Name = StaticObjects.GetField(xrec, "http://fogid.net/o/name");
+                model.StartDate = StaticObjects.GetField(xrec, "http://fogid.net/o/from-date");
+                model.EndDate = StaticObjects.GetField(xrec, "http://fogid.net/o/to-date");
+                model.Description = StaticObjects.GetField(xrec, "http://fogid.net/o/description");
+                model.Uri = StaticObjects.GetField(xrec, "http://fogid.net/o/uri");
 
                 // Теперь определим формат для этого типа
-                if (model.Formats.ContainsKey(model.Type))
+                if (model.Type == "http://fogid.net/o/photo-doc")
+                {
+                    model.XRecord = OAData.OADB.GetItemById(id, model.Formats["http://fogid.net/o/document"]);
+                }
+                else if (model.Formats.ContainsKey(model.Type))
                 {
                     XElement format = model.Formats[model.Type];
                     model.XRecord = OAData.OADB.GetItemById(id, format);
