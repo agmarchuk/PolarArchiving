@@ -196,7 +196,7 @@
                 {
                     foreach (object[] ob in Model.SearchResults.OrderBy(r => (string)r[1]))
                     {
-                        <div>
+                        <div style="text-align:left;">
                             <a href="?id=@(ob[0])">@(ob[1])</a>
                         </div>
                     }

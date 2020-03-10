@@ -13,7 +13,7 @@ namespace SoranCore
         {
             path = pth;
             OAData.OADB.Init(path);
-            OAData.OADB.Load();
+            //OAData.OADB.Load();
         }
 
         public static string GetField(XElement rec, string prop)
