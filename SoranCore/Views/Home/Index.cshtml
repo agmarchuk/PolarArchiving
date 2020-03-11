@@ -227,7 +227,7 @@
                     if (Model.Uri != null)
                     {
                         <div>
-                            <img src="/Docs/GetPhoto?u=@(Model.Uri)&amp;s=medium" />
+                            <img src="~/Docs/GetPhoto?u=@(Model.Uri)&amp;s=medium" />
                         </div>
                     }
                     <div>
@@ -273,7 +273,7 @@
 
                         <div style="float:left;width:126px;height:150px;font-size:10px;">
                             <table align="center">
-                                <tr><td><a href="?id=@iid"><img src="/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
+                                <tr><td><a href="?id=@iid"><img src="~/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
                                 <tr><td align="center">@dt</td></tr>
                             </table>
                         </div>
@@ -292,7 +292,7 @@
                                 string dt = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value;
                                 <div style="float:left;width:126px;height:150px;font-size:10px;">
                                     <table align="center">
-                                        <tr><td><a href="?id=@iid"><img src="/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
+                                        <tr><td><a href="?id=@iid"><img src="~/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
                                         <tr><td align="center">@dt</td></tr>
                                     </table>
                                 </div>
@@ -308,7 +308,7 @@
                 <div>
                     @if (portraitphotouri != null)
                     {
-                        <img src="/Docs/GetPhoto?u=@portraitphotouri&amp;s=small" align="right" />
+                        <img src="~/Docs/GetPhoto?u=@portraitphotouri&amp;s=small" align="right" />
                     }
                     @if (titles != null && titles.Count() > 0)
                     {

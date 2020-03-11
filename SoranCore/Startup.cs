@@ -34,20 +34,20 @@ namespace SoranCore
 
             services.AddDistributedMemoryCache();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            // services.AddSession(options =>
+            // {
+            //     // Set a short timeout for easy testing.
+            //     options.IdleTimeout = TimeSpan.FromSeconds(10);
+            //     options.Cookie.HttpOnly = true;
+            //     // Make the session cookie essential
+            //     options.Cookie.IsEssential = true;
+            // });
             services.AddSession(options =>
             {
-                // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
-                options.Cookie.HttpOnly = true;
-                // Make the session cookie essential
-                options.Cookie.IsEssential = true;
+               options.Cookie.Name = ".AdventureWorks.Session";
+               options.IdleTimeout = TimeSpan.FromSeconds(10);
+               options.Cookie.IsEssential = true;
             });
-            //services.AddSession(options =>
-            //{
-            //    options.Cookie.Name = ".AdventureWorks.Session";
-            //    options.IdleTimeout = TimeSpan.FromSeconds(10);
-            //    options.Cookie.IsEssential = true;
-            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,7 +67,7 @@ namespace SoranCore
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSession();
-            app.UseCookiePolicy();
+            //app.UseCookiePolicy();
 
             StaticObjects.Init(env.ContentRootPath + "/wwwroot/");
 
