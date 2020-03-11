@@ -11,7 +11,7 @@ namespace TestConsole
         static void Main(string[] args)
         {
             Console.WriteLine("Start Test Console.");
-            OAData.OADB.Init(@"D:\Home\dev2020\PolarArchiving\TestConsole\");
+            OAData.OADB.Init(@"D:\Home\dev2019\PolarArchiving\TestConsole\");
 
             //XElement xrecord;
             //IEnumerable<XElement> seq = SearchMarchuk();

@@ -122,6 +122,20 @@ namespace SoranCore.Models
                                 new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
                                 null)),
                         null),
+                    new XElement("record", new XAttribute("type", "http://fogid.net/o/collection"),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/ground")),
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                                    new XElement("record",
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                                        null)))),
+                        null),
                     null);
 
                 _formats = xformats.Elements("record").ToDictionary<XElement, string, XElement>(x => x.Attribute("type").Value, x => x);

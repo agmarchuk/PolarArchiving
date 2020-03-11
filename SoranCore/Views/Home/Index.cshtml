@@ -2,6 +2,15 @@
 @using System.Xml.Linq
 @model IndexModel
 @{
+    string home_id = "w20070417_7_1744"; // "pahomepage";
+    string soran_id = "w20070417_3_6186";
+    string database_id = "w20070417_4_1010";
+    string about_id = "w20070417_3_4658";
+    string sitecollections = "w20070417_4_1027";
+    string photocollections = "w20070417_4_1012";
+    string usefullLinks_id = "usefullLinks";
+    string newspaper_id = "newspaper_cassetteId";
+
     ViewData["Title"] = "Home Page";
 
     Tuple<string, string>[] titles = null;
@@ -13,6 +22,7 @@
     XElement[] allparticipants = null;
     Tuple<string, string, string>[] naming = null;
     XElement[] indocreflected = null;
+    XElement[] incollectionmember = null;
 
 
     if (Model != null && Model.XRecord != null)
@@ -82,6 +92,11 @@
             .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-doc")
             .Select(i => i.Element("record"))
             .ToArray();
+        incollectionmember = Model.XRecord.Elements("inverse")
+            .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-collection")
+            .Select(i => i.Element("record")?.Element("direct")?.Element("record"))
+            .Where(r => r != null)
+            .ToArray();
 
     }
 }
@@ -126,12 +141,13 @@
                     <hr noshade="1" size="1" color="#cccccc">
                     <div class="text_menu">
                         <div class="p_menu">
-                            <a href="?id=svet_100616111408_18691"><b>Testing</b></a>
-                            <hr noshade="1" size="3" color="#cccccc">
-                            
                             <a href="?id=w20070417_7_1744"><b>Начало</b></a>
                             <hr noshade="1" size="3" color="#cccccc">
                             <a href="?id=w20070417_3_6186"><b>СО РАН</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=@sitecollections"><b>Коллекции сайта</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=@photocollections"><b>Фотоколлекции</b></a>
                             <hr noshade="1" size="3" color="#cccccc">
                             <a href="?id=w20070417_4_1010"><b>Первичные фотоматериалы</b></a>
                             <hr noshade="1" size="3" color="#cccccc">
@@ -204,7 +220,7 @@
                 else if (Model.Id == null) { }
                 else
                 {
-                    if (Model.Type == "http://fogid.net/o/person" || Model.Type == "http://fogid.net/o/org-sys")
+                    if (Model.Type == "http://fogid.net/o/person" || Model.Type == "http://fogid.net/o/org-sys" || Model.Type == "http://fogid.net/o/collection")
                     {
                         <h2>@Model.Name</h2>
                     }
@@ -260,11 +276,29 @@
                                 <tr><td><a href="?id=@iid"><img src="/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
                                 <tr><td align="center">@dt</td></tr>
                             </table>
-
                         </div>
 
                     }
 
+                    @if (incollectionmember != null && incollectionmember.Count() > 0)
+                    {
+                        <div>
+                            @foreach (XElement doc in incollectionmember)
+                            {
+                                string iid = doc.Attribute("id").Value;
+                                string tp = doc.Attribute("type").Value;
+                                string nm = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/name")?.Value;
+                                string ur = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/uri")?.Value;
+                                string dt = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value;
+                                <div style="float:left;width:126px;height:150px;font-size:10px;">
+                                    <table align="center">
+                                        <tr><td><a href="?id=@iid"><img src="/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
+                                        <tr><td align="center">@dt</td></tr>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    }
 
                 }
             </td>

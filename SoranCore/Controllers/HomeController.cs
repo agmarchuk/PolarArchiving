@@ -14,6 +14,15 @@ namespace SoranCore.Controllers
 {
     public class HomeController : Controller
     {
+        //static string home_id = "w20070417_7_1744"; // "pahomepage";
+        //static string soran_id = "w20070417_3_6186";
+        //static string database_id = "w20070417_4_1010";
+        //static string about_id = "w20070417_3_4658";
+        //static string sitecollection = "w20070417_4_1027";
+        //static string photocollections = "w20070417_4_1012";
+        //static string usefullLinks_id = "usefullLinks";
+        //static string newspaper_id = "newspaper_cassetteId";
+
         public IActionResult Index()
         {
             var model = new IndexModel();
@@ -29,6 +38,7 @@ namespace SoranCore.Controllers
 
             string p = HttpContext.Request.Query["p"].FirstOrDefault();
             string id = HttpContext.Request.Query["id"].FirstOrDefault();
+            if (p == null && id == null) id = "w20070417_7_1744";
             XElement xrec = null;
             if (p == "search")
             {
