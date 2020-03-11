@@ -99,7 +99,9 @@ namespace OAData.Adapters
                             .Select(subel =>
                             {
                                 int prop = store.CodeEntity(subel.Name.NamespaceName + subel.Name.LocalName);
-                                return new object[] { prop, subel.Value };
+                                var xlang = subel.Attribute("{http://www.w3.org/XML/1998/namespace}lang");
+                                string lang = xlang == null ? "" : xlang.Value;
+                                return new object[] { prop, subel.Value, lang };
                             })
                             .ToArray()
                         };
@@ -491,6 +493,7 @@ namespace OAData.Adapters
                 ((object[])tri[2]).Cast<object[]>().Select(dup =>
                 {
                     return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                        (dup[2] == ""?null: new XAttribute("{http://www.w3.org/XML/1998/namespace}lang", (string)dup[2])),
                         (string)dup[1]);
                 }),
                 ((object[])tri[1]).Cast<object[]>().Where(dup => (int)dup[0] != store.cod_rdftype).Select(dup =>
