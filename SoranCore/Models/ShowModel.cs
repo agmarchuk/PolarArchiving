@@ -19,6 +19,7 @@ namespace SoranCore.Models
         // Генерация записи по "базовому" (после OAData.OADB.GetItemByIdBasic(id, _)) запросу
         public static Record CreateRecordWithFields(XElement xrec)
         {
+            if (xrec == null) return null;
             return new Record()
             {
                 Id = xrec.Attribute("id").Value,

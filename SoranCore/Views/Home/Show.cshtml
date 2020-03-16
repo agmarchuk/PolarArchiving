@@ -47,23 +47,26 @@
     </td>
     <td>@(ddirect==null?"": OntNm(ddirect.prop))</td>
     <td>
-        string uri = 
-        <a href="?id=@ddirect.rec.Id">@('@')</a>
-        @for (int i = 0; i < ddirect.rec.fields.Length; i++)
+        @if (ddirect != null && ddirect.rec != null)
         {
-            Field f = ddirect.rec.fields[i];
-            @if (f.prop == "http://fogid.net/o/uri")
+            string uri = ddirect.rec.Id;
+            <a href="?id=@ddirect.rec.Id">@('@')</a>
+            @for (int i = 0; i < ddirect.rec.fields.Length; i++)
             {
-                <img src="~/Docs/GetPhoto?s=small&amp;u=@(f.value)" align="right" />
-            }
-            else
-            {
-                <span style="color:green;">@(OntNm(f.prop)): </span>
-                <span>"@(f.value + (string.IsNullOrEmpty(f.lang) ? "" : "@" + f.lang))"</span>
-            }
-            @if (i != r.fields.Length - 1)
-            {
-                <span>, </span>
+                Field f = ddirect.rec.fields[i];
+                @if (f.prop == "http://fogid.net/o/uri")
+                {
+                    <img src="~/Docs/GetPhoto?s=small&amp;u=@(f.value)" align="right" />
+                }
+                else
+                {
+                    <span style="color:green;">@(OntNm(f.prop)): </span>
+                    <span>"@(f.value + (string.IsNullOrEmpty(f.lang) ? "" : "@" + f.lang))"</span>
+                }
+                @if (i != r.fields.Length - 1)
+                {
+                    <span>, </span>
+                }
             }
         }
     </td>
