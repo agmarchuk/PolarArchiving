@@ -1,0 +1,74 @@
+﻿
+@model ShowModel
+@{
+    ViewData["Title"] = "Show";
+    Func<string, string> OntNm = nm => OAData.Ontology.GetOntName(nm);
+    Func<string, string> InvOntNm = nm => OAData.Ontology.GetInvOntName(nm);
+
+}
+
+<h1>Show</h1>
+
+<table border="1">
+    <tr>
+        <td colspan="3"><span style="color:red;">@OntNm(Model.Rec.Tp)</span>  @(Model.Rec.Id)</td>
+    </tr>
+    @foreach (var tri in Model.Rec.fields)
+    {
+        <tr>
+            <td>@OntNm(tri.prop)</td>
+            <td>@tri.value</td>
+            <td>@tri.lang</td>
+        </tr>
+    }
+
+    @foreach (var qq in Model.Rec.inverses)
+    {
+        <tr>
+            <td colspan="3">
+                <span style="color:red;">@(InvOntNm(qq.prop))</span>
+            </td>
+        </tr>
+        @foreach (var r in qq.recs)
+        {
+            Direct ddirect = r.directs.FirstOrDefault();
+<tr>
+    <td>
+        @for (int i = 0; i < r.fields.Length; i++)
+        {
+            Field f = r.fields[i];
+            <span style="color:green;">@(OntNm(f.prop)): </span>
+            <span>"@(f.value + (string.IsNullOrEmpty(f.lang) ? "" : "@" + f.lang))"</span>
+            @if (i != r.fields.Length - 1)
+            {
+                <span>, </span>
+            }
+        }
+    </td>
+    <td>@(ddirect==null?"": OntNm(ddirect.prop))</td>
+    <td>
+        string uri = 
+        <a href="?id=@ddirect.rec.Id">@('@')</a>
+        @for (int i = 0; i < ddirect.rec.fields.Length; i++)
+        {
+            Field f = ddirect.rec.fields[i];
+            @if (f.prop == "http://fogid.net/o/uri")
+            {
+                <img src="~/Docs/GetPhoto?s=small&amp;u=@(f.value)" align="right" />
+            }
+            else
+            {
+                <span style="color:green;">@(OntNm(f.prop)): </span>
+                <span>"@(f.value + (string.IsNullOrEmpty(f.lang) ? "" : "@" + f.lang))"</span>
+            }
+            @if (i != r.fields.Length - 1)
+            {
+                <span>, </span>
+            }
+        }
+    </td>
+</tr>
+        }
+    }
+</table>
+

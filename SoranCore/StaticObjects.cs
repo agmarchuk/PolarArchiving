@@ -12,6 +12,7 @@ namespace SoranCore
         public static void Init(string pth)
         {
             path = pth;
+            OAData.Ontology.Init(path + "ontology_iis-v12-doc_ruen.xml");
             OAData.OADB.Init(path);
             //OAData.OADB.Load();
         }

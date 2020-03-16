@@ -96,6 +96,14 @@ namespace SoranCore.Controllers
             return View(model);
         }
 
+        public IActionResult Show()
+        {
+            string id = HttpContext.Request.Query["id"].FirstOrDefault();
+            if (id == null) return Redirect("Index");
+            ShowModel model = new ShowModel(id);
+            return View(model);
+        }
+
         public IActionResult Privacy()
         {
             return View();
