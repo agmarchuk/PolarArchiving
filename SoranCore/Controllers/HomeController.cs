@@ -101,6 +101,7 @@ namespace SoranCore.Controllers
             string id = HttpContext.Request.Query["id"].FirstOrDefault();
             if (id == null) return Redirect("Index");
             ShowModel model = new ShowModel(id);
+            if (model.Rec == null) return Redirect("~/Home/Index");
             return View(model);
         }
 

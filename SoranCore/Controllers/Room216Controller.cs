@@ -13,7 +13,7 @@ namespace SoranCore.Controllers
             OAData.OADB.Close();
             OAData.OADB.Init();
             OAData.OADB.Load();
-            return Redirect("/Home/Index");
+            return Redirect("~/Home/Index");
         }
     }
 }
