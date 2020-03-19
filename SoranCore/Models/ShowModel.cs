@@ -19,6 +19,7 @@ namespace SoranCore.Models
         // Генерация записи по "базовому" (после OAData.OADB.GetItemByIdBasic(id, _)) запросу
         public static Record CreateRecordWithFields(XElement xrec)
         {
+            if (xrec == null) return null;
             return new Record()
             {
                 Id = xrec.Attribute("id").Value,
@@ -33,6 +34,7 @@ namespace SoranCore.Models
         // xrec должен содержать прямые ссылки
         public static Record CreateRecordWithDirects(XElement xrec, string forbidden)
         {
+            if (xrec == null) return null;
             Record rec = CreateRecordWithFields(xrec);
             rec.directs = xrec.Elements("direct")
                 .Where (d => d.Attribute("prop").Value != forbidden)
@@ -50,17 +52,22 @@ namespace SoranCore.Models
         // xrec должен содержать обратные ссылки
         public static Record CreateRecordWithInverse(XElement xrec)
         {
+            if (xrec == null) return null;
             Record rec = Record.CreateRecordWithDirects(xrec, null);
-            var inversegroups = xrec.Elements("inverse")
+            var q1 = xrec.Elements("inverse")
                 .Select(i => new Tuple<string, XElement>(i.Attribute("prop").Value, i.Element("record")))
+                .ToArray();
+            var q2 = q1
                 .GroupBy(tup => tup.Item1, tup => tup.Item2)
+                .ToArray();
+            var q3 = q2
                 .Select(g => new Inverse()
                 {
                     prop = g.Key,
                     recs = g.Select(e => Record.CreateRecordWithDirects(OAData.OADB.GetItemByIdBasic(e.Attribute("id").Value, true), g.Key)).ToArray()
                 })
                 .ToArray();
-            rec.inverses = inversegroups;
+            rec.inverses = q3; //inversegroups;
             return rec;
         }
     }
