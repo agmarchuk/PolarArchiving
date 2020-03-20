@@ -46,6 +46,7 @@ namespace SoranCore.Controllers
         [HttpGet("docs/GetPdf")]
         public IActionResult GetPdf(string u)
         {
+            if (u == null) u = "iiss://test_pdf@iis.nsk.su/0001/0001/0001";
             var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
@@ -56,8 +57,8 @@ namespace SoranCore.Controllers
             string path = finfo.FullName;
             //int lastpoint = path.LastIndexOf('.');
             //string uniquename = u.Split(':', '/', '@').Aggregate((acc, s) => acc + s) + ".pdf";
-            return PhysicalFile(path, "application/octet-stream");
-            //return File(System.IO.File.Open(path, FileMode.Open, FileAccess.Read), "application/pdf", uniquename);
+            //return PhysicalFile(path, "application/octet-stream");
+            return File(System.IO.File.Open(path, FileMode.Open, FileAccess.Read), "application/pdf");
         }
     }
 }
