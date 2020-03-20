@@ -26,6 +26,8 @@
             string url = System.Web.HttpUtility.UrlEncode(uri); //"~/0002.pdf";
             @*<embed src="~/Docs/GetPdf?u=@(url)" width="400" height="400" />*@
             <iframe src="~/Docs/GetPdf?u=@(uri)" width="960" height="400"></iframe>
+            <iframe src="/Docs/GetPdf?u=@(uri)" width="960" height="400"></iframe>
+            <iframe src="Docs/GetPdf?u=@(uri)" width="960" height="400"></iframe>
         }
         <div>@documenttype</div>
     }

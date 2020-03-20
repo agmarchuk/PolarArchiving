@@ -56,7 +56,8 @@ namespace SoranCore.Controllers
             string path = finfo.FullName;
             //int lastpoint = path.LastIndexOf('.');
             //string uniquename = u.Split(':', '/', '@').Aggregate((acc, s) => acc + s) + ".pdf";
-            return PhysicalFile(path, "application/octet-stream");
+            //return PhysicalFile(path, "application/octet-stream");
+            return PhysicalFile(path, "application/pdf");
             //return File(System.IO.File.Open(path, FileMode.Open, FileAccess.Read), "application/pdf", uniquename);
         }
     }
