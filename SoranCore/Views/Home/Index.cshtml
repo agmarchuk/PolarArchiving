@@ -229,8 +229,23 @@
                     }
                     if (Model.Uri != null)
                     {
+                        string documenttype = null;
+                        if (Model.Docmetainfo != null)
+                        {
+                            documenttype = Model.Docmetainfo.Split(';')
+                                .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
+                        }
                         <div>
-                            <img src="~/Docs/GetPhoto?u=@(Model.Uri)&amp;s=medium" />
+                            @if (documenttype == "application/pdf")
+                            {
+                                string url = System.Web.HttpUtility.UrlEncode(Model.Uri); //"~/0002.pdf";
+                                string src = Url.Content("~/Docs/GetPdf?u=" + url); 
+                                <embed src="@src" width="800" height="400" />
+                            }
+                            else
+                            {
+                                <img src="~/Docs/GetPhoto?u=@(Model.Uri)&amp;s=medium" />
+                            }
                         </div>
                     }
                     <div>

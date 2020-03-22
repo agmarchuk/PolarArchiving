@@ -13,6 +13,7 @@ namespace SoranCore.Controllers
         public IActionResult GetPhoto(string u, string s)
         {
             if (u == null) return NotFound();
+            u = System.Web.HttpUtility.UrlDecode(u);
             var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
@@ -28,7 +29,8 @@ namespace SoranCore.Controllers
         [HttpGet("docs/GetVideo")]
         public IActionResult GetVideo(string u)
         {
-            //Console.WriteLine("GetVideo?u=" + u);
+            if (u == null) return NotFound();
+            u = System.Web.HttpUtility.UrlDecode(u);
             var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
@@ -46,6 +48,8 @@ namespace SoranCore.Controllers
         [HttpGet("docs/GetPdf")]
         public IActionResult GetPdf(string u)
         {
+            if (u == null) return NotFound();
+            u = System.Web.HttpUtility.UrlDecode(u);
             var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();
             string last10 = u.Substring(u.Length - 10);
@@ -56,7 +60,8 @@ namespace SoranCore.Controllers
             string path = finfo.FullName;
             //int lastpoint = path.LastIndexOf('.');
             //string uniquename = u.Split(':', '/', '@').Aggregate((acc, s) => acc + s) + ".pdf";
-            return PhysicalFile(path, "application/octet-stream");
+            //return PhysicalFile(path, "application/octet-stream");
+            return PhysicalFile(path, "application/pdf");
             //return File(System.IO.File.Open(path, FileMode.Open, FileAccess.Read), "application/pdf", uniquename);
         }
     }

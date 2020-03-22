@@ -76,6 +76,7 @@ namespace SoranCore.Controllers
                 model.EndDate = StaticObjects.GetField(xrec, "http://fogid.net/o/to-date");
                 model.Description = StaticObjects.GetField(xrec, "http://fogid.net/o/description");
                 model.Uri = StaticObjects.GetField(xrec, "http://fogid.net/o/uri");
+                model.Docmetainfo = StaticObjects.GetField(xrec, "http://fogid.net/o/docmetainfo");
 
                 // Теперь определим формат для этого типа
                 if (model.Type == "http://fogid.net/o/photo-doc")

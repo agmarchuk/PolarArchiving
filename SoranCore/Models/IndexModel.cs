@@ -23,6 +23,7 @@ namespace SoranCore.Models
         public string EndDate { get; set; }
         public string Description { get; set; }
         public string Uri { get; set; }
+        public string Docmetainfo { get; set; }
 
         // Главное поле
         public XElement XRecord { get; set; }
@@ -49,6 +50,7 @@ namespace SoranCore.Models
                                     new XElement("record",
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/docmetainfo")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
                                         null)))),
@@ -86,6 +88,7 @@ namespace SoranCore.Models
                                     new XElement("record",
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/docmetainfo")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
                                         null)))),
@@ -110,6 +113,7 @@ namespace SoranCore.Models
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/docmetainfo")),
                         new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-doc"),
                             new XElement("record",
                                 new XElement("field", new XAttribute("prop", "http://fogid.net/o/ground")),
@@ -134,6 +138,7 @@ namespace SoranCore.Models
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/docmetainfo")),
                                         null)))),
                         null),
                     null);
