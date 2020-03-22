@@ -20,7 +20,7 @@ namespace SoranCore.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return PhysicalFile(@"D:\Home\FactographProjects\test_pdf\originals\0001\0001.pdf", "application/pdf");
+            return PhysicalFile(@"C:\WinApps\FactographProjects\test_pdf\originals\0001\0001.pdf", "application/pdf");
         }
 
         // GET api/values/5

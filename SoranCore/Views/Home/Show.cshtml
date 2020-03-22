@@ -21,15 +21,18 @@
     {
         documenttype = docmetainfo.Split(';')
             .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
-        if (documenttype == "application/pdf")
+        if (documenttype.StartsWith("image/"))
         {
-            string url = System.Web.HttpUtility.UrlEncode(uri); //"~/0002.pdf";
-            @*<embed src="~/Docs/GetPdf?u=@(url)" width="400" height="400" />*@
-            @*<iframe src="~/Docs/GetPdf?u=@(uri)" width="960" height="400"></iframe>*@
-            @*<iframe src="~/Docs/GetPdf" width="960" height="400"></iframe>*@
-            <embed src="~/api/values" width="700" height="400" />
-            <iframe src="/Docs/GetPdf?u=@(uri)" width="960" height="400"></iframe>
-            <iframe src="Docs/GetPdf?u=@(uri)" width="960" height="400"></iframe>
+            string url = System.Web.HttpUtility.UrlEncode(uri);
+            string src = Url.Content("~/Docs/GetPhoto?u=" + url + "&s=normal"); 
+            <img src="@src" />
+        }
+        else if (documenttype == "application/pdf")
+        {
+            string url = System.Web.HttpUtility.UrlEncode(uri);
+            string src = Url.Content("~/Docs/GetPdf?u=" + url); 
+            <embed src="@src" width="960" height="400" />
+            @* <iframe src="@src" width="960" height="400"></iframe> *@
         }
         <div>@documenttype</div>
     }
