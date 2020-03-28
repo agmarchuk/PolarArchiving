@@ -21,11 +21,15 @@
     {
         documenttype = docmetainfo.Split(';')
             .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
-        if (documenttype.StartsWith("image/"))
+        string url = System.Web.HttpUtility.UrlEncode(uri);
+        @if (documenttype == "application/pdf")
         {
-            string url = System.Web.HttpUtility.UrlEncode(uri); //"~/0002.pdf";
-            @*<embed src="~/Docs/GetPdf?u=@(url)" width="400" height="400" />*@
-            <iframe src="~/Docs/GetPdf?u=@(uri)" width="960" height="400"></iframe>
+            string src = Url.Content("~/Docs/GetPdf?u=" + url); 
+            <embed src="@src" width="800" height="400" />
+        }
+        else if (documenttype.StartsWith("image/"))
+        {
+            <img src="~/Docs/GetPhoto?u=@(url)&amp;s=medium" />
         }
         <div>@documenttype</div>
     }
@@ -70,13 +74,33 @@
                 <td>
                     @if (ddirect != null && ddirect.rec != null)
                     {
+                        string u = ddirect.rec.fields
+                            .FirstOrDefault(f => f.prop == "http://fogid.net/o/uri")
+                            ?.value;
+                        string dmi = ddirect.rec.fields
+                            .FirstOrDefault(f => f.prop == "http://fogid.net/o/docmetainfo")
+                            ?.value;
+                        if (u != null)
+                        {
+                            string doctype = dmi?.Split(';')
+                                .FirstOrDefault(met => met.StartsWith("documenttype:"))
+                                ?.Substring(13);
+                            if (doctype.StartsWith("image/"))
+                            {
+                                <img src="~/Docs/GetPhoto?s=small&amp;u=@(u)" align="right" />
+                            }
+                            //else if (doctype == "application.pdf") {  }
+                            else
+                            {
+                                <img src="~/img/document.jpg" align="right" />
+                            }
+                        }
                         <a href="?id=@ddirect.rec.Id">@('@')</a>
                         @for (int i = 0; i < ddirect.rec.fields.Length; i++)
                         {
                             Field f = ddirect.rec.fields[i];
-                            @if (f.prop == "http://fogid.net/o/uri")
+                            @if (f.prop == "http://fogid.net/o/uri" || f.prop == "http://fogid.net/o/docmetainfo")
                             {
-                                <img src="~/Docs/GetPhoto?s=small&amp;u=@(f.value)" align="right" />
                             }
                             else
                             {
