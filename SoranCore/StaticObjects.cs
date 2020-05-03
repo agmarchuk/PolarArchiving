@@ -14,6 +14,8 @@ namespace SoranCore
             path = pth;
             OAData.Ontology.Init(path + "ontology_iis-v12-doc_ruen.xml");
             OAData.OADB.Init(path);
+            var xel = OAData.OADB.GetItemByIdBasic("newspaper_28156_1997_1", false);
+            Console.WriteLine(xel.ToString());
             //OAData.OADB.Load();
         }
 

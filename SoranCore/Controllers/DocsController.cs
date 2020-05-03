@@ -49,6 +49,12 @@ namespace SoranCore.Controllers
         public IActionResult GetPdf(string u)
         {
             if (u == null) return NotFound();
+
+            if (true)
+            {
+                // http://www.sbras.info/system/files/archive/archive1961-2009/1961_01.pdf
+                return Redirect("http://www.sbras.info/system/files/archive/archive1961-2009/1961_01.pdf");
+            }
             u = System.Web.HttpUtility.UrlDecode(u);
             var cass_dir = OAData.OADB.CassDirPath(u);
             if (cass_dir == null) return NotFound();

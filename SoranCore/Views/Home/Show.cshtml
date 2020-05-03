@@ -21,15 +21,18 @@
     {
         documenttype = docmetainfo.Split(';')
             .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
-        string url = System.Web.HttpUtility.UrlEncode(uri);
+        string url = docmetainfo.Split(';')
+            .FirstOrDefault(part => part.StartsWith("url:"))?.Substring(4);
+        string uri_coded = System.Web.HttpUtility.UrlEncode(uri);
         @if (documenttype == "application/pdf")
         {
-            string src = Url.Content("~/Docs/GetPdf?u=" + url); 
-            <embed src="@src" width="800" height="400" />
+            string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
+            <embed src="@src" width="1024" height="800" />
         }
         else if (documenttype.StartsWith("image/"))
         {
-            <img src="~/Docs/GetPhoto?u=@(url)&amp;s=medium" />
+            string src = url == null ? Url.Content("~/Docs/GetPhoto?u=" + uri_coded + "&amp;s=medium") : url;
+            <img src="@src" />
         }
         <div>@documenttype</div>
     }

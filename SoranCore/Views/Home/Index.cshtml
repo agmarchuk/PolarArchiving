@@ -142,7 +142,7 @@
                     <div class="text_menu">
                         <div class="p_menu">
                             @*http://localhost:49213/Home/Show?id=test_pdf_0001_0001*@
-                            <a href="~/Home/Show?id=test_pdf_0001_0001"><b>Тест QQQQQQQQQQQQ</b></a>
+                            <a href="http://localhost:49215/Home/Show?id=newspaper_19345_1975_11"><b>Тест QQQQQQQQQQQQ</b></a>
                             <hr noshade="1" size="3" color="#cccccc">
                             <a href="?id=w20070417_7_1744"><b>Начало</b></a>
                             <hr noshade="1" size="3" color="#cccccc">
@@ -230,22 +230,35 @@
                     if (Model.Uri != null)
                     {
                         string documenttype = null;
+                        string url = null;
+                        string uri_coded = null;
                         if (Model.Docmetainfo != null)
                         {
                             documenttype = Model.Docmetainfo.Split(';')
                                 .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
+                            url = Model.Docmetainfo.Split(';')
+                                .FirstOrDefault(part => part.StartsWith("url:"))?.Substring(4);
+                            uri_coded = System.Web.HttpUtility.UrlEncode(Model.Uri);
                         }
+                        @if (documenttype == "scanned/dz")
+                        {
+                            string[] parts = Model.Id.Split('_');
+                            string src = "http://www.sbras.info/system/files/archive/archive1961-2009/" +
+                                parts[parts.Length - 2] + "_" + parts[parts.Length - 1] + ".pdf";
+                            <a href="@src"><img src="~/img/document.jpg" /></a>
+                        }
+                        else if (documenttype == "application/pdf")
+                        {
+                            string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
+                            <embed src="@src" width="1024" height="800" />
+                        }
+                        else if (documenttype.StartsWith("image/"))
+                        {
+                            string src = url == null ? Url.Content("~/Docs/GetPhoto?u=" + uri_coded + "&amp;s=medium") : url;
+                            <img src="@src" />
+                        }
+
                         <div>
-                            @if (documenttype == "application/pdf")
-                            {
-                                string url = System.Web.HttpUtility.UrlEncode(Model.Uri); //"~/0002.pdf";
-                                string src = Url.Content("~/Docs/GetPdf?u=" + url); 
-                                <embed src="@src" width="600" height="400" />
-                            }
-                            else
-                            {
-                                <img src="~/Docs/GetPhoto?u=@(Model.Uri)&amp;s=medium" />
-                            }
                         </div>
                     }
                     <div>
@@ -289,9 +302,32 @@
                         string ur = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/uri")?.Value;
                         string dt = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value;
 
+                        string docmetainfo = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/docmetainfo")?.Value;
+                        string documenttype = null;
+                        if (docmetainfo != null)
+                        {
+                            documenttype = docmetainfo.Split(';').FirstOrDefault(pair => pair.StartsWith("documenttype:"))
+                                ?.Substring("documenttype:".Length);
+                        }
+
                         <div style="float:left;width:126px;height:150px;font-size:10px;">
                             <table align="center">
-                                <tr><td><a href="?id=@iid"><img src="~/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
+                                <tr>
+                                    <td>
+                                        @if (documenttype == "scanned/dz")
+                                        {
+                                            string[] parts = iid.Split('_');
+                                            string src = "http://www.sbras.info/system/files/archive/archive1961-2009/" +
+                                                parts[parts.Length - 2] + "_" + parts[parts.Length - 1] + ".pdf";
+                                            <a href="@src"><img src="~/img/document.jpg" /></a>
+
+                                        }
+                                        else
+                                        {
+                                            <a href="?id=@iid"><img src="~/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a>
+                                        }
+                                    </td>
+                                </tr>
                                 <tr><td align="center">@dt</td></tr>
                             </table>
                         </div>

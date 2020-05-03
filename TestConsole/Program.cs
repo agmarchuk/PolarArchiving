@@ -6,9 +6,13 @@ using OAData;
 
 namespace TestConsole
 {
-    class Program
+    partial class Program
     {
         static void Main(string[] args)
+        {
+            Main4(args);
+        }
+        static void Main1(string[] args)
         {
             Console.WriteLine("Start Test Console.");
             OAData.OADB.Init(@"D:\Home\dev2019\PolarArchiving\TestConsole\");
