@@ -3,6 +3,11 @@
   <!--<database connectionstring="trs:C:/Home/data/Databases/OADataService/" />-->
   <database connectionstring="xml:"/>
 
+<<<<<<< HEAD
+=======
+  <LoadCassette>D:\Home\FactographProjects\newspaper</LoadCassette>
+  <!--
+>>>>>>> 4fdd3015b3d205e86ea1c49b71c504a3e625ef95
   <LoadCassette>D:\FactographProjects\PA_newspapers\newspaper</LoadCassette>
 
   <LoadCassette>D:\FactographProjects\PA_cassettes\PA_database201012</LoadCassette>
@@ -21,6 +26,9 @@
   <LoadCassette>D:\FactographProjects\PA_cassettes\SBRAS_2009_12</LoadCassette>
   <LoadCassette>D:\FactographProjects\PA_cassettes\w100531</LoadCassette>
   <LoadCassette>D:\FactographProjects\PA_cassettes\wwww</LoadCassette>
+<<<<<<< HEAD
 <!--
+=======
+>>>>>>> 4fdd3015b3d205e86ea1c49b71c504a3e625ef95
 -->  
 </config>
