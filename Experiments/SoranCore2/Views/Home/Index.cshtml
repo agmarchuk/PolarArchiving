@@ -1,0 +1,481 @@
+﻿@using System.Linq
+@using System.Xml.Linq
+@model IndexModel
+@{
+    //string home_id = "w20070417_7_1744"; // "pahomepage";
+    //string soran_id = "w20070417_3_6186";
+    //string database_id = "w20070417_4_1010";
+    //string about_id = "w20070417_3_4658";
+    string sitecollections = "w20070417_4_1027";
+    string photocollections = "w20070417_4_1012";
+    //string usefullLinks_id = "usefullLinks";
+    //string newspaper_id = "newspaper_cassetteId";
+
+    ViewData["Title"] = "Home Page";
+
+    Tuple<string, string>[] titles = null;
+    string portraitphotouri = null;
+    XElement[] reflected_reflections = null;
+    XElement[] work = null;
+    XElement[] parties = null;
+    XElement[] firstfaces = null;
+    XElement[] allparticipants = null;
+    Tuple<string, string, string>[] naming = null;
+    XElement[] indocreflected = null;
+    XElement[] incollectionmember = null;
+
+
+    if (Model != null && Model.XRecord != null)
+    {
+        reflected_reflections = Model.XRecord.Elements("inverse")
+           .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/reflected")
+           .Select(i => i.Element("record"))
+           .ToArray();
+
+
+        portraitphotouri = reflected_reflections
+            .Where(re => re.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/ground")?.Value == "portrait")
+            .Select(re => re.Element("direct")?.Element("record"))
+            .Where(r => r?.Attribute("type").Value == "http://fogid.net/o/photo-doc")
+            .FirstOrDefault()
+            ?.Elements("field")
+            .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/uri")?.Value;
+
+        titles = Model.XRecord.Elements("inverse")
+            .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/has-title")
+            .Select(i => i.Element("record"))
+            .Select<XElement, Tuple<string, string>>(r => Tuple.Create<string, string>(
+                r.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/degree")?.Value,
+                r.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value
+                ))
+            .OrderBy(t => t.Item2)
+            .ToArray();
+
+        XElement[] participant_participation = Model.XRecord.Elements("inverse")
+           .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/participant")
+           .Select(i => i.Element("record"))
+           .ToArray();
+        work = participant_participation
+           .Where(r => r.Element("direct")?.Element("record")?.Elements("field")
+                .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/org-classification")?.Value == "organization")
+           .ToArray();
+        parties = participant_participation
+           .Where(r => r.Element("direct")?.Element("record")?.Elements("field")
+                .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/org-classification")?.Value != "organization")
+           .ToArray();
+
+
+        naming = Model.XRecord.Elements("inverse")
+            .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/referred-sys")
+            .Select(i => i.Element("record"))
+            .Select<XElement, Tuple<string, string, string>>(r => Tuple.Create<string, string, string>(
+                r.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/alias")?.Value,
+                r.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value,
+                r.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/to-date")?.Value
+                ))
+            .OrderBy(t => t.Item2)
+            .ToArray();
+        var inorg_participation = Model.XRecord.Elements("inverse")
+           .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-org")
+           .Select(i => i.Element("record"))
+           .ToArray();
+        firstfaces = inorg_participation
+            .Where(r => StaticObjects.GetField(r, "http://fogid.net/o/role-classification") == "director")
+            .ToArray();
+        allparticipants = inorg_participation
+            .Where(r => StaticObjects.GetField(r, "http://fogid.net/o/role-classification") != "director")
+            .ToArray();
+        inorg_participation = Model.XRecord.Elements("inverse")
+            .Select(i => i.Element("record"))
+            .ToArray();
+        indocreflected = Model.XRecord.Elements("inverse")
+            .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-doc")
+            .Select(i => i.Element("record"))
+            .ToArray();
+        incollectionmember = Model.XRecord.Elements("inverse")
+            .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-collection")
+            .Select(i => i.Element("record")?.Element("direct")?.Element("record"))
+            .Where(r => r != null)
+            .ToArray();
+
+    }
+}
+
+    <table width="100%" style="table-layout:fixed;" border="0">
+        <colgroup>
+            <col width="150" />
+            <col width="100%" />
+            <col width="410" />
+        </colgroup>
+        <tr valign="top">
+            <td />
+            <td>
+                <div id="logo" style="" width="500" height="99">
+                    <a href=""><img src="~/img/logo2.gif" width="391" height="61" vspace="12" alt="СО РАН с 1957 года" border="0" /></a>
+                </div>
+            </td>
+            <td>
+                <div id="login" style="">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                        <tr>
+                            <td class="text_arial_small">имя: </td>
+                            <td width="40%"><input type="text" class="form_login" /></td>
+                            <td class="text_arial_small">пароль: </td>
+                            <td width="40%"><input type="password" class="form_login" /></td>
+                            <td><input type="image" width="19" height="19" src="~/img/btn_login.gif" /></td>
+                        </tr>
+                        <tr>
+                            <td />
+                            <td colspan="4" class="text_arial_small"><a>регистрация</a> | <a>забыли пароль?</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td rowspan="2">
+                <div id="menu" style="">
+                    <a href="?id=w20070417_7_1744"><img src="~/img/i_home.gif" width="10" height="10" hspace="4" border="0" alt="Главная страница"></a>
+                    <a href="mailto:pavl@iis.nsk.su?subject=soran1957.ru%20 PA_folders24-59_0003_0896"><img src="~/img/i_mail.gif" width="10" height="10" hspace="11" border="0" alt="Написать письмо"></a>
+                    <br>
+                    <hr noshade="1" size="1" color="#cccccc">
+                    <div class="text_menu">
+                        <div class="p_menu">
+                            @*http://localhost:49213/Home/Show?id=test_pdf_0001_0001*@
+                            <a href="http://localhost:49215/Home/Show?id=newspaper_19345_1975_11"><b>Тест QQQQQQQQQQQQ</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=w20070417_7_1744"><b>Начало</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=w20070417_3_6186"><b>СО РАН</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=@sitecollections"><b>Коллекции сайта</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=@photocollections"><b>Фотоколлекции</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=w20070417_4_1010"><b>Первичные фотоматериалы</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=newspaper_cassetteId"><b>Архив газет "За науку в Сибири"</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=w20070417_3_4658"><b>О проекте</b></a>
+                            <hr noshade="1" size="3" color="#cccccc">
+                            <a href="?id=usefullLinks"><b>Полезные ссылки</b></a>
+                        </div>
+                    </div>
+                    <hr noshade="1" size="3" color="#cccccc">
+                </div>
+            </td>
+            <td>
+                <div id="search" style="">
+                    <form action="">
+                        <input type="hidden" name="p" value="search">
+                        <input type="hidden" name="tp" value="@Model.TabDirection">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tbody>
+                                <tr>
+                                    <td class='search_option@(Model.TabDirection=="photo-doc"?"_s":"")'>
+                                        <a href="?sdirection=photo-doc">Фотографии</a>
+                                    </td>
+                                    <td class="search_option@(Model.TabDirection=="person"?"_s":"")">
+                                        <a href="?sdirection=person">Персоны</a>
+                                    </td>
+                                    <td class="search_option@(Model.TabDirection=="org-sys"?"_s":"")">
+                                        <a href="?sdirection=org-sys">Организации</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" height="55">
+                            <tbody>
+                                <tr>
+                                    <td width="100%" class="search_form">
+                                        <input name="searchstring" type="text" class="form_search">
+                                    </td>
+                                    <td class="search_form">
+                                        <input type="image" width="63" height="19" src="~/img/btn_search.gif" style="margin-right:5px;">
+                                    </td>
+                                </tr>
+                                <tr valign="top">
+                                    <td colspan="2" class="search_form">
+                                        <input type="checkbox" id="search_all" disabled="disabled" style="border:0px solid #036;">
+                                        <label for="search_all">искать по отдельным словам</label> | <a>расширенный поиск</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </td>
+
+            <td></td>
+        </tr>
+        <tr valign="top">
+            <td align="center">
+                @if (Model == null) { }
+                else if (Model.SearchResults != null)
+                {
+                    foreach (object[] ob in Model.SearchResults.OrderBy(r => (string)r[1]))
+                    {
+                        <div style="text-align:left;">
+                            <a href="?id=@(ob[0])">@(ob[1])</a>
+                        </div>
+                    }
+                }
+                else if (Model.Id == null) { }
+                else
+                {
+                    if (Model.Type == "http://fogid.net/o/person" || Model.Type == "http://fogid.net/o/org-sys" || Model.Type == "http://fogid.net/o/collection")
+                    {
+                        <h2>@Model.Name</h2>
+                    }
+                    if (Model.Uri != null)
+                    {
+                        string documenttype = null;
+                        string url = null;
+                        string uri_coded = null;
+                        if (Model.Docmetainfo != null)
+                        {
+                            documenttype = Model.Docmetainfo.Split(';')
+                                .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
+                            url = Model.Docmetainfo.Split(';')
+                                .FirstOrDefault(part => part.StartsWith("url:"))?.Substring(4);
+                            uri_coded = System.Web.HttpUtility.UrlEncode(Model.Uri);
+                        }
+                        @if (documenttype == "scanned/dz")
+                        {
+                            string[] parts = Model.Id.Split('_');
+                            string src = "http://www.sbras.info/system/files/archive/archive1961-2009/" +
+                                parts[parts.Length - 2] + "_" + parts[parts.Length - 1] + ".pdf";
+                            <a href="@src"><img src="~/img/document.jpg" /></a>
+                        }
+                        else if (documenttype == "application/pdf")
+                        {
+                            string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
+                            <embed src="@src" width="1024" height="800" />
+                        }
+                        else if (documenttype.StartsWith("image/"))
+                        {
+                            string src = url == null ? Url.Content("~/Docs/GetPhoto?u=" + uri_coded + "&amp;s=medium") : url;
+                            <img src="@src" />
+                        }
+
+                        <div>
+                        </div>
+                    }
+                    <div>
+                        @if (Model.StartDate != null)
+                        {
+                            <span>@Model.StartDate</span>
+                        }
+                        @if (Model.EndDate != null)
+                        {
+                            <span>-@Model.EndDate</span>
+                        }
+                    </div>
+
+                    @if (Model.Description != null)
+                    {
+                        <div>@Model.Description</div>
+                    }
+                    @if (naming != null && naming.Count() > 0)
+                    {
+                        <br />
+                        <div>[Другие имена или названия]</div>
+                        @foreach (var tri in naming)
+                        {
+                            string dt = tri.Item2 == null ? "" : tri.Item2;
+                            if (tri.Item3 != null) { dt += "-" + tri.Item3; }
+                            <div>
+                                <span>@dt</span> <span>@tri.Item1</span>
+                            </div>
+                        }
+                    }
+
+                    <hr />
+
+                    @foreach (XElement rec in reflected_reflections)
+                    {
+                        XElement doc = rec?.Element("direct")?.Element("record");
+                        if (doc == null) { continue; }
+                        string iid = doc.Attribute("id").Value;
+                        string tp = doc.Attribute("type").Value;
+                        string nm = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/name")?.Value;
+                        string ur = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/uri")?.Value;
+                        string dt = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value;
+
+                        string docmetainfo = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/docmetainfo")?.Value;
+                        string documenttype = null;
+                        if (docmetainfo != null)
+                        {
+                            documenttype = docmetainfo.Split(';').FirstOrDefault(pair => pair.StartsWith("documenttype:"))
+                                ?.Substring("documenttype:".Length);
+                        }
+
+                        <div style="float:left;width:126px;height:150px;font-size:10px;">
+                            <table align="center">
+                                <tr>
+                                    <td>
+                                        @if (documenttype == "scanned/dz")
+                                        {
+                                            string[] parts = iid.Split('_');
+                                            string src = "http://www.sbras.info/system/files/archive/archive1961-2009/" +
+                                                parts[parts.Length - 2] + "_" + parts[parts.Length - 1] + ".pdf";
+                                            <a href="@src"><img src="~/img/document.jpg" /></a>
+
+                                        }
+                                        else
+                                        {
+                                            <a href="?id=@iid"><img src="~/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr><td align="center">@dt</td></tr>
+                            </table>
+                        </div>
+
+                    }
+
+                    @if (incollectionmember != null && incollectionmember.Count() > 0)
+                    {
+                        <div>
+                            @foreach (XElement doc in incollectionmember)
+                            {
+                                string iid = doc.Attribute("id").Value;
+                                string tp = doc.Attribute("type").Value;
+                                string nm = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/name")?.Value;
+                                string ur = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/uri")?.Value;
+                                string dt = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value;
+                                <div style="float:left;width:126px;height:150px;font-size:10px;">
+                                    <table align="center">
+                                        <tr><td><a href="?id=@iid"><img src="~/Docs/GetPhoto?u=@ur&amp;s=small" alt="@nm" /></a></td></tr>
+                                        <tr><td align="center">@dt</td></tr>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                }
+            </td>
+
+            <!-- =========================== Правая панель ======================== -->
+            <td valign="top">
+                <div>
+                    @if (portraitphotouri != null)
+                    {
+                        <img src="~/Docs/GetPhoto?u=@portraitphotouri&amp;s=small" align="right" />
+                    }
+                    @if (titles != null && titles.Count() > 0)
+                    {
+                        <h2>Титулы</h2>
+                        <ul>
+                            @foreach (var tit in titles)
+                            {
+                                <li>@(tit.Item2) @(tit.Item1)</li>
+                            }
+                        </ul>
+                    }
+                    @if (work != null && work.Count() > 0)
+                    {
+                        <h2>Работа</h2>
+                        <ul>
+                            @foreach (XElement part in work)
+                            {
+                                var role = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/role")?.Value;
+                                var dates = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/from-date")?.Value;
+                                var org = part.Element("direct")
+                                                ?.Element("record");
+                                string org_id = org == null ? null : org.Attribute("id").Value;
+                                string org_nm = org == null ? null : org.Elements("field")
+                                    .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
+                                <li>
+                                    <span>@dates</span>
+                                    <span>@role</span>
+                                    <a href="?id=@org_id">@org_nm</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    @if (parties != null && parties.Count() > 0)
+                    {
+                        <h2>Участие</h2>
+                        <ul>
+                            @foreach (XElement part in parties)
+                            {
+                                var role = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/role")?.Value;
+                                var dates = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/from-date")?.Value;
+                                var org = part.Element("direct")
+                                                ?.Element("record");
+                                string org_id = org == null ? null : org.Attribute("id").Value;
+                                string org_nm = org == null ? null : org.Elements("field")
+                                    .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
+                                <li>
+                                    <span>@dates</span>
+                                    <span>@role</span>
+                                    <a href="?id=@org_id">@org_nm</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    @if (firstfaces != null && firstfaces.Count() > 0)
+                    {
+                        <h2>Первые лица</h2>
+                        <ul>
+                            @foreach (XElement part in firstfaces.OrderBy(ff => StaticObjects.GetField(ff, "http://fogid.net/o/from-date")))
+                            {
+                                var role = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/role")?.Value;
+                                var dates = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/from-date")?.Value;
+                                var org = part.Element("direct")
+                                                ?.Element("record");
+                                string org_id = org == null ? null : org.Attribute("id").Value;
+                                string org_nm = org == null ? null : org.Elements("field")
+                                    .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
+                                <li>
+                                    <span>@dates</span>
+                                    <span>@role</span>
+                                    <a href="?id=@org_id">@org_nm</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    @if (allparticipants != null && allparticipants.Count() > 0)
+                    {
+                        var allparticipantssorted = allparticipants
+                            .OrderBy(ff => StaticObjects.GetField(ff.Element("direct")?.Element("record"), "http://fogid.net/o/name"))
+                            .ToArray();
+                        <h2>Сотрудники/участники</h2>
+                        <ul>
+                            @foreach (XElement part in allparticipantssorted)
+                            {
+                                var role = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/role")?.Value;
+                                var dates = part.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/from-date")?.Value;
+                                var org = part.Element("direct")
+                                                ?.Element("record");
+                                string org_id = org == null ? null : org.Attribute("id").Value;
+                                string org_nm = org == null ? null : org.Elements("field")
+                                    .FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
+                                <li>
+                                    <span>@dates</span>
+                                    <span>@role</span>
+                                    <a href="?id=@org_id">@org_nm</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    @if (indocreflected != null && indocreflected.Count() > 0)
+                    {
+                        <h2>Отражены</h2>
+                        @foreach (XElement personage in indocreflected.Select(r => r.Element("direct")?.Element("record")).Where(r1 => r1 != null))
+                        {
+                            <div>
+                                <a href='?id=@(personage.Attribute("id").Value)'>
+                                    @(StaticObjects.GetField(personage, "http://fogid.net/o/name"))
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+            </td>
+        </tr>
+        <tr valign="top"><td colspan="3"><hr></td></tr>
+        <tr valign="top"><td></td><td colspan="2">(c) Фотоархив Сибирского отделения Российской академии наук</td></tr>
+    </table>

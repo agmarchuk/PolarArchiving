@@ -13,15 +13,15 @@ namespace TestConsole
         {
             Console.WriteLine("Start Correct position");
             string pathin = @"D:\Home\FactographProjects\PA_Users\originals\0001\";
-            string pathout = @"D:\Home\FactographProjects\PA\PA_Users\originals\0001\";
+            //string pathout = @"D:\Home\FactographProjects\PA\PA_Users\originals\0001\";
             string[] fnames = Enumerable.Range(1, 11).Select(i => (i < 10 ? "000" : "00") + i + ".fog")
                 .ToArray();
-            NumberStyles styles = NumberStyles.Float | NumberStyles.Any;
+            //NumberStyles styles = NumberStyles.Float | NumberStyles.Any;
             IFormatProvider provider = CultureInfo.InvariantCulture;
 
             foreach (string fname in fnames)
             {
-                bool corrected = false;
+                //bool corrected = false;
                 XElement xin = XElement.Load(pathin + fname);
                 //XElement xout = XElement.Parse(@"<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' dbid='newspaper_current' uri='iiss://newspaper@iis.nsk.su/meta' />");
                 var xout = new XElement(xin.Name, xin.Attributes());
@@ -46,7 +46,7 @@ namespace TestConsole
                     xout.Add(clone);
                 }
 
-                xout.Save(pathout + fname);
+                //xout.Save(pathout + fname);
             }
         }
     }
