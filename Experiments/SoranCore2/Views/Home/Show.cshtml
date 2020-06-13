@@ -24,10 +24,11 @@
         string url = docmetainfo.Split(';')
             .FirstOrDefault(part => part.StartsWith("url:"))?.Substring(4);
         string uri_coded = System.Web.HttpUtility.UrlEncode(uri);
-        @if (documenttype == "application/pdf")
+        @if (documenttype == "application/pdf" || documenttype == "scanned/dz")
         {
             string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
-            <embed src="@src" width="1024" height="800" />
+            <a href="@src">Посмотреть</a>
+            <!--embed src="@src" width="1024" height="800" /-->
         }
         else if (documenttype.StartsWith("image/"))
         {

@@ -15,7 +15,7 @@ namespace SoranCore
             OAData.Ontology.Init(path + "ontology_iis-v12-doc_ruen.xml");
             OAData.OADB.Init(path);
             var xel = OAData.OADB.GetItemByIdBasic("newspaper_28156_1997_1", false);
-            Console.WriteLine(xel.ToString());
+            if (xel != null) Console.WriteLine(xel.ToString());
             //OAData.OADB.Load();
         }
 
@@ -32,6 +32,23 @@ namespace SoranCore
                 if (xlang?.Value == "ru") { break; }
             }
             return res;
+        }
+        private static string[] months = new[] { "янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек" };
+        public static string DatePrinted(string date)
+        {
+            if (date == null) return null;
+            string[] split = date.Split('-');
+            string str = split[0];
+            if (split.Length > 1)
+            {
+                int month;
+                if (Int32.TryParse(split[1], out month) && month > 0 && month <= 12)
+                {
+                    str += months[month - 1];
+                    if (split.Length > 2) str += split[2].Substring(0,2);
+                }
+            }
+            return str;
         }
     }
 
