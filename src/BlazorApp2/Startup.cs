@@ -51,7 +51,7 @@ namespace BlazorApp2
 
             app.UseRouting();
 
-            OAData.OADB.Init(env.ContentRootPath);
+            OAData.OADB.Init(env.ContentRootPath + "/wwwroot/");
 
             app.UseEndpoints(endpoints =>
             {
