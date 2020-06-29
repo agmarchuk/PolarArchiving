@@ -1,0 +1,73 @@
+﻿@page "/portrait"
+@page "/portrait/{Id}"
+@using System.Xml.Linq
+
+<h3>Portrait @Id</h3>
+
+<input @bind="searchstring" />
+<button class="btn btn-primary" @onclick="Search">Click me</button>
+<div>
+    @if (yresults != null)
+    {
+        foreach (var y in yresults)
+        {
+            <div>
+                @y[0] 
+                <a href="Portrait/@y[1]">@y[2]</a>
+            </div>
+        }
+    }
+</div>
+
+@if (Id != null)
+{
+    <div>
+        @xportrait.Attribute("type").Value
+    </div>
+    <table border=1>
+        @foreach (var xelement in xportrait.Elements("field"))
+        {
+            <tr>
+                <td>
+                    @xelement.Attribute("prop").Value
+                </td>
+                <td>
+                    @xelement.Value
+                </td>
+            </tr>
+        }
+    </table>
+    <div>@xportrait.ToString()</div>
+}
+
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private string searchstring = null;
+    private string[][] yresults = null;
+    private XElement xportrait = null;
+
+    protected override void OnParametersSet()
+    {
+        searchstring = "";
+        yresults = null;
+        if (Id != null) // Построим портрет
+        {
+            xportrait = BlazorApp3.Data.DService.GetItemByIdBasic(Id, true);
+        }
+    }
+
+    private void Search()
+    {
+        yresults = BlazorApp3.Data.DService.Search(searchstring).ToArray();
+        Id = null;
+    }
+    private void Goto(string idd)
+    {
+        yresults = null;
+    }
+
+}

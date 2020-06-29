@@ -1,0 +1,39 @@
+﻿@page "/viewer"
+@using System.Xml.Linq
+
+<h3>Viewer Id=@Id </h3>
+
+<input @bind="searchstring" />
+<button class="btn btn-primary" @onclick="Search">Click me</button>
+<div>
+    @if (yresults != null)
+    {
+        foreach (var y in yresults)
+        {
+            <div>@y[0] <a href="Viewer?Id=@y[1]">@y[2]</a></div>
+        }
+    }
+
+    @if (toview)
+    {
+        <div>QWERTY @Id</div>
+    }
+</div>
+@code {
+    [Parameter]
+    public string Id { get; set; } = null;
+
+    private string searchstring = null;
+    private string[][] yresults;
+    private void Search()
+    {
+        yresults = BlazorApp3.Data.DService.Search(searchstring).ToArray();
+    }
+
+    private bool toview = false;
+    private void View()
+    {
+        toview = true;
+    }
+
+}
