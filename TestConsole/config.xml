@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
-  <database connectionstring="trs:D:/Home/data/Databases/TestConsole/" />
+  <database connectionstring="xml:"/>
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
+
+  <!--<database connectionstring="trs:D:/Home/data/Databases/TestConsole/" />
 
   <LoadCassette>E:\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
   
@@ -31,15 +34,5 @@
   <LoadCassette>E:\FactographProjects\syp_cassettes\Syp2017video</LoadCassette>
   <LoadCassette>E:\FactographProjects\syp_cassettes\Syp2018</LoadCassette>
   <LoadCassette>E:\FactographProjects\syp_cassettes\Syp2018Users</LoadCassette>
-  <LoadCassette>E:\FactographProjects\syp_cassettes\Syp2018video</LoadCassette>
-  <!--
-
-
-  <LoadCassette>E:\FactographProjects\syp_cassettes\Syp2019</LoadCassette>
-  <LoadCassette>E:\FactographProjects\syp_cassettes\Syp2019photos</LoadCassette>
-
-Мой id=syp2001-p-marchuk_a
-  http://localhost:51056/db/SearchByName?ss=марчук
-  http://localhost:51056/db/GetItemByIdBasic?id=syp2001-p-marchuk_a&addinverse=true
-  -->
+  <LoadCassette>E:\FactographProjects\syp_cassettes\Syp2018video</LoadCassette>-->
 </config>

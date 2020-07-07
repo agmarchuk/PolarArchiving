@@ -10,12 +10,12 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            Main4(args);
+            Main1(args);
         }
         static void Main1(string[] args)
         {
             Console.WriteLine("Start Test Console.");
-            OAData.OADB.Init(@"D:\Home\dev2019\PolarArchiving\TestConsole\");
+            OAData.OADB.Init(@"D:\Home\dev2020\PolarArchiving\TestConsole\");
 
             //XElement xrecord;
             //IEnumerable<XElement> seq = SearchMarchuk();
@@ -31,11 +31,11 @@ namespace TestConsole
             //SearchMarchuk();
             //Console.WriteLine("--------");
 
-            OADB.Reload();
+            //OADB.Reload();
 
-            GetMarchuk();
-            SearchMarchuk();
-            Console.WriteLine("--------");
+            //GetMarchuk();
+            //SearchMarchuk();
+            //Console.WriteLine("--------");
         }
 
         private static void GetMarchuk()
