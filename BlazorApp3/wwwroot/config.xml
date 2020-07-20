@@ -2,6 +2,6 @@
 <config>
   <database connectionstring="xml:"/>
 
-  <LoadCassette write="yes">D:\Home\dev2019\PolarArchiving\old\Resources\Cassette_test20180311</LoadCassette>
+  <LoadCassette write="yes">D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
 
 </config>

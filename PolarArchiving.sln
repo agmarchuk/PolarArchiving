@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Soran1957core", "previous\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoranCore2", "Experiments\SoranCore2\SoranCore2.csproj", "{FE97C7A7-3693-47B4-8F8F-7A0F1231A539}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp3", "BlazorApp3\BlazorApp3.csproj", "{1B98DBC9-D7D6-4BBB-9A83-207BFEEB870F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp3", "BlazorApp3\BlazorApp3.csproj", "{1B98DBC9-D7D6-4BBB-9A83-207BFEEB870F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSoran", "BlazorSoran\BlazorSoran.csproj", "{222B902C-168D-42A3-BCDF-E4F75C9272EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{1B98DBC9-D7D6-4BBB-9A83-207BFEEB870F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B98DBC9-D7D6-4BBB-9A83-207BFEEB870F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B98DBC9-D7D6-4BBB-9A83-207BFEEB870F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{222B902C-168D-42A3-BCDF-E4F75C9272EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{222B902C-168D-42A3-BCDF-E4F75C9272EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{222B902C-168D-42A3-BCDF-E4F75C9272EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{222B902C-168D-42A3-BCDF-E4F75C9272EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

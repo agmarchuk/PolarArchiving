@@ -33,6 +33,7 @@ namespace Blazor3.Models
             if (fname != null) record.fields_directs = new Pair[1] { fname };
             return record;
         }
+/*
         public static Record GetRecord(string id, string forbidden)
         {
             XElement xrec = OAData.OADB.GetItemByIdBasic(id, true);
@@ -106,6 +107,7 @@ namespace Blazor3.Models
             rec.inverses = q3; //inversegroups;
             return rec;
         }
+*/
     }
     public class ShowModel
     {
@@ -115,7 +117,7 @@ namespace Blazor3.Models
         {
             XElement xtree = OAData.OADB.GetItemByIdBasic(id, true);
             if (xtree == null) return;
-            Rec = Record.CreateRecordWithInverse(xtree);
+            //Rec = Record.CreateRecordWithInverse(xtree);
         }
     }
 }
