@@ -276,70 +276,70 @@ namespace OAData.Adapters
             }
             return null;
         }
-        //public override XElement Delete(string id)
-        //{
-        //    XElement record = RemoveRecord(id);
-        //    if (record == null) return null;
-        //    records.Remove(id);
-        //    return record;
-        //}
+        public override XElement Delete(string id)
+        {
+            XElement record = RemoveRecord(id);
+            if (record == null) return null;
+            records.Remove(id);
+            return record;
+        }
 
-        //public override XElement Add(XElement record)
-        //{
-        //    // Работаем по "чужим спискам
-        //    XElement xel = new XElement(record);
-        //    foreach (XElement el in xel.Elements())
-        //    {
-        //        XAttribute resource = el.Attribute(ONames.rdfresource);
-        //        if (resource == null) continue;
-        //        // находим список
-        //        string id2 = resource.Value;
-        //        DbNode node2;
-        //        if (records.TryGetValue(id2, out node2))
-        //        {
-        //            // добавляем в список
-        //            node2.inverse.Add(el);
-        //        }
-        //    }
+        private XElement Add(XElement record)
+        {
+            // Работаем по "чужим спискам
+            XElement xel = new XElement(record);
+            foreach (XElement el in xel.Elements())
+            {
+                XAttribute resource = el.Attribute(ONames.rdfresource);
+                if (resource == null) continue;
+                // находим список
+                string id2 = resource.Value;
+                DbNode node2;
+                if (records.TryGetValue(id2, out node2))
+                {
+                    // добавляем в список
+                    node2.inverse.Add(el);
+                }
+            }
 
-        //    // Прикрепляем (зачем-то) запись к базе данных
-        //    db.Add(xel);
-        //    // Добавляем к словарю
-        //    string id = record.Attribute(ONames.rdfabout).Value;
+            // Прикрепляем (зачем-то) запись к базе данных
+            db.Add(xel);
+            // Добавляем к словарю
+            string id = record.Attribute(ONames.rdfabout).Value;
 
-        //    DbNode node;
-        //    if (records.TryGetValue(id, out node))
-        //    { // Если узел есть, то прикрепляем к полю узла
-        //        node.xel = xel;
-        //    }
-        //    else
-        //    { // Если узла нет, то создаем
-        //        records.Add(id, new DbNode() { id = id, xel = xel, inverse = new List<XElement>() });
-        //    }
-        //    return xel;
-        //}
+            DbNode node;
+            if (records.TryGetValue(id, out node))
+            { // Если узел есть, то прикрепляем к полю узла
+                node.xel = xel;
+            }
+            else
+            { // Если узла нет, то создаем
+                records.Add(id, new DbNode() { id = id, xel = xel, inverse = new List<XElement>() });
+            }
+            return xel;
+        }
 
-        //public override XElement AddUpdate(XElement record)
-        //{
-        //    string id = record.Attribute(ONames.rdfabout).Value;
-        //    DbNode node;
-        //    if (records.TryGetValue(id, out node))
-        //    {
-        //        // Будем перебирать элементы "старого" значения и, если таких нет, добавлять в новое
-        //        foreach (XElement old_el in node.xel.Elements())
-        //        {
-        //            XAttribute l_att = old_el.Attribute("{http://www.w3.org/XML/1998/namespace}lang");
-        //            if (record.Elements().Any(el => el.Name == old_el.Name &&
-        //                (l_att == null ? true :
-        //                    (el.Attribute("{http://www.w3.org/XML/1998/namespace}lang") != null &&
-        //                        l_att.Value == el.Attribute("{http://www.w3.org/XML/1998/namespace}lang").Value)))) continue;
-        //            record.Add(old_el);
-        //        }
-        //        RemoveRecord(id);
-        //    }
-        //    Add(record);
-        //    return record;
-        //}
+        private XElement AddUpdate(XElement record)
+        {
+            string id = record.Attribute(ONames.rdfabout).Value;
+            DbNode node;
+            if (records.TryGetValue(id, out node))
+            {
+                // Будем перебирать элементы "старого" значения и, если таких нет, добавлять в новое
+                foreach (XElement old_el in node.xel.Elements())
+                {
+                    XAttribute l_att = old_el.Attribute("{http://www.w3.org/XML/1998/namespace}lang");
+                    if (record.Elements().Any(el => el.Name == old_el.Name &&
+                        (l_att == null ? true :
+                            (el.Attribute("{http://www.w3.org/XML/1998/namespace}lang") != null &&
+                                l_att.Value == el.Attribute("{http://www.w3.org/XML/1998/namespace}lang").Value)))) continue;
+                    record.Add(old_el);
+                }
+                RemoveRecord(id);
+            }
+            Add(record);
+            return record;
+        }
 
         public override void Close()
         {
@@ -353,7 +353,15 @@ namespace OAData.Adapters
 
         public override XElement PutItem(XElement record)
         {
-            throw new NotImplementedException();
+            if (record.Name.LocalName == "delete")
+            {
+                Delete(record.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about").Value);
+                return null;
+            }
+            else
+            {
+                return AddUpdate(record);
+            }
         }
 
         public override void LoadXFlow(IEnumerable<XElement> xflow, Dictionary<string, string> orig_ids)

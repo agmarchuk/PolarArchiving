@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorSoran", "BlazorSoran\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorMvc", "BlazorMvc\BlazorMvc.csproj", "{643A1902-1602-4EC5-9550-BC963D156422}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OADataConsole", "OADataConsole\OADataConsole.csproj", "{084A3143-FA91-4B12-BAD2-704A63D22939}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,10 @@ Global
 		{643A1902-1602-4EC5-9550-BC963D156422}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{643A1902-1602-4EC5-9550-BC963D156422}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{643A1902-1602-4EC5-9550-BC963D156422}.Release|Any CPU.Build.0 = Release|Any CPU
+		{084A3143-FA91-4B12-BAD2-704A63D22939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084A3143-FA91-4B12-BAD2-704A63D22939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084A3143-FA91-4B12-BAD2-704A63D22939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084A3143-FA91-4B12-BAD2-704A63D22939}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

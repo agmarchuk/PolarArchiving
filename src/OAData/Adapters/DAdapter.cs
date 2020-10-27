@@ -231,7 +231,7 @@ namespace OAData.Adapters
 
 
         // ============== Редактирование базы данных ============= Возвращают итоговый (или исходный для Delete) вариант записи
-        // public abstract XElement Delete(string id);
+        public abstract XElement Delete(string id);
         // // Полная (для Add) или неполная (для AddUpdate) записи. Идентификатор обязателен.
         // public abstract XElement Add(XElement record);
         // public abstract XElement AddUpdate(XElement record);
