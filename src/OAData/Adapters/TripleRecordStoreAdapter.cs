@@ -651,6 +651,10 @@ namespace OAData.Adapters
             store.PutRecord(CodeRecord(record));
             return record;
         }
+        public override XElement Delete(string id)
+        {
+            throw new NotImplementedException();
+        }
 
     }
 }
