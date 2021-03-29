@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<config>
-  <database connectionstring="xml:"/>
-
-  <LoadCassette write="yes">D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
-
-</config>
