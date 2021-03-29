@@ -24,6 +24,13 @@
     XElement[] indocreflected = null;
     XElement[] incollectionmember = null;
 
+    Func<string, string> ImgSrc = (string tp) => tp == "http://fogid.net/o/document" ? "~/img/document_s.jpg" :
+        (tp == "http://fogid.net/o/photo-doc" ? "~/Docs/GetPhoto?s=small&u=" :
+        (tp == "http://fogid.net/o/video" ? "~/img/video_s.jpg" :
+        (tp == "http://fogid.net/o/audio" ? "~/img/audio_s.jpg" :
+        (tp == "http://fogid.net/o/org-sys" ? "~/img/org_s.jpg" :
+        (tp == "http://fogid.net/o/collection" ? "~/img/collection_s.jpg" : "~/img/document_s.jpg")))));
+
 
     if (Model != null && Model.XRecord != null)
     {
@@ -313,18 +320,21 @@
                             documenttype = docmetainfo.Split(';').FirstOrDefault(pair => pair.StartsWith("documenttype:"))
                                 ?.Substring("documenttype:".Length);
                         }
-                        string s = tp == "http://fogid.net/o/document" ? "~/img/document_m.jpg" :
-                            (tp == "http://fogid.net/o/photo-doc" ? "~/Docs/GetPhoto?u=" + ur + "&s=small" :
-                            (tp == "http://fogid.net/o/video" ? "~/img/video_m.jpg" :
-                            (tp == "http://fogid.net/o/audio" ? "~/img/audio_m.jpg" :
-                            (tp == "http://fogid.net/o/collection" ? "~/img/collection_m.jpg" : "~/img/document_m.jpg"))));
+                        string s = ImgSrc(tp);
+                        if (tp == "http://fogid.net/o/photo-doc") { s = s + ur; }
                         string src = Url.Content(s);
 
                         <div style="float:left;width:126px;height:150px;font-size:10px;">
                             <table align="center">
                                 <tr>
                                     <td>
-                                        <a href="?id=@iid"><img src="@src" alt="@nm" /></a>
+                                        <a href="?id=@iid">
+                                            <img src="@src" align="left" />
+                                            @if (tp != "http://fogid.net/o/photo-doc")
+                                            {
+                                                <span>@nm</span>
+                                            }
+                                        </a>
                                     </td>
                                 </tr>
                                 <tr><td align="center">@dt</td></tr>
@@ -343,18 +353,21 @@
                                 string nm = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/name")?.Value;
                                 string ur = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/uri")?.Value;
                                 string dt = doc.Elements("field").FirstOrDefault(f => f.Attribute("prop")?.Value == "http://fogid.net/o/from-date")?.Value;
-                                string s = tp == "http://fogid.net/o/document" ? "~/img/document_m.jpg" :
-                                    (tp == "http://fogid.net/o/photo-doc" ? "~/Docs/GetPhoto?u=" + ur + "&s=small" :
-                                    (tp == "http://fogid.net/o/video" ? "~/img/video_m.jpg" :
-                                    (tp == "http://fogid.net/o/audio" ? "~/img/audio_m.jpg" :
-                                    (tp == "http://fogid.net/o/collection" ? "~/img/collection_m.jpg" : "~/img/document_m.jpg"))));
+                                string s = ImgSrc(tp);
+                                if (tp == "http://fogid.net/o/photo-doc") { s = s + ur; }
                                 string src = Url.Content(s);
                                 <div style="float:left;width:126px;height:150px;font-size:10px;">
                                     <table align="center">
                                         <tr><td>
-                                            <a href="?id=@iid"><img src="@src" alt="@nm" /></a>
+                                            <a href="?id=@iid">
+                                                <img src="@src" align="left" />
+                                                @if (tp != "http://fogid.net/o/photo-doc")
+                                                {
+                                                    <span>@nm</span>
+                                                }
+                                            </a>
                                         </td></tr>
-                                        <tr><td align="center">@nm @dt</td></tr>
+                                        <tr><td align="center">@dt</td></tr>
                                     </table>
                                 </div>
                             }
