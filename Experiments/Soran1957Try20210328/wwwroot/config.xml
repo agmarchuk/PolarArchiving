@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+  <database dbname="photoarchive" connectionstring="xml:" />
+
+  <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
+
+  <LoadCassette>D:\Home\FactographProjects\newspaper</LoadCassette>
+
+  <LoadCassette>D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
+
+</config>

@@ -39,6 +39,8 @@ namespace Soran1957Try20210328
             app.UseStaticFiles();
             app.UseSession();
 
+            DataSource.Connect("./wwwroot/");
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/", async context =>
@@ -55,7 +57,7 @@ namespace Soran1957Try20210328
                     
                     var construct = new Construct(pars, session);
                     var html = construct.ConstructPage();
-                    await context.Response.WriteAsync(html.ToString());
+                    await context.Response.WriteAsync("<!DOCTYPE html>\n" + html.ToString());
                 });
             });
         }
