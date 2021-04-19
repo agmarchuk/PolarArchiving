@@ -18,6 +18,8 @@ namespace SoranCore.Controllers
             var model = new IndexModel();
 
             string sdir = HttpContext.Request.Query["sdirection"].FirstOrDefault();
+            
+            // Поработаем с сессией
             if (sdir == null)
             {
                 sdir = HttpContext.Session.GetString("sdirection");
@@ -28,6 +30,9 @@ namespace SoranCore.Controllers
 
             string p = HttpContext.Request.Query["p"].FirstOrDefault();
             string id = HttpContext.Request.Query["id"].FirstOrDefault();
+            string pg_str = HttpContext.Request.Query["pg"].FirstOrDefault();
+            if (pg_str != null) model.Pg = Int32.Parse(pg_str);
+
             if (p == null && id == null) id = "w20070417_7_1744";
             XElement xrec = null;
             if (p == "search")
@@ -72,15 +77,62 @@ namespace SoranCore.Controllers
                 if (model.Type == "http://fogid.net/o/photo-doc")
                 {
                     model.XRecord = OAData.OADB.GetItemById(id, model.Formats["http://fogid.net/o/document"]);
+                    model.BuildPortrait();
+
                 }
                 else if (model.Formats.ContainsKey(model.Type))
                 {
                     XElement format = model.Formats[model.Type];
                     model.XRecord = OAData.OADB.GetItemById(id, format);
+                    model.BuildPortrait();
                 }
                 else
                 {
                     model.XRecord = xrec;
+                }
+                //// Работаем с сессией: если docidarr null, то читаем из сессии, иначе ПИШЕМ в сессию
+                //string sess_name = "docidarr";
+                //if (model.docidarr == null)
+                //{
+                //    //model.docidarr = HttpContext.Session.GetString("docidarr").Split('\t');
+                //    string st = HttpContext.Session.GetString(sess_name);
+                //    model.look = "get "+sess_name+" [" + st + "]";
+                //}
+                //else
+                //{
+                //    string st = model.docidarr.Aggregate((acc, s) => acc + "\t" + s);
+                //    HttpContext.Session.SetString(sess_name, st);
+                //    model.look = "set " + sess_name + " [" + st + "]";
+                //}
+
+                // Вычисление docidarr. Это имеет смысл, когда задано значение ir или ic, тогда мы сделаем выборку, дойдя до документов и превратив выборку в массив.
+                string ir = HttpContext.Request.Query["ir"].FirstOrDefault();
+                string ic = HttpContext.Request.Query["ic"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(ir))
+                {
+                    model.ir = ir;
+                    XElement doctree = OAData.OADB.GetItemById(ir, new XElement("record",
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                            new XElement("record",
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-doc"),
+                                    new XElement("record"))))));
+                    model.docidarr = doctree.Elements("inverse")
+                        .Select(inv => inv.Element("record")?.Element("direct")?.Element("record")?.Attribute("id")?.Value)
+                        .Where(d => d != null)
+                        .ToArray();
+                }
+                else if (!string.IsNullOrEmpty(ic))
+                {
+                    model.ic = ic;
+                    XElement doctree = OAData.OADB.GetItemById(ic, new XElement("record",
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
+                            new XElement("record",
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
+                                    new XElement("record"))))));
+                    model.docidarr = doctree.Elements("inverse")
+                        .Select(inv => inv.Element("record")?.Element("direct")?.Element("record")?.Attribute("id")?.Value)
+                        .Where(d => d != null)
+                        .ToArray();
                 }
             }
 
@@ -90,9 +142,8 @@ namespace SoranCore.Controllers
         public IActionResult Show()
         {
             string id = HttpContext.Request.Query["id"].FirstOrDefault();
-            if (id == null) return Redirect("Index");
-            ShowModel model = new ShowModel(id);
-            if (model.Rec == null) return Redirect("~/Home/Index");
+            string ss = HttpContext.Request.Query["ss"].FirstOrDefault();
+            ShowModel model = new ShowModel(id, ss);
             return View(model);
         }
 

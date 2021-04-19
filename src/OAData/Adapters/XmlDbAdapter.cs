@@ -190,6 +190,8 @@ namespace OAData.Adapters
                         return xel.Elements()
                             .Where(el => el.Name.NamespaceName + el.Name.LocalName == prop)
                             .Select(el => new XElement("field", new XAttribute("prop", prop),
+                                el.Attribute("{http://www.w3.org/XML/1998/namespace}lang") == null ? null : 
+                                    new XAttribute(el.Attribute("{http://www.w3.org/XML/1998/namespace}lang")),
                                 el.Value));
                     }
                     else if (fel.Name == "direct")

@@ -74,12 +74,22 @@ namespace SoranCore.Models
     public class ShowModel
     {
         public Record Rec { get; private set; }
+        public IEnumerable<XElement> Vari { get; private set; }
 
-        public ShowModel(string id)
+        public ShowModel(string id, string ss)
         {
-            XElement xtree = OAData.OADB.GetItemByIdBasic(id, true);
-            if (xtree == null) return;
-            Rec = Record.CreateRecordWithInverse(xtree);
+            if (!string.IsNullOrEmpty(id))
+            {
+                XElement xtree = OAData.OADB.GetItemByIdBasic(id, true);
+                if (xtree != null) Rec = Record.CreateRecordWithInverse(xtree);
+            }
+            else Rec = null;
+
+            if (!string.IsNullOrEmpty(ss))
+            {
+                Vari = OAData.OADB.SearchByName(ss);
+            }
+            else Vari = null;
         }
     }
 }
