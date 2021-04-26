@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>db9272bb-acd8-4296-8e29-a3d717518273</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OAData\OAData.csproj" />

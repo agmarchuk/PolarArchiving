@@ -1,6 +1,6 @@
 using System;
 
-namespace SoranCore.Models
+namespace SoranCore2.Models
 {
     public class ErrorViewModel
     {

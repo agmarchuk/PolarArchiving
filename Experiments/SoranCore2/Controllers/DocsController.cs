@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SoranCore.Controllers
+namespace SoranCore2.Controllers
 {
     public class DocsController : Controller
     {

@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 
 
-namespace SoranCore.Models
+namespace SoranCore2.Models
 {
     public class IndexModel
     {

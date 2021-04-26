@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SoranCore.Models
+namespace SoranCore2.Models
 {
     public class Field { public string prop, value, lang; }
     public class Direct { public string prop; public Record rec; }

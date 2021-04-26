@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SoranCore
+namespace SoranCore2
 {
     public class StaticObjects
     {

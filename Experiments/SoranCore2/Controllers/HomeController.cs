@@ -7,9 +7,9 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SoranCore.Models;
+using SoranCore2.Models;
 
-namespace SoranCore.Controllers
+namespace SoranCore2.Controllers
 {
     public class HomeController : Controller
     {
