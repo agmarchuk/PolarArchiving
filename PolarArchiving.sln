@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TurgundaCommon", "previous\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CassettesCore", "previous\CassettesCore\CassettesCore.csproj", "{2CACEDB9-FD35-461C-ADB7-F2B6314BA2F9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSeminskiy", "Experiments\OpenSeminskiy\OpenSeminskiy.csproj", "{A9F37A12-85EF-4CB8-93E2-99662E3C8E84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{2CACEDB9-FD35-461C-ADB7-F2B6314BA2F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CACEDB9-FD35-461C-ADB7-F2B6314BA2F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CACEDB9-FD35-461C-ADB7-F2B6314BA2F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9F37A12-85EF-4CB8-93E2-99662E3C8E84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9F37A12-85EF-4CB8-93E2-99662E3C8E84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9F37A12-85EF-4CB8-93E2-99662E3C8E84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9F37A12-85EF-4CB8-93E2-99662E3C8E84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
