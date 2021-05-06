@@ -1,8 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
 
-  <database connectionstring="xml:"/>
+  <database dbname="syp" connectionstring="xml:" />
 
-  <LoadCassette>C:\Home\FactographProjects\SypCassete</LoadCassette>
+  <LoadCassette>E:\FactographProjects\da1</LoadCassette>
+  <LoadCassette>E:\FactographProjects\da2</LoadCassette>
+  <LoadCassette>E:\FactographProjects\da3</LoadCassette>
+  <LoadCassette>E:\FactographProjects\gi_pharchive</LoadCassette>
+  <LoadCassette>E:\FactographProjects\kbrd2010</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_database201012</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_folder_collections</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_folders01-20</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_folders24-59</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_folders60-99</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_folders100-111</LoadCassette>
+  <LoadCassette>E:\FactographProjects\RAS_57</LoadCassette>
+  <LoadCassette>E:\FactographProjects\SBRAS_2009_12</LoadCassette>
+  <LoadCassette>E:\FactographProjects\w100531</LoadCassette>
+  <LoadCassette>E:\FactographProjects\PA_Users</LoadCassette>
 
+  <!--
+  <LoadCassette write="yes">E:\home\FactographProjects\PA_cassettes-1\T_Users</LoadCassette>
+  <LoadCassette>E:\home\FactographProjects\PA_cassettes-1\PA_naukaVVV</LoadCassette>
+  <LoadCassette>E:\home\FactographProjects\PA_cassettes-1\PA_video</LoadCassette>
+  -->
 </config>
