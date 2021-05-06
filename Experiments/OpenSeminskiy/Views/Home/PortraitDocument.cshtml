@@ -25,7 +25,7 @@
 {
     <img src="@m.uri" />
 }
-else if (!string.IsNullOrEmpty(m.uri) && m.contenttype == "image/jpeg")
+else if (!string.IsNullOrEmpty(m.uri) && m.contenttype.StartsWith("image/"))
 {
     string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=normal&u=" + m.uri;
     //string sr = (SObjects.Engine.DaraSrc == null ? "~" :
@@ -56,7 +56,7 @@ else if (!string.IsNullOrEmpty(m.uri) && m.contenttype == "image/jpeg")
             <td class="doc-show-small">
                 @foreach (var docpart in m.parts)
                 {
-                    if (docpart == null) { continue; }
+                    if (docpart == null || docpart.docInPart == null) { continue; }
                     string nm = SObjects.GetField(docpart.docInPart, "http://fogid.net/o/name");
                     string uri = SObjects.GetField(docpart.docInPart, "http://fogid.net/o/uri");
                     string eid = docpart.docInPart.Attribute("id").Value;
