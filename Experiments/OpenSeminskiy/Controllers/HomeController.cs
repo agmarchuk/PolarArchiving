@@ -78,6 +78,13 @@ namespace OpenSeminskiy.Controllers
         }
 
 
+        public IActionResult Show()
+        {
+            string id = HttpContext.Request.Query["id"].FirstOrDefault();
+            string ss = HttpContext.Request.Query["ss"].FirstOrDefault();
+            ShowModel model = new ShowModel(id, ss);
+            return View(model);
+        }
 
 
 
