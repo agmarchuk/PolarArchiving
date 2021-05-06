@@ -31,7 +31,7 @@ namespace OAData
         public static string configfilename = "config.xml";
         public static void Init()
         { 
-            XElement xconfig = XElement.Load(path + "config.xml");
+            XElement xconfig = XElement.Load(path + configfilename);
             _xconfig = xconfig;
             // Кассеты перечислены через элементы LoadCassette. Имена кассет в файловой системе должны сравниваться по lower case
             cassettes = xconfig.Elements("LoadCassette")

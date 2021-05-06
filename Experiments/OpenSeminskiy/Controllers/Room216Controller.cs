@@ -10,11 +10,10 @@ namespace OpenSeminskiy.Controllers
     {
         public IActionResult Load(int nom)
         {
-            OAData.OADB.Close();
+            //OAData.OADB.Close();
             if (nom == 1) OAData.OADB.configfilename = "config1.xml";
             else OAData.OADB.configfilename = "config.xml";
-            OAData.OADB.Init();
-            OAData.OADB.Load();            
+            SObjects.Init();
 
             return Redirect("~/Home/Index");
         }
