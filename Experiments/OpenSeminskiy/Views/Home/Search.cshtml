@@ -31,7 +31,7 @@
                 <a href='~/Home/Portrait?id=@ite.Attribute("id").Value'>@nm</a>
                 @if (!string.IsNullOrEmpty(dt))
                 {
-                    <span>(@dt)</span>
+                    <span>(@SObjects.DatePrinted(dt))</span>
                 }
                 @descr
             </li>
