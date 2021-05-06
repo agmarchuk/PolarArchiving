@@ -473,10 +473,12 @@ namespace OpenSeminskiy.Models
             new XElement("field", new XAttribute("prop", "http://fogid.net/o/org-classification")),
             null);
     }
+    public class DocPart { public XElement docInPart; public string pages; }
     public class PortraitDocumentModel
     {
         public string id, typeid, name, description, date, doccontent, uri, contenttype;
-        public IEnumerable<XElement> parts, reflections, authors, recipients, geoplaces, collections;
+        public IEnumerable<DocPart> parts;
+        public IEnumerable<XElement> reflections, authors, recipients, geoplaces, collections;
         public XElement infosource, descr_infosource;
         public Dictionary<string, string> docContentSources;
         // Временное решение - единственный сетевой источник данных или null 
@@ -506,14 +508,15 @@ namespace OpenSeminskiy.Models
             parts = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/inDocument")
                 .Select(inv => inv.Element("record"))
-                .Select(rec => new
+                .Select(rec => new DocPart()
                 {
-                    docpart = rec.Element("direct")?.Element("record"),
-                    page = SObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
+                    docInPart = rec.Element("direct")?.Element("record"),
+                    pages = SObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
                 })
-                .OrderBy(pair => pair.page)
-                .ThenBy(pair => pair.docpart == null ? "" : SObjects.GetField(pair.docpart, "http://fogid.net/o/name"))
-                .Select(pair => pair.docpart);
+                .OrderBy(pair => pair.pages)
+                .ThenBy(pair => pair.docInPart == null ? "" : SObjects.GetField(pair.docInPart, "http://fogid.net/o/name"))
+                ;
+                //.Select(pair => pair.docpart);
             // Отражения
             reflections = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/in-doc")
