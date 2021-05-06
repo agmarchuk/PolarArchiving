@@ -345,7 +345,8 @@ namespace OAData.Adapters
 
         public override void Close()
         {
-            throw new NotImplementedException();
+            db = null;
+            records = null;
         }
 
         public override IEnumerable<XElement> GetAll()

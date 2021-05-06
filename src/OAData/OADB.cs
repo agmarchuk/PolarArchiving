@@ -28,6 +28,7 @@ namespace OAData
             path = pth;
             Init();
         }
+        public static string configfilename = "config.xml";
         public static void Init()
         { 
             XElement xconfig = XElement.Load(path + "config.xml");
