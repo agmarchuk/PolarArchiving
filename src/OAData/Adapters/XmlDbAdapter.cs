@@ -351,7 +351,7 @@ namespace OAData.Adapters
 
         public override IEnumerable<XElement> GetAll()
         {
-            throw new NotImplementedException();
+            return db.Elements();
         }
 
         public override XElement PutItem(XElement record)

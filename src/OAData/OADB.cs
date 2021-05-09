@@ -23,14 +23,18 @@ namespace OAData
         private static XElement _xconfig = null;
         public static XElement XConfig { get { return _xconfig; } }
 
+        public static bool initiated = false;
+        public static bool firsttime = true;
         public static void Init(string pth)
         {
             path = pth;
             Init();
+            if (adapter.firsttime) firsttime = true;
+            initiated = true;
         }
         public static string configfilename = "config.xml";
         public static void Init()
-        { 
+        {
             XElement xconfig = XElement.Load(path + configfilename);
             _xconfig = xconfig;
             // Кассеты перечислены через элементы LoadCassette. Имена кассет в файловой системе должны сравниваться по lower case
@@ -40,11 +44,56 @@ namespace OAData
                     string cassPath = lc.Value;
                     XAttribute write_att = lc.Attribute("write");
                     string name = cassPath.Split('/', '\\').Last();
-                    return new CassInfo() { name = name, path = cassPath,
-                        writable = (write_att != null && (write_att.Value == "yes" || write_att.Value == "true")) };
+                    return new CassInfo()
+                    {
+                        name = name,
+                        path = cassPath,
+                        writable = (write_att != null && (write_att.Value == "yes" || write_att.Value == "true"))
+                    };
                 })
                 .ToArray();
 
+            // PrepareFogs(xconfig); -- перенесен в Load
+
+            // Подключение к базе данных, если задано
+            string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
+            if (connectionstring != null)
+            {
+                string pre = connectionstring.Substring(0, connectionstring.IndexOf(':'));
+                if (pre == "trs")
+                {
+                    adapter = new TripleRecordStoreAdapter();
+                }
+                else if (pre == "xml")
+                {
+                    adapter = new XmlDbAdapter();
+                }
+                adapter.Init(connectionstring);
+                
+                //bool toload = false;
+                //if (toload)
+                //{
+                //    adapter.StartFillDb(null);
+                //    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
+                //    //    null, null);
+                //    adapter.FillDb(fogs, null);
+                //    adapter.FinishFillDb(null);
+                //}
+                //else
+                //{
+
+                //}
+                
+                if (pre == "xml") Load();
+
+                // Логфайл элементов Put()
+                //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
+                putlogfilename = path + "logfile_put.txt";
+            }
+        }
+
+        private static void PrepareFogs(XElement xconfig)
+        {
             // Формирую список фог-документов
             List<FogInfo> fogs_list = new List<FogInfo>();
             // Прямое попадание в список фогов из строчек конфигуратора
@@ -66,7 +115,7 @@ namespace OAData
                     prefix = atts.prefix,
                     counter = atts.counter == null ? -1 : Int32.Parse(atts.counter)
                 });
-                
+
             }
             // Сбор фогов из кассет
             for (int i = 0; i < cassettes.Length; i++)
@@ -116,46 +165,12 @@ namespace OAData
             // На выходе я определил, что будет массив
             fogs = fogs_list.ToArray();
             fogs_list = null;
-
-            // Подключение к базе данных, если задано
-            string connectionstring = xconfig.Element("database")?.Attribute("connectionstring")?.Value;
-            if (connectionstring != null)
-            {
-                string pre = connectionstring.Substring(0, connectionstring.IndexOf(':'));
-                if (pre == "trs")
-                {
-                    adapter = new TripleRecordStoreAdapter();
-                }
-                else if (pre == "xml")
-                {
-                    adapter = new XmlDbAdapter();
-                }
-                adapter.Init(connectionstring);
-                bool toload = false;
-                if (toload)
-                {
-                    adapter.StartFillDb(null);
-                    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
-                    //    null, null);
-                    adapter.FillDb(fogs, null);
-                    adapter.FinishFillDb(null);
-                }
-                else
-                {
-                    
-                }
-                if (pre == "xml") Load();
-
-                // Логфайл элементов Put()
-                //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
-                putlogfilename = path + "logfile_put.txt";
-            }
         }
+
         public static void Load()
         {
+            PrepareFogs(XConfig);
             adapter.StartFillDb(null);
-            //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
-            //    null, null);
             adapter.FillDb(fogs, null);
             adapter.FinishFillDb(null);
         }

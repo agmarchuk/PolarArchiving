@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
 
-  <database dbname="OA" connectionstring="xml:" />
-  <!--database connectionstring="trs:C:\WinApps\PolarDatabases\PolarSoran\"/-->
+  <!--database dbname="OA" connectionstring="xml:" /-->
+  <database connectionstring="trs:C:\Home\PolarDatabases\OA\"/>
 
+  
   <LoadCassette>H:\OA\Ad</LoadCassette>
   <LoadCassette>H:\OA\Ba</LoadCassette>
   <LoadCassette>H:\OA\L5</LoadCassette>

@@ -22,7 +22,7 @@ namespace OAData.Adapters
         private Action<string> errors = s => { Console.WriteLine(s); };
         string dbfolder = "D:/";
         int file_no = 0;
-        internal bool firsttime = true; // Отмечает (вычисляет) ситуацию, когда базу данных обязательно нужно строить.
+        //public bool firsttime = true; // Отмечает (вычисляет) ситуацию, когда базу данных обязательно нужно строить.
         // Важные коды
         //private int cod_rdftype = 0;
         //private int cod_name;

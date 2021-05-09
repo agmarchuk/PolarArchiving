@@ -44,7 +44,7 @@ namespace OpenSeminskiy
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             SObjects.Init(env.ContentRootPath + "/wwwroot/");
 

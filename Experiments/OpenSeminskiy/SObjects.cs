@@ -21,6 +21,7 @@ namespace OpenSeminskiy
             path = pth;
             OAData.Ontology.Init(path + "ontology_iis-v12-doc_ruen.xml");
             OAData.OADB.Init(path);
+            if (OAData.OADB.firsttime) OAData.OADB.Load();
 
             XElement fondy = SObjects.SearchByName(funds_name)
                 .FirstOrDefault(x => SObjects.GetField(x, "http://fogid.net/o/name") == "Фонды");
