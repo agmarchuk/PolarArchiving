@@ -8,6 +8,10 @@ namespace OpenSeminskiy.Controllers
 {
     public class Room216Controller : Controller
     {
+        public IActionResult Index()
+        {
+            return View("Control");
+        }
         public IActionResult Init()
         {
             if (OAData.OADB.initiated) OAData.OADB.Close();
@@ -24,10 +28,6 @@ namespace OpenSeminskiy.Controllers
             OAData.OADB.Load();
 
             return Redirect("~/Home/Index");
-        }
-        public IActionResult Control()
-        {
-            return View("Control");
         }
 
     }
