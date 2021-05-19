@@ -122,12 +122,17 @@ namespace OAData.Adapters
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
             string ss = searchstring.ToLower();
+            //var query1 = db.Elements()
+            //    .Where(xel => xel.Elements("{http://fogid.net/o/}name").Any(f => f.Value.ToLower().StartsWith(ss)))
+            //    .ToArray();
             var query = db.Elements()
                 .SelectMany(xel => xel.Elements().Where(el => el.Name == "{http://fogid.net/o/}name"))
                 .Where(el => el.Value.ToLower().StartsWith(ss))
                 .Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(ONames.rdfabout).Value),
                     new XAttribute("type", el.Parent.Name.NamespaceName + el.Parent.Name.LocalName),
-                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"), el.Value)));
+                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"), el.Value)))
+                //.ToArray()
+                ;
                 //.Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(ONames.rdfabout).Value)));
             return query;
         }

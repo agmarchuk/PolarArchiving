@@ -542,7 +542,10 @@ namespace OAData.Adapters
                         .Where(dup => (int)dup[0] == iprop)
                         .Select(dup =>
                         {
-                            return new XElement("field", new XAttribute("prop", prop), (string)dup[1]);
+                            //return new XElement("field", new XAttribute("prop", prop), (string)dup[1]);
+                            return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                        ((string)dup[2] == "" ? null : new XAttribute("{http://www.w3.org/XML/1998/namespace}lang", (string)dup[2])),
+                        (string)dup[1]);
                         });
                         return query;
                     }

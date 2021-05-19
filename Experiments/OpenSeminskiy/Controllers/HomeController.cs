@@ -31,7 +31,7 @@ namespace OpenSeminskiy.Controllers
             return View("ExtSearch", new ExtSearchModel(fund, context, person, org, coll, geo, fdate, tdate));
         }
         [HttpGet]
-        public IActionResult Portrait(string id)
+        public IActionResult Portrait(string id, string eid) // eid (external id) - ид айтема, в котором есть список, в котором есть id
         {
             DateTime tt0 = DateTime.Now;
 
@@ -56,7 +56,7 @@ namespace OpenSeminskiy.Controllers
             }
             else if (type == "http://fogid.net/o/document" || type == "http://fogid.net/o/photo-doc")
             {
-                return View("PortraitDocument", new PortraitDocumentModel(id));
+                return View("PortraitDocument", new PortraitDocumentModel(id, eid));
             }
             else if (type == "http://fogid.net/o/city" || type == "http://fogid.net/o/country")
             {

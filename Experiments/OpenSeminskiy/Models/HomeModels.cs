@@ -477,15 +477,38 @@ namespace OpenSeminskiy.Models
     public class PortraitDocumentModel
     {
         public string id, typeid, name, description, date, doccontent, uri, contenttype;
+        public string eid = null; // ид внешнего объекта, который через отношение относится к данному
+        public string[] doceidarr = null; // массив ид документов, относящихся через отношение к eid
+
         public IEnumerable<DocPart> parts;
         public IEnumerable<XElement> reflections, authors, recipients, geoplaces, collections;
         public XElement infosource, descr_infosource;
         public Dictionary<string, string> docContentSources;
         // Временное решение - единственный сетевой источник данных или null 
         public string docSrc = null;
-        public PortraitDocumentModel(string id)
+        public PortraitDocumentModel(string id, string eid)
         {
             this.id = id;
+            this.eid = eid;
+
+            if (!string.IsNullOrEmpty(eid))
+            {
+                XElement doctree = OAData.OADB.GetItemById(eid, new XElement("record",
+                    new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/inDocument"),
+                        new XElement("record",
+                            new XElement("field", new XAttribute("prop", "http://fogid.net/o/pageNumbers")),
+                            new XElement("direct", new XAttribute("prop", "http://fogid.net/o/partItem"),
+                                new XElement("record"))))));
+
+                doceidarr = doctree.Elements("inverse")
+                        .Select(inv => inv.Element("record"))
+                        .OrderBy(r => r.Element("field")?.Value)
+                        .Select(r => r.Element("direct")?.Element("record")?.Attribute("id")?.Value)
+                        .Where(d => d != null)
+                        .ToArray();
+            }
+
+
             if (id == null) { return; }
             XElement item = SObjects.GetItemById(id, format);
             typeid = item.Attribute("id").Value;

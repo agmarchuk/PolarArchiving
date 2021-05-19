@@ -239,7 +239,8 @@ namespace OAData.Adapters
         // Заменяет предыдущие 3. Помещает запись в базу данных, если у нее нет идентификатора, то генерирует его. Возвращает зафиксированную запись
         public abstract XElement PutItem(XElement record);
 
-        private static Func<string, string> ConvertId = id => id;
+        private static string ConvertId(string id) { if (id.Contains('|')) return id.Replace("|", ""); else return id; }
+
         public static Func<XElement, XElement> ConvertXElement = xel =>
         {
             if (xel.Name == "delete" || xel.Name == ONames.fogi + "delete") return new XElement(ONames.fogi + "delete",

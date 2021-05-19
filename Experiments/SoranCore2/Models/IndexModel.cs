@@ -47,6 +47,7 @@ namespace SoranCore2.Models
         public Tuple<string, string, string>[] naming = null;
         public XElement[] indocreflected = null;
         public XElement[] incollectionmember = null;
+        public XElement[] orgparentorgrelatives = null;
 
         public Func<string, string> ImgSrc = (string tp) => tp == "http://fogid.net/o/document" ? "~/img/document_s.jpg" :
             (tp == "http://fogid.net/o/photo-doc" ? "~/Docs/GetPhoto?s=small&u=" :
@@ -131,6 +132,12 @@ namespace SoranCore2.Models
                 .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-collection")
                 .Select(i => i.Element("record")?.Element("direct")?.Element("record"))
                 .Where(r => r != null)
+                .OrderBy(r => StaticObjects.GetField(r, "http://fogid.net/o/name"))
+                .ToArray();
+            orgparentorgrelatives = this.XRecord.Elements("inverse")
+                .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/org-parent")
+                .Select(i => i.Element("record")?.Element("direct")?.Element("record"))
+                .Where(r => r != null)
                 .ToArray();
         }
 
@@ -212,6 +219,20 @@ namespace SoranCore2.Models
                                     new XElement("record",
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
                                         null)))),
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/org-parent"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/org-child"),
+                                    new XElement("record",
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                                        null)))),
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/org-child"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/org-parent"),
+                                    new XElement("record",
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                                        null)))),
                         new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/referred-sys"),
                             new XElement("record",
                                 new XElement("field", new XAttribute("prop", "http://fogid.net/o/alias")),
@@ -255,6 +276,7 @@ namespace SoranCore2.Models
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/docmetainfo")),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
                                         null)))),
                         null),
                     null);

@@ -38,12 +38,15 @@ namespace SoranCore2.Controllers
             if (p == "search")
             {
                 string searchstring = HttpContext.Request.Query["searchstring"].FirstOrDefault();
-                IEnumerable<XElement> query = OAData.OADB.SearchByName(searchstring);
+                IEnumerable<XElement> query = OAData.OADB.SearchByName(searchstring)
+                    .Distinct(new RecordIdComparer())
+                    .ToArray();
                 var list = new List<object[]>();
                 foreach (XElement el in query)
                 {
                     string t = el.Attribute("type").Value;
                     string name = el.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
+                    string name1 = StaticObjects.GetField(el, "http://fogid.net/o/name");
                     if (t == "http://fogid.net/o/person")
                     {
                         list.Add(new object[] { el.Attribute("id").Value, name });
@@ -128,10 +131,13 @@ namespace SoranCore2.Controllers
                         new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/in-collection"),
                             new XElement("record",
                                 new XElement("direct", new XAttribute("prop", "http://fogid.net/o/collection-item"),
-                                    new XElement("record"))))));
+                                    new XElement("record", new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))))));
                     model.docidarr = doctree.Elements("inverse")
-                        .Select(inv => inv.Element("record")?.Element("direct")?.Element("record")?.Attribute("id")?.Value)
-                        .Where(d => d != null)
+                        .Select(inv => inv.Element("record")?.Element("direct")?.Element("record"))
+                        //.Attribute("id")?.Value)
+                        .Where(r => r != null)
+                        .OrderBy(r => StaticObjects.GetField(r, "http://fogid.net/o/name"))
+                        .Select(r => r.Attribute("id").Value)
                         .ToArray();
                 }
             }
@@ -165,4 +171,24 @@ namespace SoranCore2.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
+
+    class RecordIdComparer : IEqualityComparer<XElement>
+    {
+        public bool Equals(XElement r1, XElement r2)
+        {
+            if (r1 == null || r2 == null)
+                return false;
+            else if (r1.Attribute("id").Value == r2.Attribute("id").Value)
+                return true;
+            else
+                return false;
+        }
+
+        public int GetHashCode(XElement rec)
+        {
+            string code = rec.Attribute("id").Value;
+            return code.GetHashCode();
+        }
+    }
+
 }

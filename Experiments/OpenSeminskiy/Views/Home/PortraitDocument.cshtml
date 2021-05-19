@@ -21,6 +21,32 @@
 <div class="heading1">
     <h1>@m.name</h1>
 </div>
+@if (m.doceidarr != null)
+{
+    int ind = 0;
+    for (; ind<m.doceidarr.Length; ind++) { if (m.doceidarr[ind] == m.id) { break; } }
+<div style="text-align: center;">
+    <a href="/Home/Portrait?id=@m.eid">к документу</a>
+    &nbsp;
+    @if (ind == 0)
+    {
+        <span>пред</span>
+    }
+    else
+    {
+        <span><a href="/Home/Portrait?id=@(m.doceidarr[ind - 1])&eid=@(m.eid)">пред</a></span>
+    }
+    &nbsp;
+    @if (ind == m.doceidarr.Length - 1)
+    {
+        <span>след</span>
+    }
+    else
+    {
+        <span><a href="/Home/Portrait?id=@(m.doceidarr[ind + 1])&eid=@(m.eid)">след</a></span>
+    }
+</div>
+}
 @if (!string.IsNullOrEmpty(m.uri) && !m.uri.StartsWith("iiss://"))
 {
     <img src="@m.uri" />
@@ -59,13 +85,13 @@ else if (!string.IsNullOrEmpty(m.uri) && m.contenttype.StartsWith("image/"))
                     if (docpart == null || docpart.docInPart == null) { continue; }
                     string nm = SObjects.GetField(docpart.docInPart, "http://fogid.net/o/name");
                     string uri = SObjects.GetField(docpart.docInPart, "http://fogid.net/o/uri");
-                    string eid = docpart.docInPart.Attribute("id").Value;
+                    string idd = docpart.docInPart.Attribute("id").Value;
 
                     if (uri.StartsWith("iiss://"))
                     {
                         string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=small&u=" + uri;
                         <div class="show-small">
-                            <a href="~/Home/Portrait?id=@eid">
+                            <a href="~/Home/Portrait?id=@idd&eid=@m.id">
                                 @*<img src="@Url.Content(sr)" border="0" vspace="10" hspace="10" alt="" />*@
                                 <img src="@Url.Content(sr)" />
                             </a>
