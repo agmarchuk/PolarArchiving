@@ -47,7 +47,7 @@
             <a href="@src">Посмотреть</a>
             <!--embed src="@src" width="1024" height="800" /-->
         }
-        else if (documenttype.StartsWith("image/"))
+        else if (documenttype != null && documenttype.StartsWith("image/"))
         {
             string src = url == null ? Url.Content("~/Docs/GetPhoto?u=" + uri_coded + "&amp;s=medium") : url;
             <img src="@src" />

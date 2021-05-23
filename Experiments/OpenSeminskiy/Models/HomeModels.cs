@@ -476,7 +476,7 @@ namespace OpenSeminskiy.Models
     public class DocPart { public XElement docInPart; public string pages; }
     public class PortraitDocumentModel
     {
-        public string id, typeid, name, description, date, doccontent, uri, contenttype;
+        public string id, typeid, name, description, startdate, enddate, doccontent, uri, contenttype;
         public string eid = null; // ид внешнего объекта, который через отношение относится к данному
         public string[] doceidarr = null; // массив ид документов, относящихся через отношение к eid
 
@@ -520,7 +520,8 @@ namespace OpenSeminskiy.Models
             var desc_el = item.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/description");
             description = desc_el == null ? "" : desc_el.Value;
             // Даты
-            date = SObjects.GetField(item, "http://fogid.net/o/from-date");
+            startdate = SObjects.GetField(item, "http://fogid.net/o/from-date");
+            enddate = SObjects.GetField(item, "http://fogid.net/o/to-date");
             doccontent = SObjects.GetField(item, "http://fogid.net/o/doc-content");
             uri = SObjects.GetField(item, "http://fogid.net/o/uri");
             var docmetainfo = SObjects.GetField(item, "http://fogid.net/o/docmetainfo");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -8,8 +9,39 @@ using Microsoft.AspNetCore.Http;
 
 namespace SoranCore2.Models
 {
+    internal class PhotosFirst : IComparer<XElement>
+    {
+        public int Compare(XElement x, XElement y)
+        {
+            int cmp1 = x.Attribute("type").Value.CompareTo(y.Attribute("type").Value);
+            if (cmp1 != 0) return -cmp1;
+            string s1 = StaticObjects.GetField(x, "http://fogid.net/o/from-date");
+            string s2 = StaticObjects.GetField(y, "http://fogid.net/o/from-date");
+            if (string.IsNullOrEmpty(s1)) s1 = "_";// + x.Attribute("id").Value;
+            if (string.IsNullOrEmpty(s2)) s2 = "_";// + y.Attribute("id").Value;
+            int cmp2 = s1.CompareTo(s2); //string.Compare(s1, s2);
+            if (cmp2 != 0) return cmp2;
+            return x.Attribute("id").Value.CompareTo(y.Attribute("id").Value);
+        }
+        private static PhotosFirst _phf = null;
+        public static PhotosFirst PhF() { if (_phf == null) _phf = new PhotosFirst(); return _phf; } 
+    }
+    internal class IdEqual : IEqualityComparer<XElement>
+    {
+        public bool Equals(XElement x, XElement y)
+        {
+            if (x == null || y == null) return true;
+            return x.Element("direct")?.Element("record")?.Attribute("id").Value == y.Element("direct")?.Element("record")?.Attribute("id").Value;
+        }
+        public int GetHashCode([DisallowNull] XElement obj)
+        {
+            return string.GetHashCode(obj.Element("direct")?.Element("record")?.Attribute("id").Value);
+        }
+    }
+
     public class IndexModel
     {
+
         // Для отладки:
         public string look = "";
         public string ir = null; // база массива отражений документов через отражения
@@ -57,17 +89,31 @@ namespace SoranCore2.Models
             (tp == "http://fogid.net/o/collection" ? "~/img/collection_s.jpg" : "~/img/document_s.jpg")))));
 
         public string[] docidarr = null; // массив идентификаторов документов в reflected_reflections 
+        internal static Dictionary<string, string[]> ir_dic = new Dictionary<string, string[]>(); 
         public void BuildPortrait()
         {
             reflected_reflections = this.XRecord.Elements("inverse")
                .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/reflected")
                .Select(i => i.Element("record"))
+               .Distinct(new IdEqual())
+               //.OrderBy(r => r.Element("direct")?.Element("record"), new PhotosFirst())
+               .OrderBy(r => r.Element("direct")?.Element("record"), PhotosFirst.PhF())
                .ToArray();
 
-            if (reflected_reflections.Length > 0)
-            {
-                docidarr = reflected_reflections.Select(r => r.Element("direct")?.Element("record")?.Attribute("id")?.Value).ToArray();
-            }
+            //if (reflected_reflections.Length > 0)
+            //{
+            //    string[] arr = reflected_reflections.Select(r => r.Element("direct")?.Element("record")?.Attribute("id")?.Value).ToArray();
+            //     var xarr = this.XRecord.Elements("inverse")
+            //       .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/reflected")
+            //       .Select(inv => inv.Element("record"))
+            //       .Distinct(new IdEqual())
+            //       .Take(5)
+            //       //.OrderBy(r => r.Element("direct")?.Element("record"), PhotosFirst.PhF())
+            //       //.Select(r => r.Attribute("id").Value)
+            //       .ToArray();
+            //    var xxx = new XElement("sbor", xarr);                
+            //        //Check_docidarr(Id, arr);
+            //}
 
             portraitphotouri = reflected_reflections
                 .Where(re => re.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/ground")?.Value == "portrait")
@@ -121,9 +167,10 @@ namespace SoranCore2.Models
             allparticipants = inorg_participation
                 .Where(r => StaticObjects.GetField(r, "http://fogid.net/o/role-classification") != "director")
                 .ToArray();
-            inorg_participation = this.XRecord.Elements("inverse")
-                .Select(i => i.Element("record"))
-                .ToArray();
+            //inorg_participation = this.XRecord.Elements("inverse")
+            //    .Select(i => i.Element("record"))
+            //    .OrderBy(r => StaticObjects.GetField(r.Element("direct").Element("record"), "http://fogid.net/o/from-date"))
+            //    .ToArray();
             indocreflected = this.XRecord.Elements("inverse")
                 .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/in-doc")
                 .Select(i => i.Element("record"))
@@ -139,6 +186,18 @@ namespace SoranCore2.Models
                 .Select(i => i.Element("record")?.Element("direct")?.Element("record"))
                 .Where(r => r != null)
                 .ToArray();
+        }
+
+        internal void Check_docidarr(string id, string[] arr)
+        {
+            if (ir_dic.ContainsKey(id))
+            {
+                string[] saved = ir_dic[id];
+                if (arr.Length != saved.Length) throw new Exception("Длины не равны");
+                for (int i = 0; i < arr.Length; i++)
+                    if (arr[i] != saved[i]) throw new Exception("Значения не равны");
+            }
+            else ir_dic.Add(id, arr);
         }
 
         // =============

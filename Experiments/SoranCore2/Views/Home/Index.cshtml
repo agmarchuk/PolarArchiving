@@ -137,6 +137,48 @@
             else if (Model.Id == null) { }
             else
             {
+                if (Model.docidarr != null)
+                {
+                    @* Линейка управления "пред" "след" *@
+                    <div>
+                        @{
+                            // Определяем какое отношение
+                            string irc = "ir=" + Model.ir;
+                            if (string.IsNullOrEmpty(Model.ir)) { irc = "ic=" + Model.ic; }
+
+                            // Ищем индекс совпадающего документа
+                            int i = 0;
+                            for (; i < Model.docidarr.Length; i++)
+                            {
+                                if (Model.docidarr[i] == Model.Id)
+                                {
+                                    break;
+                                }
+                            }
+                            if (i < Model.docidarr.Length)
+                            {
+                                if (i == 0)
+                                {
+                                    <span>пред</span>
+                                }
+                                else
+                                {
+                                    <a href="?@(irc)&amp;id=@Model.docidarr[i - 1]">пред</a>
+                                }
+                                <span>&nbsp;</span>
+                                if (i == Model.docidarr.Length - 1)
+                                {
+                                    <span>след</span>
+                                }
+                                else
+                                {
+                                    <a href="?@(irc)&amp;id=@Model.docidarr[i + 1]">след</a>
+                                }
+                            }
+                        }
+                    </div>
+                }
+
                 <div style="font-family: arial, sans-serif; font-size:0.7em; text-align:left;">@(OAData.Ontology.GetOntName(Model.Type))</div>@*TODO: Убрать или по-русски!*@
                 // Или портрет персоны, орг-системы, коллекции (?) или другое (документы?)
                 if (Model.Type == "http://fogid.net/o/person" || Model.Type == "http://fogid.net/o/org-sys"
@@ -148,83 +190,43 @@
                     <h1>@Model.Name</h1>
                     <div>@spandate</div>
                 }
+
                 if (Model.Uri != null)
                 {
                     string documenttype = null;
                     string url = null;
                     string uri_coded = null;
-                    if (Model.docidarr != null)
+                    if (Model.Docmetainfo != null)
                     {
-                        @* Линейка управления "пред" "след" *@
-                        <div>
-                            @{
-                                // Определяем какое отношение
-                                string irc = "ir=" + Model.ir;
-                                if (string.IsNullOrEmpty(Model.ir)) { irc = "ic=" + Model.ic; }
-
-                                // Ищем индекс совпадающего документа
-                                int i = 0;
-                                for (; i < Model.docidarr.Length; i++)
-                                {
-                                    if (Model.docidarr[i] == Model.Id)
-                                    {
-                                        break;
-                                    }
-                                }
-                                if (i < Model.docidarr.Length)
-                                {
-                                    if (i == 0)
-                                    {
-                                        <span>пред</span>
-                                    }
-                                    else
-                                    {
-                                        <a href="?@(irc)&amp;id=@Model.docidarr[i - 1]">пред</a>
-                                    }
-                                    <span>&nbsp;</span>
-                                    if (i == Model.docidarr.Length - 1)
-                                    {
-                                        <span>след</span>
-                                    }
-                                    else
-                                    {
-                                        <a href="?@(irc)&amp;id=@Model.docidarr[i + 1]">след</a>
-                                    }
-                                }
-                            }
-                        </div>
-                                }
-                                if (Model.Docmetainfo != null)
-                                {
-                                    documenttype = Model.Docmetainfo.Split(';')
-                                        .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
-                                    url = Model.Docmetainfo.Split(';')
-                                        .FirstOrDefault(part => part.StartsWith("url:"))?.Substring(4);
-                                    uri_coded = System.Web.HttpUtility.UrlEncode(Model.Uri);
-                                }
-                                if (documenttype == "scanned/dz")
-                                {
+                        documenttype = Model.Docmetainfo.Split(';')
+                            .FirstOrDefault(part => part.StartsWith("documenttype:"))?.Substring(13);
+                        url = Model.Docmetainfo.Split(';')
+                            .FirstOrDefault(part => part.StartsWith("url:"))?.Substring(4);
+                        uri_coded = System.Web.HttpUtility.UrlEncode(Model.Uri);
+                    }
+                    if (documenttype == "scanned/dz")
+                    {
                         @* string[] parts = Model.Id.Split('_');
                     string src = "http://www.sbras.info/system/files/archive/archive1961-2009/" +
                         parts[parts.Length - 2] + "_" + parts[parts.Length - 1] + ".pdf";
                     <a href="@src"><img src="~/img/document.jpg" /></a> *@
-            string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
+                        string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
                         <a href="@src"><img src="~/img/PDF_m.jpg" /></a>
-                                }
-                                else if (documenttype == "application/pdf")
-                                {
-                                    string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
+                    }
+                    else if (documenttype == "application/pdf")
+                    {
+                        string src = url == null ? Url.Content("~/Docs/GetPdf?u=" + uri_coded) : url;
                         <embed src="@src" width="1024" height="800" />
-                                }
-                                else if (documenttype.StartsWith("image/"))
-                                {
-                                    string src = url == null ? Url.Content("~/Docs/GetPhoto?u=" + uri_coded + "&amp;s=medium") : url;
+                    }
+                    else if (documenttype.StartsWith("image/"))
+                    {
+                        string src = url == null ? Url.Content("~/Docs/GetPhoto?u=" + uri_coded + "&amp;s=medium") : url;
                         <img src="@src" />
-                                }
+                    }
 
                     <div>
                     </div>
-                                }
+                }
 
                 @if (Model.Description != null)
                 {
@@ -404,7 +406,9 @@
                                             <div>@(dt) &nbsp; @(geoname)</div>
                                             @if (tp != "http://fogid.net/o/photo-doc")
                                             {
-                                                <div>@(ds)</div>
+                                                string ds_short = ds;
+                                                if (!string.IsNullOrEmpty(ds) && ds.Length > 40) ds_short = ds.Substring(0, 40);
+                                                <div>@(ds_short)</div>
                                             }
                                         </td>
                                     </tr>
@@ -415,7 +419,7 @@
                 }
                 @* <hr /> *@
 
-                                }
+            }
             @* =============== конец центральной панели ============== *@
         </td>
 

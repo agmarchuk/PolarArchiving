@@ -61,11 +61,14 @@ else if (!string.IsNullOrEmpty(m.uri) && m.contenttype.StartsWith("image/"))
 }
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="info-document">
-    @if (!string.IsNullOrEmpty(m.date))
+    @if (!string.IsNullOrEmpty(m.startdate))
     {
         <tr valign="top">
             <td width="25%" class="line-name">Дата:</td>
-            <td width="75%" class="line-info">@SObjects.DatePrinted(m.date)</td>
+            <td width="75%" class="line-info">
+                @(SObjects.DatePrinted(m.startdate))
+                @if (!string.IsNullOrEmpty(m.enddate)) { <span>- @SObjects.DatePrinted(m.enddate)</span> }
+            </td>
         </tr>
     }
     @if (!string.IsNullOrEmpty(m.description))

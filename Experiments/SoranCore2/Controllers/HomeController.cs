@@ -118,11 +118,18 @@ namespace SoranCore2.Controllers
                         new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/reflected"),
                             new XElement("record",
                                 new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-doc"),
-                                    new XElement("record"))))));
+                                    new XElement("record",
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                                        null))))));
                     model.docidarr = doctree.Elements("inverse")
-                        .Select(inv => inv.Element("record")?.Element("direct")?.Element("record")?.Attribute("id")?.Value)
+                        .Select(inv => inv.Element("record"))
+                        .Distinct(new IdEqual())
+                        .OrderBy(r => r.Element("direct")?.Element("record"), new PhotosFirst())
+                        .Select(r => r?.Element("direct")?.Element("record")?.Attribute("id")?.Value)
                         .Where(d => d != null)
                         .ToArray();
+                    model.Check_docidarr(ir, model.docidarr);
                 }
                 else if (!string.IsNullOrEmpty(ic))
                 {
