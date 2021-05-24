@@ -152,6 +152,11 @@ namespace SoranCore2.Controllers
             return View(model);
         }
 
+        public IActionResult UsefullLinks()
+        {
+            return View();
+        }
+
         public IActionResult Show()
         {
             string id = HttpContext.Request.Query["id"].FirstOrDefault();
