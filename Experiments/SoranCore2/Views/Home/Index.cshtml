@@ -183,6 +183,7 @@
                 // Или портрет персоны, орг-системы, коллекции (?) или другое (документы?)
                 if (Model.Type == "http://fogid.net/o/person" || Model.Type == "http://fogid.net/o/org-sys"
                     || Model.Type == "http://fogid.net/o/document"
+                    || Model.Type == "http://fogid.net/o/city"
                     || Model.Type == "http://fogid.net/o/collection")
                 {
                     string spandate = (Model.StartDate == null ? "" : StaticObjects.DatePrinted(Model.StartDate)) +
@@ -248,85 +249,89 @@
 
                 <hr />
 
-                <div>
+                @if (Model.reflected_reflections != null && Model.reflected_reflections.Count() > 0)
+                {
+                    <div>
                     @* ======= Линейка номеров страниц ======= *@
-                    @for (int d = 0; d < Model.reflected_reflections.Length; d += Model.page_length)
-                    {
-                        if (Model.Pg != d / Model.page_length)
+                        @for (int d = 0; d < Model.reflected_reflections.Length; d += Model.page_length)
                         {
+                            if (Model.Pg != d / Model.page_length)
+                            {
                             <a href="?id=@Model.Id&amp;pg=@(d / Model.page_length)">
                                 @(d / Model.page_length + 1)
                             </a>
                             <span>&nbsp;</span>
 
-                        }
-                        else if (Model.reflected_reflections.Length > Model.page_length)
-                        {
+                            }
+                            else if (Model.reflected_reflections.Length > Model.page_length)
+                            {
                             <b> @(d / Model.page_length + 1) </b>
+                            }
                         }
-                    }
-                </div>
-
-                @* ======== Массив документов по отношению отражения, разбитый на страницы ======== *@
-                @for (int nrec = Model.Pg * Model.page_length; nrec < Math.Min((Model.Pg + 1) * Model.page_length, Model.reflected_reflections.Length); nrec++)
-                {
-                    XElement rec = Model.reflected_reflections[nrec];
-                    XElement doc = rec?.Element("direct")?.Element("record");
-                    if (doc == null) { continue; }
-                    string iid = doc.Attribute("id").Value;
-                    string tp = doc.Attribute("type").Value;
-                    string nm = StaticObjects.GetField(doc, "http://fogid.net/o/name");
-                    string ur = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
-                    string dt = StaticObjects.DatePrinted(
-                        StaticObjects.GetField(doc, "http://fogid.net/o/from-date"));
-
-                    string docmetainfo = StaticObjects.GetField(doc, "http://fogid.net/o/docmetainfo");
-                    string documenttype = null;
-                    if (docmetainfo != null)
-                    {
-                        documenttype = docmetainfo.Split(';').FirstOrDefault(pair => pair.StartsWith("documenttype:"))
-                            ?.Substring("documenttype:".Length);
-                    }
-                    string s = Model.ImgSrc(tp);
-                    if (tp == "http://fogid.net/o/photo-doc") { s = s + ur; }
-                    string src = Url.Content(s);
-
-                    //Место, отраженное в документе
-                    var indocrecords = doc.Elements("inverse")
-                        .Where(el => el.Attribute("prop").Value == "http://fogid.net/o/in-doc")
-                        .Select(el => el.Element("record"));
-                    XElement rr = indocrecords.FirstOrDefault(r => r.Elements("field")
-                        .Any(f => f.Attribute("prop").Value == "http://fogid.net/o/ground" && f.Value == "place"));
-                    string idd = null;
-                    string geoname = null;
-                    if (rr != null && (idd = rr.Attribute("id")?.Value) != null)
-                    {
-                        var xres = OAData.OADB.GetItemById(idd, new XElement("record",
-                            new XElement("direct", new XAttribute("prop", "http://fogid.net/o/reflected"),
-                                new XElement("record", new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))));
-                        //var yres = OAData.OADB.GetItemByIdBasic(idd, true);
-                        var georecord = xres.Element("direct")?.Element("record");
-                        if (georecord != null) geoname = StaticObjects.GetField(georecord, "http://fogid.net/o/name");
-                    }
-
-                    <div style="float:left;width:126px;height:150px;font-size:10px;">
-                        <table align="center">
-                            <tr>
-                                <td>
-                                    <a href="?id=@iid&amp;ir=@Model.Id">
-                                        <img src="@src" align="left" />
-                                        @if (tp != "http://fogid.net/o/photo-doc")
-                                        {
-                                            <span>@nm</span>
-                                        }
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr><td align="center">@dt <span>@geoname</span> </td></tr>
-                        </table>
                     </div>
 
+                    @* ======== Массив документов по отношению отражения, разбитый на страницы ======== *@
+                    @for (int nrec = Model.Pg * Model.page_length; nrec < Math.Min((Model.Pg + 1) * Model.page_length, Model.reflected_reflections.Length); nrec++)
+                    {
+                        XElement rec = Model.reflected_reflections[nrec];
+                        XElement doc = rec?.Element("direct")?.Element("record");
+                        if (doc == null) { continue; }
+                        string iid = doc.Attribute("id").Value;
+                        string tp = doc.Attribute("type").Value;
+                        string nm = StaticObjects.GetField(doc, "http://fogid.net/o/name");
+                        string ur = StaticObjects.GetField(doc, "http://fogid.net/o/uri");
+                        string dt = StaticObjects.DatePrinted(
+                            StaticObjects.GetField(doc, "http://fogid.net/o/from-date"));
+
+                        string docmetainfo = StaticObjects.GetField(doc, "http://fogid.net/o/docmetainfo");
+                        string documenttype = null;
+                        if (docmetainfo != null)
+                        {
+                            documenttype = docmetainfo.Split(';').FirstOrDefault(pair => pair.StartsWith("documenttype:"))
+                                ?.Substring("documenttype:".Length);
+                        }
+                        string s = Model.ImgSrc(tp);
+                        if (tp == "http://fogid.net/o/photo-doc") { s = s + ur; }
+                        string src = Url.Content(s);
+
+                        //Место, отраженное в документе
+                        var indocrecords = doc.Elements("inverse")
+                            .Where(el => el.Attribute("prop").Value == "http://fogid.net/o/in-doc")
+                            .Select(el => el.Element("record"));
+                        XElement rr = indocrecords.FirstOrDefault(r => r.Elements("field")
+                            .Any(f => f.Attribute("prop").Value == "http://fogid.net/o/ground" && f.Value == "place"));
+                        string idd = null;
+                        string geoname = null;
+                        if (rr != null && (idd = rr.Attribute("id")?.Value) != null)
+                        {
+                            var xres = OAData.OADB.GetItemById(idd, new XElement("record",
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                                    new XElement("record", new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"))))));
+                            //var yres = OAData.OADB.GetItemByIdBasic(idd, true);
+                            var georecord = xres.Element("direct")?.Element("record");
+                            if (georecord != null) geoname = StaticObjects.GetField(georecord, "http://fogid.net/o/name");
+                        }
+
+                        <div style="float:left;width:126px;height:150px;font-size:10px;">
+                            <table align="center">
+                                <tr>
+                                    <td>
+                                        <a href="?id=@iid&amp;ir=@Model.Id">
+                                            <img src="@src" align="left" />
+                                            @if (tp != "http://fogid.net/o/photo-doc")
+                                            {
+                                                <span>@nm</span>
+                                            }
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr><td align="center">@dt <span>@geoname</span> </td></tr>
+                            </table>
+                        </div>
+
+                    }
                 }
+
 
 
                 @if (Model.incollectionmember != null && Model.incollectionmember.Count() > 0)

@@ -6,7 +6,7 @@
 }
 
 <h1>Show</h1>
-<form method="get" action="/Home/Show">
+<form method="get" action="">
     <input type="text" name="ss" />
     <input type="submit" />
 </form>
@@ -18,7 +18,7 @@
         <div>
             <span>@v.Attribute("type").Value</span>
             &nbsp;
-            <a href="/Home/Show?id=@(v.Attribute("id").Value)">
+            <a href="?id=@(v.Attribute("id").Value)">
                 @StaticObjects.GetField(v, "http://fogid.net/o/name")
             </a>
         </div>
