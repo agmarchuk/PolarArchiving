@@ -578,7 +578,8 @@ namespace OpenSeminskiy.Models
             // Элемент коллекций    
             collections = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/collection-item")
-                .Select(inv => inv.Element("record")?.Element("direct")?.Element("record"));
+                .Select(inv => inv.Element("record")?.Element("direct")?.Element("record"))
+                .Where(r => r != null);
 
             // Это пока не нужно
             docContentSources = new Dictionary<string, string>();

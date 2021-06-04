@@ -26,7 +26,7 @@
     int ind = 0;
     for (; ind<m.doceidarr.Length; ind++) { if (m.doceidarr[ind] == m.id) { break; } }
 <div style="text-align: center;">
-    <a href="/Home/Portrait?id=@m.eid">к документу</a>
+    <a href="?id=@m.eid">к документу</a>
     &nbsp;
     @if (ind == 0)
     {
@@ -34,7 +34,7 @@
     }
     else
     {
-        <span><a href="/Home/Portrait?id=@(m.doceidarr[ind - 1])&eid=@(m.eid)">пред</a></span>
+        <span><a href="?id=@(m.doceidarr[ind - 1])&eid=@(m.eid)">пред</a></span>
     }
     &nbsp;
     @if (ind == m.doceidarr.Length - 1)
@@ -43,7 +43,7 @@
     }
     else
     {
-        <span><a href="/Home/Portrait?id=@(m.doceidarr[ind + 1])&eid=@(m.eid)">след</a></span>
+        <span><a href="?id=@(m.doceidarr[ind + 1])&eid=@(m.eid)">след</a></span>
     }
 </div>
 }
