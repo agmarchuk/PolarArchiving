@@ -96,24 +96,8 @@ namespace SoranCore2.Models
                .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/reflected")
                .Select(i => i.Element("record"))
                .Distinct(new IdEqual())
-               //.OrderBy(r => r.Element("direct")?.Element("record"), new PhotosFirst())
                .OrderBy(r => r.Element("direct")?.Element("record"), PhotosFirst.PhF())
                .ToArray();
-
-            //if (reflected_reflections.Length > 0)
-            //{
-            //    string[] arr = reflected_reflections.Select(r => r.Element("direct")?.Element("record")?.Attribute("id")?.Value).ToArray();
-            //     var xarr = this.XRecord.Elements("inverse")
-            //       .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/reflected")
-            //       .Select(inv => inv.Element("record"))
-            //       .Distinct(new IdEqual())
-            //       .Take(5)
-            //       //.OrderBy(r => r.Element("direct")?.Element("record"), PhotosFirst.PhF())
-            //       //.Select(r => r.Attribute("id").Value)
-            //       .ToArray();
-            //    var xxx = new XElement("sbor", xarr);                
-            //        //Check_docidarr(Id, arr);
-            //}
 
             portraitphotouri = reflected_reflections
                 .Where(re => re.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/ground")?.Value == "portrait")

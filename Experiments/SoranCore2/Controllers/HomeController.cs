@@ -86,6 +86,29 @@ namespace SoranCore2.Controllers
                 else if (model.Formats.ContainsKey(model.Type))
                 {
                     XElement format = model.Formats[model.Type];
+                    
+                    model.XRecord = OAData.OADB.GetItemById(id, format);
+                    model.BuildPortrait();
+                }
+                else if (new string[] {"http://fogid.net/o/geosys", "http://fogid.net/o/country", "http://fogid.net/o/region",
+                        "http://fogid.net/o/city", "http://fogid.net/o/geosys-special" }.Contains(model.Type))
+                {
+                    XElement format = new XElement("record", //new XAttribute("type", "http://fogid.net/o/person"),
+                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/to-date")),
+                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
+                    new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                        new XElement("record",
+                            //new XElement("field", new XAttribute("prop", "http://fogid.net/o/ground")),
+                            new XElement("direct", new XAttribute("prop", "http://fogid.net/o/in-doc"),
+                                new XElement("record",
+                                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/uri")),
+                                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/docmetainfo")),
+                                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/description")),
+                                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/from-date")),
+                                    null)))));
                     model.XRecord = OAData.OADB.GetItemById(id, format);
                     model.BuildPortrait();
                 }
@@ -93,21 +116,6 @@ namespace SoranCore2.Controllers
                 {
                     model.XRecord = xrec;
                 }
-                //// Работаем с сессией: если docidarr null, то читаем из сессии, иначе ПИШЕМ в сессию
-                //string sess_name = "docidarr";
-                //if (model.docidarr == null)
-                //{
-                //    //model.docidarr = HttpContext.Session.GetString("docidarr").Split('\t');
-                //    string st = HttpContext.Session.GetString(sess_name);
-                //    model.look = "get "+sess_name+" [" + st + "]";
-                //}
-                //else
-                //{
-                //    string st = model.docidarr.Aggregate((acc, s) => acc + "\t" + s);
-                //    HttpContext.Session.SetString(sess_name, st);
-                //    model.look = "set " + sess_name + " [" + st + "]";
-                //}
-
                 // Вычисление docidarr. Это имеет смысл, когда задано значение ir или ic, тогда мы сделаем выборку, дойдя до документов и превратив выборку в массив.
                 string ir = HttpContext.Request.Query["ir"].FirstOrDefault();
                 string ic = HttpContext.Request.Query["ic"].FirstOrDefault();
