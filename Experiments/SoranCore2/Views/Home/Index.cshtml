@@ -186,9 +186,16 @@
                     || Model.Type == "http://fogid.net/o/city"
                     || Model.Type == "http://fogid.net/o/collection")
                 {
+                    <h1>@Model.Name</h1>
+                }
+                if (Model.Type == "http://fogid.net/o/person" || Model.Type == "http://fogid.net/o/org-sys"
+                    || Model.Type == "http://fogid.net/o/document"
+                    || Model.Type == "http://fogid.net/o/photo-doc"
+                    || Model.Type == "http://fogid.net/o/city"
+                    || Model.Type == "http://fogid.net/o/collection")
+                {
                     string spandate = (Model.StartDate == null ? "" : StaticObjects.DatePrinted(Model.StartDate)) +
                         (string.IsNullOrEmpty(Model.EndDate) ? "" : "-" + StaticObjects.DatePrinted(Model.EndDate));
-                    <h1>@Model.Name</h1>
                     <div>@spandate</div>
                 }
 
@@ -252,20 +259,20 @@
                 @if (Model.reflected_reflections != null && Model.reflected_reflections.Count() > 0)
                 {
                     <div>
-                    @* ======= Линейка номеров страниц ======= *@
+                        @* ======= Линейка номеров страниц ======= *@
                         @for (int d = 0; d < Model.reflected_reflections.Length; d += Model.page_length)
                         {
                             if (Model.Pg != d / Model.page_length)
                             {
-                            <a href="?id=@Model.Id&amp;pg=@(d / Model.page_length)">
-                                @(d / Model.page_length + 1)
-                            </a>
-                            <span>&nbsp;</span>
+                                <a href="?id=@Model.Id&amp;pg=@(d / Model.page_length)">
+                                    @(d / Model.page_length + 1)
+                                </a>
+                                <span>&nbsp;</span>
 
                             }
                             else if (Model.reflected_reflections.Length > Model.page_length)
                             {
-                            <b> @(d / Model.page_length + 1) </b>
+                                <b> @(d / Model.page_length + 1) </b>
                             }
                         }
                     </div>

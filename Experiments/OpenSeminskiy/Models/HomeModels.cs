@@ -299,7 +299,8 @@ namespace OpenSeminskiy.Models
             // Проживание
             livings = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/something")
-                .Select(inv => inv.Element("record").Element("direct").Element("record"));
+                .Select(inv => inv.Element("record")?.Element("direct")?.Element("record"))
+                .Where(r => r != null);
             // Авторство
             auth = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/author")
@@ -473,7 +474,25 @@ namespace OpenSeminskiy.Models
             new XElement("field", new XAttribute("prop", "http://fogid.net/o/org-classification")),
             null);
     }
-    public class DocPart { public XElement docInPart; public string pages; }
+    public class DocPart 
+    { 
+        public XElement docInPart; public string pages;
+        public static IEnumerable<DocPart> ExtractDocParts(XElement item)
+        {
+            return item.Elements("inverse")
+                .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/inDocument")
+                .Select(inv => inv.Element("record"))
+                .Select(rec => new DocPart()
+                {
+                    docInPart = rec.Element("direct")?.Element("record"),
+                    pages = SObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
+                })
+                .OrderBy(pair => pair.pages)
+                .ThenBy(pair => pair.docInPart == null ? "" : SObjects.GetField(pair.docInPart, "http://fogid.net/o/name"))
+                ;
+        }
+
+    }
     public class PortraitDocumentModel
     {
         public string id, typeid, name, description, startdate, enddate, doccontent, uri, contenttype;
@@ -500,10 +519,15 @@ namespace OpenSeminskiy.Models
                             new XElement("direct", new XAttribute("prop", "http://fogid.net/o/partItem"),
                                 new XElement("record"))))));
 
-                doceidarr = doctree.Elements("inverse")
-                        .Select(inv => inv.Element("record"))
-                        .OrderBy(r => r.Element("field")?.Value)
-                        .Select(r => r.Element("direct")?.Element("record")?.Attribute("id")?.Value)
+                //doceidarr = doctree.Elements("inverse")
+                //        .Select(inv => inv.Element("record"))
+                //        .OrderBy(r => r.Element("field")?.Value)
+                //        .Select(r => r.Element("direct")?.Element("record")?.Attribute("id")?.Value)
+                //        .Where(d => d != null)
+                //        .ToArray();
+                //var dip = DocPart.ExtractDocParts(doctree).ToArray();
+                doceidarr = DocPart.ExtractDocParts(doctree)
+                        .Select(dp => dp.docInPart.Attribute("id")?.Value)
                         .Where(d => d != null)
                         .ToArray();
             }
@@ -529,18 +553,8 @@ namespace OpenSeminskiy.Models
                 .Where(pair => pair.StartsWith("documenttype:"))
                 .Select(pair => pair.Substring("documenttype:".Length)).FirstOrDefault());
             // Части документа
-            parts = item.Elements("inverse")
-                .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/inDocument")
-                .Select(inv => inv.Element("record"))
-                .Select(rec => new DocPart()
-                {
-                    docInPart = rec.Element("direct")?.Element("record"),
-                    pages = SObjects.GetField(rec, "http://fogid.net/o/pageNumbers")
-                })
-                .OrderBy(pair => pair.pages)
-                .ThenBy(pair => pair.docInPart == null ? "" : SObjects.GetField(pair.docInPart, "http://fogid.net/o/name"))
-                ;
-                //.Select(pair => pair.docpart);
+            parts = DocPart.ExtractDocParts(item);
+            //.Select(pair => pair.docpart);
             // Отражения
             reflections = item.Elements("inverse")
                 .Where(inv => inv.Attribute("prop").Value == "http://fogid.net/o/in-doc")
@@ -587,6 +601,8 @@ namespace OpenSeminskiy.Models
             //docSrc = StaticObjects.Engine.DaraSrc;
 
         }
+
+
         private static XElement format = new XElement("record", new XAttribute("type", "http://fogid.net/o/document"),
             // Части документа
             new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/inDocument"),
