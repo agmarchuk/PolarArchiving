@@ -18,11 +18,19 @@
 {
     string name = r.Elements("field").First(f => f.Attribute("prop").Value == "http://fogid.net/o/name").Value;
     string img_src = "~/images/fund89x89.jpg";
-    var qq = r.Elements("inverse").FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/reflected");
+
+    // Последний критерий выбора поставлен потому что в данных есть разные рефлекшины, иногда берется не тот. Это ЗАПЛАТА!
+    var qq = r.Elements("inverse")
+        .FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/reflected" && !string.IsNullOrEmpty(inv.Element("record")?.Value));
+
     if (qq != null && !string.IsNullOrEmpty(qq.Value))
     {
         img_src = // (Turgunda7.SObjects.Engine.DaraSrc == null ? "~" : Turgunda7.SObjects.Engine.DaraSrc) +
             "~/Docs/GetPhoto?s=small&u=" + qq.Value;
+    }
+    else
+    {
+
     }
     string id = r.Attribute("id").Value;
     <div class="block-25 small">

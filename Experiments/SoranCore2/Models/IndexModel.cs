@@ -80,6 +80,7 @@ namespace SoranCore2.Models
         public XElement[] indocreflected = null;
         public XElement[] incollectionmember = null;
         public XElement[] orgparentorgrelatives = null;
+        public XElement[] adocauthority = null;
 
         public Func<string, string> ImgSrc = (string tp) => tp == "http://fogid.net/o/document" ? "~/img/document_s.jpg" :
             (tp == "http://fogid.net/o/photo-doc" ? "~/Docs/GetPhoto?s=small&u=" :
@@ -92,6 +93,11 @@ namespace SoranCore2.Models
         internal static Dictionary<string, string[]> ir_dic = new Dictionary<string, string[]>(); 
         public void BuildPortrait()
         {
+            adocauthority = this.XRecord.Elements("inverse")
+               .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/adoc")
+               .Select(i => i.Element("record"))
+               .ToArray();
+
             reflected_reflections = this.XRecord.Elements("inverse")
                .Where(i => i.Attribute("prop").Value == "http://fogid.net/o/reflected")
                .Select(i => i.Element("record"))
@@ -293,6 +299,13 @@ namespace SoranCore2.Models
                             new XElement("record",
                                 new XElement("field", new XAttribute("prop", "http://fogid.net/o/ground")),
                                 new XElement("direct", new XAttribute("prop", "http://fogid.net/o/reflected"),
+                                    new XElement("record",
+                                        new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
+                                        null)))),
+                        new XElement("inverse", new XAttribute("prop", "http://fogid.net/o/adoc"),
+                            new XElement("record",
+                                new XElement("field", new XAttribute("prop", "http://fogid.net/o/authority-specificator")),
+                                new XElement("direct", new XAttribute("prop", "http://fogid.net/o/author"),
                                     new XElement("record",
                                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")),
                                         null)))),
