@@ -20,9 +20,4 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!--<ProjectReference Include="..\CassettesCore\CassettesCore.csproj" />
-    <ProjectReference Include="..\Turgunda7\Turgunda7.csproj" />-->
-  </ItemGroup>
-
 </Project>
