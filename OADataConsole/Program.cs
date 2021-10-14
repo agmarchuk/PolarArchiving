@@ -5,13 +5,18 @@ using OAData;
 
 namespace OADataConsole
 {
-    class Program
+    partial class Program
     {
         static void Main(string[] args)
         {
+            //Main1(args);
+            Main2(args);
+        }
+        static void Main1(string[] args)
+        {
             Console.WriteLine("Start OADataConsole");
             // Работаем в этой директории
-            string datadir = @"D:\Home\dev2020\PolarArchiving\OADataConsole\";
+            string datadir = @"C:\Home\dev2021\PolarArchiving\OADataConsole\";
 
             // Сформируем тестовую кассету, поместим ее в директорию
             OAData.OADB.Init(datadir);

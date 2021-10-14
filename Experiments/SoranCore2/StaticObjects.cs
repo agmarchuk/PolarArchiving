@@ -21,6 +21,7 @@ namespace SoranCore2
 
         public static string GetField(XElement rec, string prop)
         {
+            if (rec == null) return null;
             //string lang = null;
             string res = null;
             foreach (XElement f in rec.Elements("field"))

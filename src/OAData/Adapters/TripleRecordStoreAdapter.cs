@@ -22,7 +22,7 @@ namespace OAData.Adapters
         private Action<string> errors = s => { Console.WriteLine(s); };
         string dbfolder = "D:/";
         int file_no = 0;
-        internal bool firsttime = true; // Отмечает (вычисляет) ситуацию, когда базу данных обязательно нужно строить.
+        //public bool firsttime = true; // Отмечает (вычисляет) ситуацию, когда базу данных обязательно нужно строить.
         // Важные коды
         //private int cod_rdftype = 0;
         //private int cod_name;
@@ -542,7 +542,10 @@ namespace OAData.Adapters
                         .Where(dup => (int)dup[0] == iprop)
                         .Select(dup =>
                         {
-                            return new XElement("field", new XAttribute("prop", prop), (string)dup[1]);
+                            //return new XElement("field", new XAttribute("prop", prop), (string)dup[1]);
+                            return new XElement("field", new XAttribute("prop", store.DecodeEntity((int)dup[0])),
+                        ((string)dup[2] == "" ? null : new XAttribute("{http://www.w3.org/XML/1998/namespace}lang", (string)dup[2])),
+                        (string)dup[1]);
                         });
                         return query;
                     }

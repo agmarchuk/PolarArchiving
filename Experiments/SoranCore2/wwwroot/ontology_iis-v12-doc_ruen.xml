@@ -1,4 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Правки http://fogid.net/o/some-date заменена на http://fogid.net/o/date
+-->
 <Ontology dbid="ontology_iis-v6" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <Class rdf:about="http://fogid.net/o/entity" abstract="yes" />
   <DatatypeProperty rdf:about="http://fogid.net/o/comment" priority="z">
@@ -537,7 +540,7 @@
     <state value="after" xml:lang="ru">после конца</state>
     <state value="after" xml:lang="en">after</state>
   </EnumerationType>
-  <DatatypeProperty rdf:about="http://fogid.net/o/some-date" priority="n" essential="yes">
+  <DatatypeProperty rdf:about="http://fogid.net/o/date" priority="n" essential="yes">
     <label xml:lang="ru">дата</label>
     <label xml:lang="en">date</label>
     <domain rdf:resource="http://fogid.net/o/dating"/>
