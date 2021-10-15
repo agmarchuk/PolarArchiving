@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" dbid="Cassette_test20180311_cassette_1">
-  <sourcemeta rdf:about="Cassette_test20180311config_1">
-    <foldername>0001</foldername>
-    <documentnumber>0011</documentnumber>
-  </sourcemeta>
-</rdf:RDF>

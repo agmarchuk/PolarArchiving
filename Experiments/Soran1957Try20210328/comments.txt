@@ -1,4 +1,0 @@
-﻿
-Construct.cs
-Надо сделать Description через поля. 
-
