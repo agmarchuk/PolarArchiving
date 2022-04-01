@@ -13,8 +13,8 @@ namespace OAData
 {
     public class OADB
     {
-        private static CassInfo[] cassettes = null;
-        private static FogInfo[] fogs = null;
+        public static CassInfo[] cassettes = null;
+        public static FogInfo[] fogs = null;
         public static DAdapter adapter = null;
 
         public static string look = "";
@@ -68,23 +68,15 @@ namespace OAData
                 {
                     adapter = new XmlDbAdapter();
                 }
+                else if (pre == "om")
+                {
+                    adapter = new OmAdapter();
+                }
                 adapter.Init(connectionstring);
                 
-                //bool toload = false;
-                //if (toload)
-                //{
-                //    adapter.StartFillDb(null);
-                //    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
-                //    //    null, null);
-                //    adapter.FillDb(fogs, null);
-                //    adapter.FinishFillDb(null);
-                //}
-                //else
-                //{
-
-                //}
-                
+                if (pre == "trs") Load();
                 if (pre == "xml") Load();
+                if (pre == "om") Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
@@ -147,7 +139,7 @@ namespace OAData
                     var attts = ReadFogAttributes(fi.FullName);
 
                     // запишем владельца, уточним признак записи
-                    cass.owner = attts.owner;
+                    //cass.owner = attts.owner;
                     fogs_list.Add(new FogInfo()
                     {
                         //cassette = cass,
@@ -291,7 +283,7 @@ namespace OAData
                 {
                     string prop = el.Attribute("prop").Value;
                     int pos = prop.LastIndexOf('/');
-                    XName subel_name = XName.Get(prop.Substring(pos + 1), prop.Substring(0, pos));
+                    XName subel_name = XName.Get(prop.Substring(pos + 1), prop.Substring(0, pos + 1));
                     if (props.Contains(prop.Substring(pos + 1))) return null;
                     XElement subel = new XElement(subel_name);
                     if (el.Name == "field") subel.Add(el.Value);
@@ -300,6 +292,10 @@ namespace OAData
                 }));
                 return PutItem(nitem);
             }
+        }
+        public static bool HasWritabeFogForUser(string user)
+        {
+            return fogs.Any(f => f.owner == user && f.writable);
         }
         public static XElement PutItem(XElement item)
         {
@@ -375,8 +371,8 @@ namespace OAData
         private static (string owner, string prefix, string counter)  ReadFogAttributes(string pth)
         {
             // Нужно для чтиния в кодировке windows-1251. Нужен также Nuget System.Text.Encoding.CodePages
-            var v = System.Text.CodePagesEncodingProvider.Instance;
-            System.Text.Encoding.RegisterProvider(v);
+            //var v = System.Text.CodePagesEncodingProvider.Instance;
+            //System.Text.Encoding.RegisterProvider(v);
 
             string owner = null;
             string prefix = null;

@@ -139,6 +139,7 @@ namespace OAData.Adapters
                 {
 
                 }
+                GC.Collect();
             }
 
             // Второй проход сканирования фог-файлов. В этом проходе, для каждого фога формируется поток записей в 
@@ -189,6 +190,7 @@ namespace OAData.Adapters
                 {
 
                 }
+                GC.Collect();
             }
             //store.Build();
             //store.Flush();
