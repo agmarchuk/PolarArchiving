@@ -112,6 +112,7 @@ namespace OAData.Adapters
             Dictionary<string, InverseLink[]> inverseProps = xflow.SelectMany(record =>
             {
                 string id = record.Attribute(ONames.rdfabout).Value;
+                if (id == "syp2001-p-marchuk_a") { }
                 // Корректируем идентификатор
                 if (orig_ids.TryGetValue(id, out string idd)) id = idd;
                 var directProps = record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
@@ -128,6 +129,8 @@ namespace OAData.Adapters
             .Select(g => new { key = g.Key, ilinks = g.Select(lnk => lnk) })
             .ToDictionary(pair => pair.key, pair => pair.ilinks.ToArray());
             //Dictionary<string, InverseLink[]> inverseProps = new Dictionary<string, InverseLink[]>();
+
+            //var test_rec = inverseProps["syp2001-p-marchuk_a"];
 
             // Проход 2: вычисление графа 
             IEnumerable<object> flow = xflow.Select(record =>
