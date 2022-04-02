@@ -203,7 +203,7 @@ namespace OAData.Adapters
                     var pa_prop = ((object[])record[2]).Cast<object[]>()
                         .FirstOrDefault(pa => (int)pa[0] == 2 && (string)((object[])pa[1])[0] == prop);
                      
-                    if (pa_prop == null) Enumerable.Empty<XElement>();
+                    if (pa_prop == null || pa_prop.Length != 2) return Enumerable.Empty<XElement>();
                     // Найдем запись 
                     object[] drec = (object[])GetRecord((string)((object[])pa_prop[1])[1]);
                     if (drec == null) return Enumerable.Empty<XElement>();
