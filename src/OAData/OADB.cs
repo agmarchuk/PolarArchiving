@@ -371,8 +371,8 @@ namespace OAData
         private static (string owner, string prefix, string counter)  ReadFogAttributes(string pth)
         {
             // Нужно для чтиния в кодировке windows-1251. Нужен также Nuget System.Text.Encoding.CodePages
-            //var v = System.Text.CodePagesEncodingProvider.Instance;
-            //System.Text.Encoding.RegisterProvider(v);
+            var v = System.Text.CodePagesEncodingProvider.Instance;
+            System.Text.Encoding.RegisterProvider(v);
 
             string owner = null;
             string prefix = null;
