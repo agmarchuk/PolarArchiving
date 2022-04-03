@@ -603,6 +603,7 @@ namespace OAData.Adapters
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"), GetRecordName(tri)));
                     return res;
                 })//.ToArray()
+                .ToArray()
                 ;
             return query2;
         }

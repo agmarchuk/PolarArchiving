@@ -209,8 +209,15 @@ namespace OAData.Adapters
                     if (drec == null) return Enumerable.Empty<XElement>();
                     string tp = (string)drec[1];
                     XElement f = fe.Elements("record")
-                        .FirstOrDefault(xre => xre.Attribute("type") == null || xre.Attribute("type").Value == tp); ;
-                    
+                        .FirstOrDefault(xre => xre.Attribute("type") == null || xre.Attribute("type").Value == tp); 
+                    // Вот это место надо бы сделать с учетом наследования типов, а пока - упрощенный вариант
+                    if (f == null)
+                    {
+                        XElement ff = fe.Element("record");
+                        if (ff == null) return Enumerable.Empty<XElement>();
+                        f = ff;
+                    }
+
                     // Мы подобрали формат к записи и можем рекурсивно применить метод
                     return Enumerable.Repeat<XElement>(new XElement("direct", ItemByRecord(drec, f)), 1);
                 }
