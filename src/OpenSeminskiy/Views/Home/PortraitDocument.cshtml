@@ -51,7 +51,7 @@
 {
     <img src="@m.uri" />
 }
-else if (!string.IsNullOrEmpty(m.uri) && m.contenttype.StartsWith("image/"))
+else if (!string.IsNullOrEmpty(m.uri) && m.contenttype != null && m.contenttype.StartsWith("image/"))
 {
     string sr = (m.docSrc == null ? "~" : m.docSrc) + "/Docs/GetPhoto?s=normal&u=" + m.uri;
     //string sr = (SObjects.Engine.DaraSrc == null ? "~" :
