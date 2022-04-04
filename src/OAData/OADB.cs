@@ -24,7 +24,7 @@ namespace OAData
         public static XElement XConfig { get { return _xconfig; } }
 
         public static bool initiated = false;
-        public static bool firsttime = true;
+        public static bool firsttime = false;
         public static void Init(string pth)
         {
             path = pth;
