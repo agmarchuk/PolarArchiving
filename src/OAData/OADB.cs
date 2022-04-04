@@ -74,7 +74,7 @@ namespace OAData
                 }
                 adapter.Init(connectionstring);
                 
-                if (pre == "trs") Load();
+                if (pre == "trs" && firsttime) Load();
                 if (pre == "xml") Load();
                 if (pre == "om") Load();
 
