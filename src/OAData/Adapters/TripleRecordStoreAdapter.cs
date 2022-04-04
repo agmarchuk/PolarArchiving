@@ -648,7 +648,7 @@ namespace OAData.Adapters
                         .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName),
                                 store.CodeEntity(el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource").Value) })).ToArray(),
                 rec.Elements().Where(el => el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource") == null)
-                        .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName), el.Value }).ToArray()
+                        .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName), el.Value, el.Attribute(ONames.xmllang)==null?"": el.Attribute(ONames.xmllang).Value }).ToArray()
             };
         }
         public override XElement PutItem(XElement record)
