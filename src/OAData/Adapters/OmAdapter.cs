@@ -100,6 +100,7 @@ namespace OAData.Adapters
         public override void FinishFillDb(Action<string> turlog)
         {
             records.Build();
+            GC.Collect();
         }
 
         // Загрузка потока x-элементов

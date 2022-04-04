@@ -113,6 +113,7 @@ namespace OAData.Adapters
         public override void FinishFillDb(Action<string> turlog)
         {
             store.Build();
+            GC.Collect();
         }
         // Новая реализация загрузки базы данных
         //public override void FillDb(IEnumerable<FogInfo> fogflow, Action<string> turlog)
