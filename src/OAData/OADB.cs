@@ -73,8 +73,10 @@ namespace OAData
                     adapter = new OmAdapter();
                 }
                 adapter.Init(connectionstring);
-                
-                if (pre == "trs" && firsttime) Load();
+                PrepareFogs(XConfig);
+
+                //if (pre == "trs" && firsttime) Load();
+                if (pre == "trs") Load();
                 if (pre == "xml") Load();
                 if (pre == "om") Load();
 
@@ -161,7 +163,6 @@ namespace OAData
 
         public static void Load()
         {
-            PrepareFogs(XConfig);
             adapter.StartFillDb(null);
             adapter.FillDb(fogs, null);
             adapter.FinishFillDb(null);
