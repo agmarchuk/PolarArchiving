@@ -38,7 +38,7 @@ namespace OAData.Adapters
             {
                 dbfolder = connectionstring.Substring(4);
             }
-            if (File.Exists(dbfolder + "0.bin")) firsttime = false;
+            if (File.Exists(dbfolder + "0.bin")) nodatabase = false;
             Func<Stream> GenStream = () =>
                 new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             store = new TripleRecordStore(GenStream, dbfolder, new string[] {

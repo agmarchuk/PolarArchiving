@@ -24,12 +24,11 @@ namespace OAData
         public static XElement XConfig { get { return _xconfig; } }
 
         public static bool initiated = false;
-        public static bool firsttime = false;
+        public static bool nodatabase = true;
         public static void Init(string pth)
         {
             path = pth;
             Init();
-            if (adapter.firsttime) firsttime = true;
             initiated = true;
         }
         public static string configfilename = "config.xml";
@@ -75,10 +74,11 @@ namespace OAData
                 adapter.Init(connectionstring);
                 PrepareFogs(XConfig);
 
-                //if (pre == "trs" && firsttime) Load();
-                if (pre == "trs") Load();
+                if (!adapter.nodatabase) nodatabase = false;
+
+                if (pre == "trs" && nodatabase) Load();
                 if (pre == "xml") Load();
-                if (pre == "om") Load();
+                if (pre == "om" && nodatabase) Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
@@ -348,7 +348,25 @@ namespace OAData
             {
                 element.Remove();
             }
-            XElement nitem = new XElement(item);
+
+            // Очищаем запись от пустых полей
+            XElement nitem = new XElement(item.Name, item.Attribute(ONames.rdfabout), item.Attribute("mT"), 
+                item.Elements().Select(xprop =>
+                {
+                    XAttribute aresource = xprop.Attribute(ONames.rdfresource);
+                    if (aresource == null)
+                    {   // DatatypeProperty
+                        if (string.IsNullOrEmpty(xprop.Value)) return null; // Глевное убирание!!!
+                        return new XElement(xprop);
+                    }
+                    else
+                    {   // ObjectProperty
+                        return new XElement(xprop); //TODO: Возможно, надо убрать ссылки типа ""
+                    }
+                }),
+                null);
+
+
             fi.fogx.Add(nitem);
 
             // Сохраняем файл

@@ -56,7 +56,7 @@ namespace OAData.Adapters
             {
                 dbfolder = connectionstring.Substring("om:".Length);
             }
-            if (File.Exists(dbfolder + "0.bin")) firsttime = false;
+            if (File.Exists(dbfolder + "0.bin")) nodatabase = false;
             Func<Stream> GenStream = () =>
                 new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
 

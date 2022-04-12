@@ -9,7 +9,7 @@ namespace OAData.Adapters
 {
     abstract public class DAdapter
     {
-        public bool firsttime = true;
+        public bool nodatabase = true;
         public abstract void Init(string connectionstring);
         public abstract void Close();
         // ============== Основные методы доступа к БД =============
