@@ -178,6 +178,8 @@ namespace OAData
         {
             adapter.Close();
         }
+
+        // Доступ к документным файлам по uri и параметрам
         public static string CassDirPath(string uri)
         {
             if (!uri.StartsWith("iiss://")) throw new Exception("Err: 22233");
@@ -185,43 +187,25 @@ namespace OAData
             if (pos < 8) throw new Exception("Err: 22234");
             return cassettes.FirstOrDefault(c => c.name == uri.Substring(7, pos - 7))?.path;
         }
-        public void Test()
-        { 
-            // Испытаем
-            var query = adapter.SearchByName("марчук");
-            XElement xseq = new XElement("sequ");
-            foreach (XElement rec in query)
-            {
-                //Console.WriteLine(rec.ToString());
-                xseq.Add(rec);
-            }
-            look = xseq.ToString();
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine(look);
-            XElement xrec = adapter.GetItemByIdBasic("syp2001-p-marchuk_a", true);
-            if (xrec != null) Console.WriteLine(xrec.ToString());
-
-            XElement x = XElement.Parse(@"
-<person xmlns='http://fogid.net/o/' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' owner='tester'
->
-<name xml:lang='ru'>Пупкин Первый</name>
-</person>
-    ");
-            //var result = PutItem(x);
-            //Console.WriteLine(result.ToString());
-
-            foreach (XElement rec in SearchByName("Аааков"))
-            {
-                Console.WriteLine(rec.ToString());
-            }
-
-            //string person_id = "syp2001-p-marchuk_a";
-            string person_id = "Cassette_test20180311_tester_636565276468061094_1067";
-            XElement format = new XElement("record",
-                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")));
-            var xperson = GetItemById(person_id, format);
-            Console.WriteLine(xperson.ToString());
+        public static string GetFilePath(string u, string s)
+        {
+            if (u == null) return null;
+            u = System.Web.HttpUtility.UrlDecode(u);
+            var cass_dir = OAData.OADB.CassDirPath(u);
+            if (cass_dir == null) return null;
+            string last10 = u.Substring(u.Length - 10);
+            string subpath;
+            string method = s;
+            if (method == null) subpath = "/originals";
+            if (method == "small") subpath = "/documents/small";
+            else if (method == "medium") subpath = "/documents/medium";
+            else subpath = "/documents/normal"; // (method == "n")
+            string path = cass_dir + subpath + last10 + ".jpg";
+            return path;
         }
+
+
+        // Доступ ка базе данных
         public static IEnumerable<XElement> SearchByName(string ss)
         {
             return adapter.SearchByName(ss);
