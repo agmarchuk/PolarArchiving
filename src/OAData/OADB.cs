@@ -71,6 +71,10 @@ namespace OAData
                 {
                     adapter = new OmAdapter();
                 }
+                else if (pre == "uni")
+                {
+                    adapter = new UniAdapter();
+                }
                 adapter.Init(connectionstring);
                 PrepareFogs(XConfig);
 
@@ -79,6 +83,7 @@ namespace OAData
                 if (pre == "trs" && nodatabase) Load();
                 if (pre == "xml") Load();
                 if (pre == "om" && nodatabase) Load();
+                if (pre == "uni") Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
