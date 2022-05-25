@@ -16,8 +16,8 @@ namespace OAData.Adapters
         private PType tp_rec;
         private PType tp_triple;
         private USequence records;
-        private UVectorIndex names;
-        private UVectorIndex words;
+        private SVectorIndex names;
+        private SVectorIndex words;
 
         private Func<object, bool> Isnull;
 
@@ -85,7 +85,7 @@ namespace OAData.Adapters
                     .Select(f => (string)f[1]).ToArray();
                 return query;
             };
-            names = new UVectorIndex(GenStream, records, new PType(PTypeEnumeration.sstring), skey);
+            names = new SVectorIndex(GenStream, records, skey);
             //additional_names = new SVectorDynaIndex(records, skey);
             records.uindexes = new IUIndex[]
             {
