@@ -579,14 +579,11 @@ namespace OpenSeminskiy.Models
             // Источник поступления
             var fromarchivemember = item.Elements("inverse")
                 .FirstOrDefault(inv => inv.Attribute("prop").Value == "http://fogid.net/o/archive-item");
-            XElement toinfosource = fromarchivemember == null ? null :
-                fromarchivemember.Element("record").Elements("direct")
-                .FirstOrDefault(di => di.Attribute("prop").Value == "http://fogid.net/o/info-source");
-            infosource = toinfosource == null ? null :
-                toinfosource.Element("record");
+            XElement toinfosource = fromarchivemember?.Element("record")?.Elements("direct")
+                .FirstOrDefault(di => di.Attribute("prop")?.Value == "http://fogid.net/o/info-source");
+            infosource = toinfosource?.Element("record");
             // Дополнительная информация про источник поступления
-            descr_infosource = fromarchivemember == null ? null :
-                fromarchivemember.Element("record")?.Elements("field")
+            descr_infosource = fromarchivemember?.Element("record")?.Elements("field")
                 .FirstOrDefault(di => di.Attribute("prop").Value == "http://fogid.net/o/description");
 
             // Элемент коллекций    

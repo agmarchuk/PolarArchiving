@@ -9,7 +9,7 @@ namespace OAData.Adapters
 {
     abstract public class DAdapter
     {
-        public bool firsttime = true;
+        public bool nodatabase = true;
         public abstract void Init(string connectionstring);
         public abstract void Close();
         // ============== Основные методы доступа к БД =============
@@ -31,12 +31,15 @@ namespace OAData.Adapters
         {
             // Нулевой проход сканирования фог-файлов. Строим таблицу строка-строка с соответствием идентификатору
             // идентификатора оригинала или null.
+            Console.WriteLine("=== Загрузка данных согласно конфигуратору");
             Dictionary<string, string> substitutes = new Dictionary<string, string>();
+            int nfogs = 0;
             foreach (FogInfo fi in fogflow)
             {
                 // Чтение фога
                 if (fi.vid == ".fog")
                 {
+                    nfogs++;
                     fi.fogx = XElement.Load(fi.pth);
                     foreach (XElement xrec in fi.fogx.Elements())
                     {
@@ -73,6 +76,7 @@ namespace OAData.Adapters
                     }
                 }
             }
+            Console.WriteLine($"{nfogs} fogs");
             // Функция, добирающаяся до последнего определения или это и есть последнее
             Func<string, string> original = null;
             original = id =>
@@ -94,6 +98,7 @@ namespace OAData.Adapters
                 orig_ids.Add(key, value);
             }
 
+            Console.WriteLine($"{orig_ids.Count} orig_ids");
 
             // Готовим битовый массив для отметки того, что хеш id уже "попадал" в этот бит
             int rang = 24; // пока предполагается, что число записей (много) меньше 16 млн.
@@ -139,16 +144,25 @@ namespace OAData.Adapters
                 {
 
                 }
+                GC.Collect();
             }
+            Console.WriteLine($"{lastDefs.Count} lastDefs");
 
             // Второй проход сканирования фог-файлов. В этом проходе, для каждого фога формируется поток записей в 
             // объектном представлении, потом этот поток добавляется в store
+
+            // Будем формировать единый поток x-ЗАПИСЕЙ
+            IEnumerable<XElement> xflow = Enumerable.Empty<XElement>();
+            int nrecords = 0;
             foreach (FogInfo fi in fogflow)
             {
                 // Чтение фога
-                if (fi.vid == ".fog" || fi.vid == ".fogx")
+                if (fi.vid == ".fog" || fi.vid == ".fogx") //TODO: раньше .fogx не было
                 {
                     fi.fogx = XElement.Load(fi.pth);
+
+                    Console.WriteLine($"loaded {fi.fogx.Elements().Count()} elements from {fi.pth}");
+                    
                     var flow = fi.fogx.Elements()
                     .Select(xrec => ConvertXElement(xrec))
                     // Обработаем delete и replace. delete доминирует (по времени), но в выходной поток ничего не попадает
@@ -180,8 +194,11 @@ namespace OAData.Adapters
                             }
                         }
                         return true;
-                    });
-                    LoadXFlow(flow, orig_ids);
+                    })
+                    .Where(record => { nrecords++; return true; });
+
+                    xflow = xflow.Concat(flow); 
+                    //LoadXFlow(flow, orig_ids);
 
                     fi.fogx = null;
                 }
@@ -189,7 +206,13 @@ namespace OAData.Adapters
                 {
 
                 }
+                GC.Collect();
             }
+
+            LoadXFlow(xflow, orig_ids);
+
+            Console.WriteLine($"Total {nrecords} records");
+
             //store.Build();
             //store.Flush();
             //GC.Collect();

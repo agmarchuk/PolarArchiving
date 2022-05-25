@@ -10,5 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\PolarDB\src\TripleStore\Polar.TripleStore.csproj" />
+    <ProjectReference Include="..\..\..\PolarDB\Polar.OModel\Polar.OModel.csproj" />
+    <ProjectReference Include="..\..\..\PolarDB\Polar.Universal\Polar.Universal.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <config>
-  <!--<database connectionstring="trs:C:/Home/data/Databases/OADataService/" />-->
+  <!--
+    <database connectionstring="trs:C:/Home/data/Databases/OADataService/" />
+    <database connectionstring="om:D:\Home\data\om\" />
+    -->
   <database connectionstring="xml:"/>
 
   <!--

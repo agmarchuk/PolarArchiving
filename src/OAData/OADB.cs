@@ -13,8 +13,8 @@ namespace OAData
 {
     public class OADB
     {
-        private static CassInfo[] cassettes = null;
-        private static FogInfo[] fogs = null;
+        public static CassInfo[] cassettes = null;
+        public static FogInfo[] fogs = null;
         public static DAdapter adapter = null;
 
         public static string look = "";
@@ -24,12 +24,11 @@ namespace OAData
         public static XElement XConfig { get { return _xconfig; } }
 
         public static bool initiated = false;
-        public static bool firsttime = true;
+        public static bool nodatabase = true;
         public static void Init(string pth)
         {
             path = pth;
             Init();
-            if (adapter.firsttime) firsttime = true;
             initiated = true;
         }
         public static string configfilename = "config.xml";
@@ -68,23 +67,23 @@ namespace OAData
                 {
                     adapter = new XmlDbAdapter();
                 }
+                else if (pre == "om")
+                {
+                    adapter = new OmAdapter();
+                }
+                else if (pre == "uni")
+                {
+                    adapter = new UniAdapter();
+                }
                 adapter.Init(connectionstring);
-                
-                //bool toload = false;
-                //if (toload)
-                //{
-                //    adapter.StartFillDb(null);
-                //    //adapter.LoadFromCassettesExpress(fogs.Select(fo => fo.pth),
-                //    //    null, null);
-                //    adapter.FillDb(fogs, null);
-                //    adapter.FinishFillDb(null);
-                //}
-                //else
-                //{
+                PrepareFogs(XConfig);
 
-                //}
-                
+                if (!adapter.nodatabase) nodatabase = false;
+
+                if (pre == "trs" && nodatabase) Load();
                 if (pre == "xml") Load();
+                if (pre == "om" && nodatabase) Load();
+                if (pre == "uni") Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
@@ -147,7 +146,7 @@ namespace OAData
                     var attts = ReadFogAttributes(fi.FullName);
 
                     // запишем владельца, уточним признак записи
-                    cass.owner = attts.owner;
+                    //cass.owner = attts.owner;
                     fogs_list.Add(new FogInfo()
                     {
                         //cassette = cass,
@@ -169,7 +168,6 @@ namespace OAData
 
         public static void Load()
         {
-            PrepareFogs(XConfig);
             adapter.StartFillDb(null);
             adapter.FillDb(fogs, null);
             adapter.FinishFillDb(null);
@@ -185,6 +183,8 @@ namespace OAData
         {
             adapter.Close();
         }
+
+        // Доступ к документным файлам по uri и параметрам
         public static string CassDirPath(string uri)
         {
             if (!uri.StartsWith("iiss://")) throw new Exception("Err: 22233");
@@ -192,43 +192,25 @@ namespace OAData
             if (pos < 8) throw new Exception("Err: 22234");
             return cassettes.FirstOrDefault(c => c.name == uri.Substring(7, pos - 7))?.path;
         }
-        public void Test()
-        { 
-            // Испытаем
-            var query = adapter.SearchByName("марчук");
-            XElement xseq = new XElement("sequ");
-            foreach (XElement rec in query)
-            {
-                //Console.WriteLine(rec.ToString());
-                xseq.Add(rec);
-            }
-            look = xseq.ToString();
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine(look);
-            XElement xrec = adapter.GetItemByIdBasic("syp2001-p-marchuk_a", true);
-            if (xrec != null) Console.WriteLine(xrec.ToString());
-
-            XElement x = XElement.Parse(@"
-<person xmlns='http://fogid.net/o/' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' owner='tester'
->
-<name xml:lang='ru'>Пупкин Первый</name>
-</person>
-    ");
-            //var result = PutItem(x);
-            //Console.WriteLine(result.ToString());
-
-            foreach (XElement rec in SearchByName("Аааков"))
-            {
-                Console.WriteLine(rec.ToString());
-            }
-
-            //string person_id = "syp2001-p-marchuk_a";
-            string person_id = "Cassette_test20180311_tester_636565276468061094_1067";
-            XElement format = new XElement("record",
-                new XElement("field", new XAttribute("prop", "http://fogid.net/o/name")));
-            var xperson = GetItemById(person_id, format);
-            Console.WriteLine(xperson.ToString());
+        public static string GetFilePath(string u, string s)
+        {
+            if (u == null) return null;
+            u = System.Web.HttpUtility.UrlDecode(u);
+            var cass_dir = OAData.OADB.CassDirPath(u);
+            if (cass_dir == null) return null;
+            string last10 = u.Substring(u.Length - 10);
+            string subpath;
+            string method = s;
+            if (method == null) subpath = "/originals";
+            if (method == "small") subpath = "/documents/small";
+            else if (method == "medium") subpath = "/documents/medium";
+            else subpath = "/documents/normal"; // (method == "n")
+            string path = cass_dir + subpath + last10 + ".jpg";
+            return path;
         }
+
+
+        // Доступ ка базе данных
         public static IEnumerable<XElement> SearchByName(string ss)
         {
             return adapter.SearchByName(ss);
@@ -291,7 +273,7 @@ namespace OAData
                 {
                     string prop = el.Attribute("prop").Value;
                     int pos = prop.LastIndexOf('/');
-                    XName subel_name = XName.Get(prop.Substring(pos + 1), prop.Substring(0, pos));
+                    XName subel_name = XName.Get(prop.Substring(pos + 1), prop.Substring(0, pos + 1));
                     if (props.Contains(prop.Substring(pos + 1))) return null;
                     XElement subel = new XElement(subel_name);
                     if (el.Name == "field") subel.Add(el.Value);
@@ -300,6 +282,10 @@ namespace OAData
                 }));
                 return PutItem(nitem);
             }
+        }
+        public static bool HasWritabeFogForUser(string user)
+        {
+            return fogs.Any(f => f.owner == user && f.writable);
         }
         public static XElement PutItem(XElement item)
         {
@@ -351,7 +337,25 @@ namespace OAData
             {
                 element.Remove();
             }
-            XElement nitem = new XElement(item);
+
+            // Очищаем запись от пустых полей
+            XElement nitem = new XElement(item.Name, item.Attribute(ONames.rdfabout), item.Attribute("mT"), 
+                item.Elements().Select(xprop =>
+                {
+                    XAttribute aresource = xprop.Attribute(ONames.rdfresource);
+                    if (aresource == null)
+                    {   // DatatypeProperty
+                        if (string.IsNullOrEmpty(xprop.Value)) return null; // Глевное убирание!!!
+                        return new XElement(xprop);
+                    }
+                    else
+                    {   // ObjectProperty
+                        return new XElement(xprop); //TODO: Возможно, надо убрать ссылки типа ""
+                    }
+                }),
+                null);
+
+
             fi.fogx.Add(nitem);
 
             // Сохраняем файл

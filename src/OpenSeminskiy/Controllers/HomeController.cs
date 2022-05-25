@@ -46,7 +46,7 @@ namespace OpenSeminskiy.Controllers
             {
                 return View("PortraitPerson", new PortraitPersonModel(id));
             }
-            else if (type == "http://fogid.net/o/collection")
+            else if (type == "http://fogid.net/o/collection" || type == "http://fogid.net/o/cassette")
             {
                 return View("PortraitCollection", new PortraitCollectionModel(id));
             }

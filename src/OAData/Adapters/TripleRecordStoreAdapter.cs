@@ -38,7 +38,7 @@ namespace OAData.Adapters
             {
                 dbfolder = connectionstring.Substring(4);
             }
-            if (File.Exists(dbfolder + "0.bin")) firsttime = false;
+            if (File.Exists(dbfolder + "0.bin")) nodatabase = false;
             Func<Stream> GenStream = () =>
                 new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             store = new TripleRecordStore(GenStream, dbfolder, new string[] {
@@ -113,6 +113,7 @@ namespace OAData.Adapters
         public override void FinishFillDb(Action<string> turlog)
         {
             store.Build();
+            GC.Collect();
         }
         // Новая реализация загрузки базы данных
         //public override void FillDb(IEnumerable<FogInfo> fogflow, Action<string> turlog)
@@ -603,6 +604,7 @@ namespace OAData.Adapters
                         new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"), GetRecordName(tri)));
                     return res;
                 })//.ToArray()
+                .ToArray()
                 ;
             return query2;
         }
@@ -646,7 +648,7 @@ namespace OAData.Adapters
                         .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName),
                                 store.CodeEntity(el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource").Value) })).ToArray(),
                 rec.Elements().Where(el => el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource") == null)
-                        .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName), el.Value }).ToArray()
+                        .Select(el => new object[] { store.CodeEntity("http://fogid.net/o/" + el.Name.LocalName), el.Value, el.Attribute(ONames.xmllang)==null?"": el.Attribute(ONames.xmllang).Value }).ToArray()
             };
         }
         public override XElement PutItem(XElement record)
