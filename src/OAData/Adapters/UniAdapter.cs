@@ -256,7 +256,66 @@ namespace OAData.Adapters
 
         public override XElement GetItemById(string id, XElement format)
         {
-            throw new NotImplementedException();
+            return ItemByRecord((object[])GetRecord(id), format);
+        }
+        private XElement ItemByRecord(object[] record, XElement format)
+        {
+            var xprops = format.Elements().SelectMany(fe =>
+            {
+                string prop = fe.Attribute("prop").Value;
+                if (fe.Name.LocalName == "field")
+                {
+                    var ofields = ((object[])record[2]).Cast<object[]>().Where(pa => (int)pa[0] == 1)
+                        .Select(pa => (object[])pa[1]).Where(ofield => (string)ofield[0] == prop)
+                        .Select(ofield => new XElement("field", new XAttribute("prop", prop),
+                            (ofield[2] == null ? null : new XAttribute(ONames.xmllang, ofield[2])),
+                            ofield[1]));
+                    return ofields;
+                }
+                else if (fe.Name.LocalName == "direct")
+                {
+                    // Прямая ссылка может быть только одна (???)
+                    var pa_prop = ((object[])record[2]).Cast<object[]>()
+                        .FirstOrDefault(pa => (int)pa[0] == 2 && (string)((object[])pa[1])[0] == prop);
+
+                    if (pa_prop == null || pa_prop.Length != 2) return Enumerable.Empty<XElement>();
+                    // Найдем запись 
+                    object[] drec = (object[])GetRecord((string)((object[])pa_prop[1])[1]);
+                    if (drec == null) return Enumerable.Empty<XElement>();
+                    string tp = (string)drec[1];
+                    XElement f = fe.Elements("record")
+                        .FirstOrDefault(xre => xre.Attribute("type") == null || xre.Attribute("type").Value == tp);
+                    // Вот это место надо бы сделать с учетом наследования типов, а пока - упрощенный вариант
+                    if (f == null)
+                    {
+                        XElement ff = fe.Element("record");
+                        if (ff == null) return Enumerable.Empty<XElement>();
+                        f = ff;
+                    }
+
+                    // Мы подобрали формат к записи и можем рекурсивно применить метод
+                    return Enumerable.Repeat<XElement>(new XElement("direct", ItemByRecord(drec, f)), 1);
+                }
+                else if (fe.Name.LocalName == "inverse")
+                {
+                    // обратных ссылок может быть несколько (!)
+                    var pa_props = ((object[])record[2]).Cast<object[]>()
+                        .Where(pa => (int)pa[0] == 3 && (string)((object[])pa[1])[0] == prop);
+
+                    XElement f = fe.Element("record");
+
+                    var iprops = pa_props.Select(pa => ((object[])pa[1]))
+                        .Select(prop_resource => new XElement("inverse", new XAttribute("prop", prop_resource[0]),
+                        ItemByRecord((object[])GetRecord((string)prop_resource[1]), f)));
+                    return iprops;
+                }
+                return Enumerable.Empty<XElement>();
+            });
+            XElement xres = new XElement("record", new XAttribute("id", (string)record[0]),
+                new XAttribute("type", (string)record[1]),
+                xprops,
+                null);
+            return xres;
         }
 
         public override IEnumerable<XElement> GetAll()
