@@ -228,6 +228,31 @@ namespace OAData.Adapters
                     return null;
                 }));
         }
+        private object XRecToORec(XElement xrec)
+        {
+            object[] orec = new object[]
+            {
+                xrec.Attribute(ONames.rdfabout).Value,
+                xrec.Name.NamespaceName + xrec.Name.LocalName,
+                xrec.Elements()
+                    .Select<XElement, object>(el =>
+                    {
+                        string prop = el.Name.NamespaceName + el.Name.LocalName;
+                        string resource = el.Attribute(ONames.rdfresource)?.Value;
+                        if (resource == null)
+                        {  // Поле
+                            string lang = el.Attribute(ONames.xmllang)?.Value;
+                            return new object[] { 1, new object[] { prop, el.Value, lang } };
+                        }
+                        else
+                        {  // Объектная ссылка
+                            return new object[] { 2, new object[] { prop, resource } };
+                        }
+                    }).ToArray()
+            };
+            return orec;
+        }
+
 
         public override XElement GetItemById(string id, XElement format)
         {
@@ -246,7 +271,153 @@ namespace OAData.Adapters
 
         public override XElement PutItem(XElement record)
         {
-            throw new NotImplementedException();
+            DirectPropComparer pcomparer = new DirectPropComparer();
+            // Вычисляем идентификатор
+            string id = record.Attribute(ONames.rdfabout).Value;
+
+            // Вычисляем новую запись в объектном представлении
+            object nrec;
+            if (record.Name == "delete")
+            {
+                nrec = new object[] { id, "delete", new object[0] };
+            }
+            else
+            {
+                nrec = XRecToORec(record);
+            }
+
+            // Вычисляем старую запись в объектном представлении. Ее или нет, или она в динамическом наборе или она в статическом
+            // Дополнительно устанавливаем признак isindyndic
+            //bool isindyndic = false;
+            object orec = null;
+            orec = records.GetByKey(id);
+            //if (dyndic.TryGetValue(id, out orec)) { isindyndic = true; }
+            //else
+            //{  // или объект или null
+            //    orec = records.GetByKey(new object[] { id, null, null });
+            //}
+
+            // Соберем прямые ссылки из nrec и orec (O и N) в три множества: Те которые были removed, те которые появляются appeared
+            // и остальные (сохраняемые). removed = O \ N, appeared = N \ O.
+            // Делаем множества пар свойство-ссылка: 
+            object[] O = orec == null ? new object[0] : ((object[])((object[])orec)[2])
+                .Where(x => (int)((object[])x)[0] == 2)
+                .Select(x => (object[])((object[])x)[1])
+                .Distinct(pcomparer)
+                .ToArray();
+            object[] N = ((object[])((object[])nrec)[2])
+                .Where(x => (int)((object[])x)[0] == 2)
+                .Select(x => (object[])((object[])x)[1])
+                .Distinct(pcomparer)
+                .ToArray();
+            var removed = O.Except(N, pcomparer).ToArray();
+            var appeared = N.Except(O, pcomparer).ToArray();
+
+            // Если orec не нулл, перенесем из него обратные ссылки (!)
+            if (orec != null)
+            {
+                ((object[])nrec)[2] = ((object[])((object[])nrec)[2]).Concat(((object[])(((object[])orec)[2]))
+                    .Where(rprop => (int)((object[])rprop)[0] == 3))
+                    .ToArray();
+            }
+
+            //// Новым значением заместим старое в динамическом наборе
+            //if (isindyndic)
+            //{
+            //    object[] oarr = (object[])orec;
+            //    object[] narr = (object[])nrec;
+            //    narr[0] = oarr[0];
+            //    narr[1] = oarr[1];
+            //    narr[2] = oarr[2];
+            //}
+            //else
+            //{
+            //    dyndic.Add(id, nrec);
+            //}
+            records.AppendElement(nrec);
+
+            //// Добавим в имена
+            //additional_names.OnAddItem(nrec, long.MinValue);
+
+            // Убираем обратные ссылки
+            foreach (object[] proplink in removed)
+            {
+                string prop = (string)proplink[0];
+                string target = (string)proplink[1];
+
+                //// В узле target надо убрать обратные ссылки пары {prop, id}
+                //bool indyn = false;
+                //object node;
+                //if (dyndic.TryGetValue(target, out node)) indyn = true;
+                //else
+                //{
+                //    node = records.GetByKey(new object[] { target, null, null });
+                //}
+                object node = records.GetByKey(target);
+
+                if (node != null)
+                {
+                    ((object[])node)[2] = ((object[])((object[])node)[2]).Cast<object[]>()
+                        .Where(x => (int)x[0] != 3 || (string)((object[])x[1])[1] != id || (string)((object[])x[1])[0] != prop)
+                        .ToArray();
+                    //if (indyn)
+                    //{
+                    //    // Изменения внесены, поскольку узел уже на месте
+                    //}
+                    //else
+                    //{
+                    //    dyndic.Add(target, node);
+                    //}
+                    records.AppendElement(node);
+                }
+            }
+
+            // Добавляем обратные ссылки
+            foreach (object[] proplink in appeared)
+            {
+                string prop = (string)proplink[0];
+                string target = (string)proplink[1];
+                // В узле target надо добавить обратную ссылку пары {prop, id}
+                //bool indyn = false;
+                object node;
+                //if (dyndic.TryGetValue(target, out node)) indyn = true;
+                //else
+                //{
+                //    node = records.GetByKey(new object[] { target, null, null });
+                //}
+                node = records.GetByKey(target);
+                if (node != null)
+                {
+                    ((object[])node)[2] = ((object[])((object[])node)[2]).Cast<object[]>()
+                        .Concat(new object[] { new object[] { 3, new object[] { prop, id } } })
+                        .ToArray();
+                    //if (indyn)
+                    //{
+                    //    // Изменения внесены, поскольку узел уже на месте
+                    //}
+                    //else
+                    //{
+                    //    dyndic.Add(target, node);
+                    //}
+                    records.AppendElement(node);
+                }
+            }
+
+            return null;
         }
+        private class DirectPropComparer : IEqualityComparer<object>
+        {
+            public new bool Equals(object x, object y)
+            {
+                return ((string)((object[])x)[1]).Equals((string)((object[])y)[1]) &&
+                    ((string)((object[])x)[0]).Equals((string)((object[])y)[0]);
+            }
+
+            public int GetHashCode(object obj)
+            {
+                return ((string)((object[])obj)[1]).GetHashCode();
+            }
+        }
+
     }
 }
