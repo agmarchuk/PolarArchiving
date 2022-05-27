@@ -23,6 +23,7 @@ namespace OAData
         private static XElement _xconfig = null;
         public static XElement XConfig { get { return _xconfig; } }
 
+        public static bool directreload = true; 
         public static bool initiated = false;
         public static bool nodatabase = true;
         public static void Init(string pth)
@@ -80,10 +81,10 @@ namespace OAData
 
                 if (!adapter.nodatabase) nodatabase = false;
 
-                if (pre == "trs" && nodatabase) Load();
+                if (pre == "trs" && (directreload || nodatabase)) Load();
                 if (pre == "xml") Load();
-                if (pre == "om" && nodatabase) Load();
-                if (pre == "uni") Load();
+                if (pre == "om" && (directreload || nodatabase)) Load();
+                if (pre == "uni" && (directreload || nodatabase)) Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
