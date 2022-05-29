@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,8 +34,30 @@ namespace OAData
             initiated = true;
         }
         public static string configfilename = "config.xml";
+        public static Dictionary<string, string> toNormalForm = null;
         public static void Init()
         {
+            // Создание словаря если есть файл zaliznyak_shortform.zip
+            if (File.Exists(path + "zaliznyak_shortform.zip"))
+            {
+                System.IO.Compression.ZipFile.ExtractToDirectory(path + "zaliznyak_shortform.zip", path);
+                var reader = new StreamReader(path + "zaliznyak_shortform.txt");
+                toNormalForm = new Dictionary<string, string>();
+                string line = null;
+                string normal = null;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] parts = line.Split(' ');
+                    normal = parts[0];
+                    foreach (string w in parts)
+                    {
+                        if (!toNormalForm.ContainsKey(w)) toNormalForm.Add(w, normal);
+                    }
+                }
+                reader.Close();
+                File.Delete(path + "zaliznyak_shortform.txt");
+            }
+
             XElement xconfig = XElement.Load(path + configfilename);
             _xconfig = xconfig;
             // Кассеты перечислены через элементы LoadCassette. Имена кассет в файловой системе должны сравниваться по lower case
@@ -82,9 +105,9 @@ namespace OAData
                 if (!adapter.nodatabase) nodatabase = false;
 
                 if (pre == "trs" && (directreload || nodatabase)) Load();
-                if (pre == "xml") Load();
-                if (pre == "om" && (directreload || nodatabase)) Load();
-                if (pre == "uni" && (directreload || nodatabase)) Load();
+                else if (pre == "xml") Load();
+                else if (pre == "om" && (directreload || nodatabase)) Load();
+                else if (pre == "uni" && (directreload || nodatabase)) Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";

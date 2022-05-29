@@ -86,10 +86,30 @@ namespace OAData.Adapters
                 return query;
             };
             names = new SVectorIndex(GenStream, records, skey);
-            //additional_names = new SVectorDynaIndex(records, skey);
+
+            char[] delemeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?' };
+            string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
+            Func<object, IEnumerable<string>> toWords = obj =>
+            {
+                object[] props = (object[])((object[])obj)[2];
+                var query = props
+                    .Where(p => (int)((object[])p)[0] == 1)
+                    .Select(p => ((object[])p)[1])
+                    .Cast<object[]>()
+                    .Where(f => (propnames.Contains((string)f[0])))
+                    .SelectMany(f => 
+                    {
+                        string line = (string)f[1];
+                        var words = line.Split(delemeters, StringSplitOptions.RemoveEmptyEntries);
+                        return words.Select(w => w);
+                    }).ToArray();
+                return query;
+            };
+            words = new SVectorIndex(GenStream, records, toWords);
             records.uindexes = new IUIndex[]
             {
-                names
+                names,
+                words
             };
         }
 
@@ -181,6 +201,7 @@ namespace OAData.Adapters
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
+            //var qqq = records.GetAllByValue(1, searchstring).Take(100).ToArray();
             var qu = records.GetAllByLike(0, searchstring).ToArray();
             return qu.Select(r => ORecToXRec((object[])r, false));
         }
