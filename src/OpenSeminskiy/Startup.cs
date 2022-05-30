@@ -46,6 +46,7 @@ namespace OpenSeminskiy
 
             //app.UseAuthorization();
 
+            //OAData.OADB.directreload = false;
             SObjects.Init(env.ContentRootPath + "/wwwroot/");
 
             app.UseEndpoints(endpoints =>

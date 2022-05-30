@@ -382,6 +382,7 @@ namespace OAData.Adapters
                     return null;
                 })));
         }
+        public override IEnumerable<XElement> SearchByWords(string searchwords) { throw new NotImplementedException(); }
 
 
         /// <summary>

@@ -51,6 +51,7 @@ namespace OAData.Adapters
         // Главный инициализатор. Используем connectionstring 
         private string dbfolder;
         private int file_no = 0;
+        private char[] delimeters;
         public override void Init(string connectionstring)
         {
             if (connectionstring != null && connectionstring.StartsWith("uni:"))
@@ -86,10 +87,31 @@ namespace OAData.Adapters
                 return query;
             };
             names = new SVectorIndex(GenStream, records, skey);
-            //additional_names = new SVectorDynaIndex(records, skey);
+
+            delimeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?', '\"', '\'', '=', '\\', '|', '/', 
+                '(', ')', '[', ']', '{', '}', ';', '*', '<', '>'};
+            string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
+            Func<object, IEnumerable<string>> toWords = obj =>
+            {
+                object[] props = (object[])((object[])obj)[2];
+                var query = props
+                    .Where(p => (int)((object[])p)[0] == 1)
+                    .Select(p => ((object[])p)[1])
+                    .Cast<object[]>()
+                    .Where(f => (propnames.Contains((string)f[0])))
+                    .SelectMany(f => 
+                    {
+                        string line = (string)f[1];
+                        var words = line.Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
+                        return words.Select(w => w);
+                    }).ToArray();
+                return query;
+            };
+            words = new SVectorIndex(GenStream, records, toWords);
             records.uindexes = new IUIndex[]
             {
-                names
+                names,
+                words
             };
         }
 
@@ -181,8 +203,30 @@ namespace OAData.Adapters
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            var qu = records.GetAllByLike(0, searchstring).ToArray();
-            return qu.Select(r => ORecToXRec((object[])r, false));
+            //var qu = records.GetAllByLike(0, searchstring);
+            //return qu.Select(r => ORecToXRec((object[])r, false));
+            return SearchByWords(searchstring);
+        }
+        public override IEnumerable<XElement> SearchByWords(string line) 
+        {
+            string[] wrds = line.Split(delimeters);
+            var qqq = wrds.SelectMany(w =>
+            {
+                string wrd = w;
+                if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out wrd)) { }
+                else wrd = w;
+                var qu = records.GetAllByValue(1, wrd).Select(r => new { obj = r, wrd = wrd })
+                    .ToArray();
+                return qu;
+            })
+                .GroupBy(ow => (string)((object[])ow.obj)[0])
+                .Select(gr => new { key=gr.Key, c=gr.Count(), o=gr.First() })
+                .OrderByDescending(tri => tri.c)
+                .Take(20)
+                .ToArray();
+            var query = qqq.Select(tri => ORecToXRec((object[])(tri.o.obj), false));
+            return query;
+            //throw new NotImplementedException(); 
         }
 
         public override XElement GetItemByIdBasic(string id, bool addinverse)
@@ -228,10 +272,94 @@ namespace OAData.Adapters
                     return null;
                 }));
         }
+        private object XRecToORec(XElement xrec)
+        {
+            object[] orec = new object[]
+            {
+                xrec.Attribute(ONames.rdfabout).Value,
+                xrec.Name.NamespaceName + xrec.Name.LocalName,
+                xrec.Elements()
+                    .Select<XElement, object>(el =>
+                    {
+                        string prop = el.Name.NamespaceName + el.Name.LocalName;
+                        string resource = el.Attribute(ONames.rdfresource)?.Value;
+                        if (resource == null)
+                        {  // Поле
+                            string lang = el.Attribute(ONames.xmllang)?.Value;
+                            return new object[] { 1, new object[] { prop, el.Value, lang } };
+                        }
+                        else
+                        {  // Объектная ссылка
+                            return new object[] { 2, new object[] { prop, resource } };
+                        }
+                    }).ToArray()
+            };
+            return orec;
+        }
+
 
         public override XElement GetItemById(string id, XElement format)
         {
-            throw new NotImplementedException();
+            return ItemByRecord((object[])GetRecord(id), format);
+        }
+        private XElement ItemByRecord(object[] record, XElement format)
+        {
+            var xprops = format.Elements().SelectMany(fe =>
+            {
+                string prop = fe.Attribute("prop").Value;
+                if (fe.Name.LocalName == "field")
+                {
+                    var ofields = ((object[])record[2]).Cast<object[]>().Where(pa => (int)pa[0] == 1)
+                        .Select(pa => (object[])pa[1]).Where(ofield => (string)ofield[0] == prop)
+                        .Select(ofield => new XElement("field", new XAttribute("prop", prop),
+                            (ofield[2] == null ? null : new XAttribute(ONames.xmllang, ofield[2])),
+                            ofield[1]));
+                    return ofields;
+                }
+                else if (fe.Name.LocalName == "direct")
+                {
+                    // Прямая ссылка может быть только одна (???)
+                    var pa_prop = ((object[])record[2]).Cast<object[]>()
+                        .FirstOrDefault(pa => (int)pa[0] == 2 && (string)((object[])pa[1])[0] == prop);
+
+                    if (pa_prop == null || pa_prop.Length != 2) return Enumerable.Empty<XElement>();
+                    // Найдем запись 
+                    object[] drec = (object[])GetRecord((string)((object[])pa_prop[1])[1]);
+                    if (drec == null) return Enumerable.Empty<XElement>();
+                    string tp = (string)drec[1];
+                    XElement f = fe.Elements("record")
+                        .FirstOrDefault(xre => xre.Attribute("type") == null || xre.Attribute("type").Value == tp);
+                    // Вот это место надо бы сделать с учетом наследования типов, а пока - упрощенный вариант
+                    if (f == null)
+                    {
+                        XElement ff = fe.Element("record");
+                        if (ff == null) return Enumerable.Empty<XElement>();
+                        f = ff;
+                    }
+
+                    // Мы подобрали формат к записи и можем рекурсивно применить метод
+                    return Enumerable.Repeat<XElement>(new XElement("direct", ItemByRecord(drec, f)), 1);
+                }
+                else if (fe.Name.LocalName == "inverse")
+                {
+                    // обратных ссылок может быть несколько (!)
+                    var pa_props = ((object[])record[2]).Cast<object[]>()
+                        .Where(pa => (int)pa[0] == 3 && (string)((object[])pa[1])[0] == prop);
+
+                    XElement f = fe.Element("record");
+
+                    var iprops = pa_props.Select(pa => ((object[])pa[1]))
+                        .Select(prop_resource => new XElement("inverse", new XAttribute("prop", prop_resource[0]),
+                        ItemByRecord((object[])GetRecord((string)prop_resource[1]), f)));
+                    return iprops;
+                }
+                return Enumerable.Empty<XElement>();
+            });
+            XElement xres = new XElement("record", new XAttribute("id", (string)record[0]),
+                new XAttribute("type", (string)record[1]),
+                xprops,
+                null);
+            return xres;
         }
 
         public override IEnumerable<XElement> GetAll()
@@ -246,7 +374,153 @@ namespace OAData.Adapters
 
         public override XElement PutItem(XElement record)
         {
-            throw new NotImplementedException();
+            DirectPropComparer pcomparer = new DirectPropComparer();
+            // Вычисляем идентификатор
+            string id = record.Attribute(ONames.rdfabout).Value;
+
+            // Вычисляем новую запись в объектном представлении
+            object nrec;
+            if (record.Name == "delete")
+            {
+                nrec = new object[] { id, "delete", new object[0] };
+            }
+            else
+            {
+                nrec = XRecToORec(record);
+            }
+
+            // Вычисляем старую запись в объектном представлении. Ее или нет, или она в динамическом наборе или она в статическом
+            // Дополнительно устанавливаем признак isindyndic
+            //bool isindyndic = false;
+            object orec = null;
+            orec = records.GetByKey(id);
+            //if (dyndic.TryGetValue(id, out orec)) { isindyndic = true; }
+            //else
+            //{  // или объект или null
+            //    orec = records.GetByKey(new object[] { id, null, null });
+            //}
+
+            // Соберем прямые ссылки из nrec и orec (O и N) в три множества: Те которые были removed, те которые появляются appeared
+            // и остальные (сохраняемые). removed = O \ N, appeared = N \ O.
+            // Делаем множества пар свойство-ссылка: 
+            object[] O = orec == null ? new object[0] : ((object[])((object[])orec)[2])
+                .Where(x => (int)((object[])x)[0] == 2)
+                .Select(x => (object[])((object[])x)[1])
+                .Distinct(pcomparer)
+                .ToArray();
+            object[] N = ((object[])((object[])nrec)[2])
+                .Where(x => (int)((object[])x)[0] == 2)
+                .Select(x => (object[])((object[])x)[1])
+                .Distinct(pcomparer)
+                .ToArray();
+            var removed = O.Except(N, pcomparer).ToArray();
+            var appeared = N.Except(O, pcomparer).ToArray();
+
+            // Если orec не нулл, перенесем из него обратные ссылки (!)
+            if (orec != null)
+            {
+                ((object[])nrec)[2] = ((object[])((object[])nrec)[2]).Concat(((object[])(((object[])orec)[2]))
+                    .Where(rprop => (int)((object[])rprop)[0] == 3))
+                    .ToArray();
+            }
+
+            //// Новым значением заместим старое в динамическом наборе
+            //if (isindyndic)
+            //{
+            //    object[] oarr = (object[])orec;
+            //    object[] narr = (object[])nrec;
+            //    narr[0] = oarr[0];
+            //    narr[1] = oarr[1];
+            //    narr[2] = oarr[2];
+            //}
+            //else
+            //{
+            //    dyndic.Add(id, nrec);
+            //}
+            records.AppendElement(nrec);
+
+            //// Добавим в имена
+            //additional_names.OnAddItem(nrec, long.MinValue);
+
+            // Убираем обратные ссылки
+            foreach (object[] proplink in removed)
+            {
+                string prop = (string)proplink[0];
+                string target = (string)proplink[1];
+
+                //// В узле target надо убрать обратные ссылки пары {prop, id}
+                //bool indyn = false;
+                //object node;
+                //if (dyndic.TryGetValue(target, out node)) indyn = true;
+                //else
+                //{
+                //    node = records.GetByKey(new object[] { target, null, null });
+                //}
+                object node = records.GetByKey(target);
+
+                if (node != null)
+                {
+                    ((object[])node)[2] = ((object[])((object[])node)[2]).Cast<object[]>()
+                        .Where(x => (int)x[0] != 3 || (string)((object[])x[1])[1] != id || (string)((object[])x[1])[0] != prop)
+                        .ToArray();
+                    //if (indyn)
+                    //{
+                    //    // Изменения внесены, поскольку узел уже на месте
+                    //}
+                    //else
+                    //{
+                    //    dyndic.Add(target, node);
+                    //}
+                    records.AppendElement(node);
+                }
+            }
+
+            // Добавляем обратные ссылки
+            foreach (object[] proplink in appeared)
+            {
+                string prop = (string)proplink[0];
+                string target = (string)proplink[1];
+                // В узле target надо добавить обратную ссылку пары {prop, id}
+                //bool indyn = false;
+                object node;
+                //if (dyndic.TryGetValue(target, out node)) indyn = true;
+                //else
+                //{
+                //    node = records.GetByKey(new object[] { target, null, null });
+                //}
+                node = records.GetByKey(target);
+                if (node != null)
+                {
+                    ((object[])node)[2] = ((object[])((object[])node)[2]).Cast<object[]>()
+                        .Concat(new object[] { new object[] { 3, new object[] { prop, id } } })
+                        .ToArray();
+                    //if (indyn)
+                    //{
+                    //    // Изменения внесены, поскольку узел уже на месте
+                    //}
+                    //else
+                    //{
+                    //    dyndic.Add(target, node);
+                    //}
+                    records.AppendElement(node);
+                }
+            }
+
+            return null;
         }
+        private class DirectPropComparer : IEqualityComparer<object>
+        {
+            public new bool Equals(object x, object y)
+            {
+                return ((string)((object[])x)[1]).Equals((string)((object[])y)[1]) &&
+                    ((string)((object[])x)[0]).Equals((string)((object[])y)[0]);
+            }
+
+            public int GetHashCode(object obj)
+            {
+                return ((string)((object[])obj)[1]).GetHashCode();
+            }
+        }
+
     }
 }

@@ -5,7 +5,7 @@
   <database dbname="OA" connectionstring="xml:" />
   <database connectionstring="om:D:\Home\data\om\" />
   -->
-  <database connectionstring="trs:D:\Home\data\trs\" />
+  <database connectionstring="uni:D:\Home\data\uni\" />
 
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
   <LoadCassette>D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
