@@ -239,6 +239,10 @@ namespace OAData
         {
             return adapter.SearchByName(ss);
         }
+        public static IEnumerable<XElement> SearchByWords(string ss)
+        {
+            return adapter.SearchByWords(ss);
+        }
         public static XElement GetItemByIdBasic(string id, bool addinverse)
         {
             return adapter.GetItemByIdBasic(id, addinverse);
