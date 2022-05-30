@@ -14,6 +14,7 @@ namespace OAData.Adapters
         public abstract void Close();
         // ============== Основные методы доступа к БД =============
         public abstract IEnumerable<XElement> SearchByName(string searchstring);
+        public abstract IEnumerable<XElement> SearchByWords(string searchwords);
         public abstract XElement GetItemByIdBasic(string id, bool addinverse);
         public abstract XElement GetItemById(string id, XElement format);
         //public abstract XElement GetItemByIdSpecial(string id);

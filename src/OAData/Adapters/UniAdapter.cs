@@ -51,6 +51,7 @@ namespace OAData.Adapters
         // Главный инициализатор. Используем connectionstring 
         private string dbfolder;
         private int file_no = 0;
+        private char[] delimeters;
         public override void Init(string connectionstring)
         {
             if (connectionstring != null && connectionstring.StartsWith("uni:"))
@@ -87,7 +88,8 @@ namespace OAData.Adapters
             };
             names = new SVectorIndex(GenStream, records, skey);
 
-            char[] delemeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?' };
+            delimeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?', '\"', '\'', '=', '\\', '|', '/', 
+                '(', ')', '[', ']', '{', '}', ';', '*', '<', '>'};
             string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
             Func<object, IEnumerable<string>> toWords = obj =>
             {
@@ -100,7 +102,7 @@ namespace OAData.Adapters
                     .SelectMany(f => 
                     {
                         string line = (string)f[1];
-                        var words = line.Split(delemeters, StringSplitOptions.RemoveEmptyEntries);
+                        var words = line.Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
                         return words.Select(w => w);
                     }).ToArray();
                 return query;
@@ -201,9 +203,30 @@ namespace OAData.Adapters
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            //var qqq = records.GetAllByValue(1, searchstring).Take(100).ToArray();
-            var qu = records.GetAllByLike(0, searchstring).ToArray();
-            return qu.Select(r => ORecToXRec((object[])r, false));
+            //var qu = records.GetAllByLike(0, searchstring);
+            //return qu.Select(r => ORecToXRec((object[])r, false));
+            return SearchByWords(searchstring);
+        }
+        public override IEnumerable<XElement> SearchByWords(string line) 
+        {
+            string[] wrds = line.Split(delimeters);
+            var qqq = wrds.SelectMany(w =>
+            {
+                string wrd = w;
+                if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out wrd)) { }
+                else wrd = w;
+                var qu = records.GetAllByValue(1, wrd).Select(r => new { obj = r, wrd = wrd })
+                    .ToArray();
+                return qu;
+            })
+                .GroupBy(ow => (string)((object[])ow.obj)[0])
+                .Select(gr => new { key=gr.Key, c=gr.Count(), o=gr.First() })
+                .OrderByDescending(tri => tri.c)
+                .Take(20)
+                .ToArray();
+            var query = qqq.Select(tri => ORecToXRec((object[])(tri.o.obj), false));
+            return query;
+            //throw new NotImplementedException(); 
         }
 
         public override XElement GetItemByIdBasic(string id, bool addinverse)

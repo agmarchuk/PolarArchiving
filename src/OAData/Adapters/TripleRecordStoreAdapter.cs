@@ -608,6 +608,8 @@ namespace OAData.Adapters
                 ;
             return query2;
         }
+        public override IEnumerable<XElement> SearchByWords(string searchwords) { throw new NotImplementedException(); }
+
         public override IEnumerable<XElement> GetAll()
         {
             var query = store.GetRecords()

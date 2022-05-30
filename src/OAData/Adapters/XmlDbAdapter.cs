@@ -136,6 +136,8 @@ namespace OAData.Adapters
                 //.Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(ONames.rdfabout).Value)));
             return query;
         }
+        public override IEnumerable<XElement> SearchByWords(string searchwords) { throw new NotImplementedException(); }
+
         public override XElement GetItemByIdBasic(string id, bool addinverse)
         {
             DbNode node;
