@@ -103,7 +103,14 @@ namespace OAData.Adapters
                     {
                         string line = (string)f[1];
                         var words = line.Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
-                        return words.Select(w => w);
+                        return words.Select(w => 
+                        {
+                            if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out string wrd))
+                            {
+                                return wrd;
+                            }
+                            return w;
+                        });
                     }).ToArray();
                 return query;
             };
@@ -203,17 +210,15 @@ namespace OAData.Adapters
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            //var qu = records.GetAllByLike(0, searchstring);
-            //return qu.Select(r => ORecToXRec((object[])r, false));
-            return SearchByWords(searchstring);
+            var qu = records.GetAllByLike(0, searchstring);
+            return qu.Select(r => ORecToXRec((object[])r, false));
         }
         public override IEnumerable<XElement> SearchByWords(string line) 
         {
             string[] wrds = line.Split(delimeters);
             var qqq = wrds.SelectMany(w =>
             {
-                string wrd = w;
-                if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out wrd)) { }
+                if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out string wrd)) { }
                 else wrd = w;
                 var qu = records.GetAllByValue(1, wrd).Select(r => new { obj = r, wrd = wrd })
                     .ToArray();
