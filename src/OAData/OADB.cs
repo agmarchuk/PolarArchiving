@@ -293,21 +293,28 @@ namespace OAData
             { // возможно update
                 XElement old = adapter.GetItemByIdBasic(id, false);
                 if (old == null) return PutItem(item);
-                // добавляем старые, которых нет
+                // добавляем старые, которых нет. Особенность в том, что старые - в запросном формате, новые - в базовом. 
                 IEnumerable<XElement> adding = old.Elements()
                     .Select(oe =>
                     {
                         string prop_value = oe.Attribute("prop").Value;
                         string lang = oe.Attribute("{http://www.w3.org/XML/1998/namespace}lang")?.Value;
-                        bool nsimilar = item.Elements(oe.Name).Any(el =>
+                        bool similar = item.Elements().Where(el => el.Name.NamespaceName+el.Name.LocalName == prop_value).Any(el =>
                         {
                             string olang = el.Attribute("{http://www.w3.org/XML/1998/namespace}lang")?.Value;
-                            return el.Attribute("prop").Value == prop_value && (lang == null && olang == null ? true : lang == olang);
+                            return (lang == null && olang == null ? true : lang == olang);
                         });
-                        if (nsimilar) return (XElement)null; // Если найден похожий, то ее нужен старый
-                        else return new XElement(oe); // Добавляем старый
+                        if (similar) return (XElement)null; // Если найден похожий, то не нужен старый
+                        else
+                        {
+                            int pos = prop_value.LastIndexOf('/');
+                            XName xn = XName.Get(prop_value.Substring(pos + 1), prop_value.Substring(0, pos+1));
+                            return new XElement(xn, 
+                                lang==null?null: new XAttribute("{http://www.w3.org/XML/1998/namespace}lang", lang),
+                                oe.Value); // Добавляем старый
+                        }
                     });
-                XElement nitem = new XElement(item.Name, item.Elements(), adding);
+                XElement nitem = new XElement(item.Name, item.Attributes(), item.Elements(), adding);
                 //// новые свойства. TODO: Языковые варианты опущены!
                 //XElement nitem = new XElement(item);
                 //string[] props = nitem.Elements().Select(el => el.Name.LocalName).ToArray();

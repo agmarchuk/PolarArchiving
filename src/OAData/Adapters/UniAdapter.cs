@@ -369,7 +369,9 @@ namespace OAData.Adapters
 
         public override IEnumerable<XElement> GetAll()
         {
-            throw new NotImplementedException();
+            var query = records.ElementValues()
+                .Select(record => ORecToXRec((object[])record, false));
+            return query;
         }
 
         public override XElement Delete(string id)

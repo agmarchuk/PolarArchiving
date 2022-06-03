@@ -8,7 +8,5 @@
   <database connectionstring="uni:D:\Home\data\uni\" />
 
   <LoadCassette>D:\Home\FactographProjects\syp_cassettes\SypCassete</LoadCassette>
-  <LoadCassette>D:\Home\FactographProjects\Cassette_test20180311</LoadCassette>
-  
-  <LoadCassette>D:\Home\FactographProjects\Ad</LoadCassette>
+
 </config>
