@@ -245,7 +245,8 @@ namespace OAData
         }
         public static XElement GetItemByIdBasic(string id, bool addinverse)
         {
-            return adapter.GetItemByIdBasic(id, addinverse);
+            var val = adapter.GetItemByIdBasic(id, addinverse);
+            return val;
         }
 
         /// <summary>
@@ -293,21 +294,35 @@ namespace OAData
                 XElement old = adapter.GetItemByIdBasic(id, false);
                 if (old == null) return PutItem(item);
                 // добавляем старые, которых нет
-                XElement nitem = new XElement(item);
-                // новые свойства. TODO: Языковые варианты опущены!
-                string[] props = nitem.Elements().Select(el => el.Name.LocalName).ToArray();
-                nitem.Add(old.Elements()
-                .Select(el =>
-                {
-                    string prop = el.Attribute("prop").Value;
-                    int pos = prop.LastIndexOf('/');
-                    XName subel_name = XName.Get(prop.Substring(pos + 1), prop.Substring(0, pos + 1));
-                    if (props.Contains(prop.Substring(pos + 1))) return null;
-                    XElement subel = new XElement(subel_name);
-                    if (el.Name == "field") subel.Add(el.Value);
-                    else if (el.Name == "direct") subel.Add(new XAttribute(ONames.rdfresource, el.Element("record").Attribute("id").Value));
-                    return subel;
-                }));
+                IEnumerable<XElement> adding = old.Elements()
+                    .Select(oe =>
+                    {
+                        string prop_value = oe.Attribute("prop").Value;
+                        string lang = oe.Attribute("{http://www.w3.org/XML/1998/namespace}lang")?.Value;
+                        bool nsimilar = item.Elements(oe.Name).Any(el =>
+                        {
+                            string olang = el.Attribute("{http://www.w3.org/XML/1998/namespace}lang")?.Value;
+                            return el.Attribute("prop").Value == prop_value && (lang == null && olang == null ? true : lang == olang);
+                        });
+                        if (nsimilar) return (XElement)null; // Если найден похожий, то ее нужен старый
+                        else return new XElement(oe); // Добавляем старый
+                    });
+                XElement nitem = new XElement(item.Name, item.Elements(), adding);
+                //// новые свойства. TODO: Языковые варианты опущены!
+                //XElement nitem = new XElement(item);
+                //string[] props = nitem.Elements().Select(el => el.Name.LocalName).ToArray();
+                //nitem.Add(old.Elements()
+                //.Select(el =>
+                //{
+                //    string prop = el.Attribute("prop").Value;
+                //    int pos = prop.LastIndexOf('/');
+                //    XName subel_name = XName.Get(prop.Substring(pos + 1), prop.Substring(0, pos + 1));
+                //    if (props.Contains(prop.Substring(pos + 1))) return null;
+                //    XElement subel = new XElement(subel_name);
+                //    if (el.Name == "field") subel.Add(el.Value);
+                //    else if (el.Name == "direct") subel.Add(new XAttribute(ONames.rdfresource, el.Element("record").Attribute("id").Value));
+                //    return subel;
+                //}));
                 return PutItem(nitem);
             }
         }
