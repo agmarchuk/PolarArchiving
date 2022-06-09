@@ -342,6 +342,8 @@ namespace OAData.Adapters
                         (l_att == null ? true :
                             (el.Attribute("{http://www.w3.org/XML/1998/namespace}lang") != null &&
                                 l_att.Value == el.Attribute("{http://www.w3.org/XML/1998/namespace}lang").Value)))) continue;
+                    // старые ссылки не копируем
+                    if (old_el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource") != null) continue;
                     record.Add(old_el);
                 }
                 RemoveRecord(id);
