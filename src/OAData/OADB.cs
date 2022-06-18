@@ -83,11 +83,12 @@ namespace OAData
             if (connectionstring != null)
             {
                 string pre = connectionstring.Substring(0, connectionstring.IndexOf(':'));
-                if (pre == "trs")
-                {
-                    adapter = new TripleRecordStoreAdapter();
-                }
-                else if (pre == "xml")
+                //if (pre == "trs")
+                //{
+                //    adapter = new TripleRecordStoreAdapter();
+                //}
+                //else 
+                if (pre == "xml")
                 {
                     adapter = new XmlDbAdapter();
                 }
