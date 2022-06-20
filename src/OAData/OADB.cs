@@ -230,7 +230,7 @@ namespace OAData
             if (method == "small") subpath = "/documents/small";
             else if (method == "medium") subpath = "/documents/medium";
             else subpath = "/documents/normal"; // (method == "n")
-            string path = cass_dir + subpath + last10 + ".jpg";
+            string path = cass_dir + subpath + last10;
             return path;
         }
 
