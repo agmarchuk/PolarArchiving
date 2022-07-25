@@ -362,49 +362,61 @@ namespace OAData
             // Если фог не загружен, то загрузить его
             if (fi.fogx == null) fi.fogx = XElement.Load(fi.pth);
 
-
-            // читаем или формируем идентификатор
-            string id = item.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value;
-            XElement element = null; // запись с пришедшим идентификатором
-            if (id == null)
-            {
-                XAttribute counter_att = fi.fogx.Attribute("counter");
-                int counter = Int32.Parse(counter_att.Value);
-                id = fi.fogx.Attribute("prefix").Value + counter;
-                // внедряем
-                item.Add(new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about", id));
-                counter_att.Value = "" + (counter + 1);
-            }
-            else
-            {
-                element = fi.fogx.Elements().FirstOrDefault(el => 
-                    el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value == id);
-            }
-
             // Изымаем из пришедшего элемента владельца и фиксируем его в фоге
             XAttribute owner_att = item.Attribute("owner");
             owner_att.Remove();
-            if (element != null)
-            {
-                element.Remove();
-            }
 
-            // Очищаем запись от пустых полей
-            XElement nitem = new XElement(item.Name, item.Attribute(ONames.rdfabout), item.Attribute("mT"), 
-                item.Elements().Select(xprop =>
+            // Формируемый элемент (new item)
+            XElement nitem;
+
+            // substitute обрабатываем отдельно
+            if (item.Name == "substitute")
+            {
+                nitem = item;
+            }
+            else
+            {
+                // читаем или формируем идентификатор
+                string id = item.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value;
+                XElement element = null; // запись с пришедшим идентификатором
+                if (id == null)
                 {
-                    XAttribute aresource = xprop.Attribute(ONames.rdfresource);
-                    if (aresource == null)
-                    {   // DatatypeProperty
+                    XAttribute counter_att = fi.fogx.Attribute("counter");
+                    int counter = Int32.Parse(counter_att.Value);
+                    id = fi.fogx.Attribute("prefix").Value + counter;
+                    // внедряем
+                    item.Add(new XAttribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about", id));
+                    counter_att.Value = "" + (counter + 1);
+                }
+                else
+                {
+                    element = fi.fogx.Elements().FirstOrDefault(el =>
+                        el.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about")?.Value == id);
+                }
+
+                if (element != null)
+                {
+                    element.Remove();
+                }
+
+                // Очищаем запись от пустых полей
+                nitem = new XElement(item.Name, item.Attribute(ONames.rdfabout), item.Attribute("mT"),
+                    item.Elements().Select(xprop =>
+                    {
+                        XAttribute aresource = xprop.Attribute(ONames.rdfresource);
+                        if (aresource == null)
+                        {   // DatatypeProperty
                         if (string.IsNullOrEmpty(xprop.Value)) return null; // Глевное убирание!!!
                         return new XElement(xprop);
-                    }
-                    else
-                    {   // ObjectProperty
+                        }
+                        else
+                        {   // ObjectProperty
                         return new XElement(xprop); //TODO: Возможно, надо убрать ссылки типа ""
                     }
-                }),
-                null);
+                    }),
+                    null);
+
+            }
 
 
             fi.fogx.Add(nitem);

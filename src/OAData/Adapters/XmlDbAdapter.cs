@@ -370,6 +370,10 @@ namespace OAData.Adapters
                 Delete(record.Attribute("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about").Value);
                 return null;
             }
+            else if (record.Name.LocalName == "substitute")
+            {
+                return null;
+            }
             else
             {
                 return AddUpdate(record);
