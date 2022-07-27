@@ -153,7 +153,8 @@ namespace OAData.Adapters
             // объектном представлении, потом этот поток добавляется в store
 
             // Будем формировать единый поток x-ЗАПИСЕЙ
-            IEnumerable<XElement> xflow = Enumerable.Empty<XElement>();
+            IEnumerable<XElement> xflow = Enumerable.Repeat<XElement>(new XElement("{http://fogid.net/o/}collection",
+                new XAttribute(ONames.rdfabout, "cassetterootcollection"), new XElement("{http://fogid.net/o/}name", "кассеты")), 1);
             int nrecords = 0;
             foreach (FogInfo fi in fogflow)
             {

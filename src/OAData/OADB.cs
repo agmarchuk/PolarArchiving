@@ -215,7 +215,9 @@ namespace OAData
             if (!uri.StartsWith("iiss://")) throw new Exception("Err: 22233");
             int pos = uri.IndexOf('@', 7);
             if (pos < 8) throw new Exception("Err: 22234");
-            return cassettes.FirstOrDefault(c => c.name == uri.Substring(7, pos - 7))?.path;
+            var s1 = uri.Substring(7, pos - 7).ToLower();
+            var sear = cassettes.FirstOrDefault(c => c.name.ToLower() == s1);
+            return sear?.path;
         }
         public static string GetFilePath(string u, string s)
         {
