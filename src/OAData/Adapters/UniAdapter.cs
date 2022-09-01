@@ -58,7 +58,19 @@ namespace OAData.Adapters
             {
                 dbfolder = connectionstring.Substring("uni:".Length);
             }
-            if (File.Exists(dbfolder + "0.bin")) nodatabase = false;
+            if (File.Exists(dbfolder + "0.bin"))
+            {
+                nodatabase = false;
+                Console.WriteLine("Before try to close adapter... ");
+                if (OAData.OADB.adapter != null)
+                {
+                    Console.WriteLine("try to close adapter... ");
+                    //TODO: Зачем так сложно, почему не this.Close() или
+                    // даже просто закрытие последовательностей?
+                    OAData.OADB.adapter.Close();
+                    Console.WriteLine("OK.");
+                }
+            }
             Func<Stream> GenStream = () =>
                 new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
@@ -120,6 +132,12 @@ namespace OAData.Adapters
                 names,
                 words
             };
+        }
+        public override void Close()
+        {
+            records?.Close();
+            names?.Close();
+            words?.Close();
         }
 
 
@@ -203,10 +221,6 @@ namespace OAData.Adapters
             GC.Collect();
         }
 
-        public override void Close()
-        {
-            throw new NotImplementedException();
-        }
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
@@ -383,13 +397,17 @@ namespace OAData.Adapters
         {
             DirectPropComparer pcomparer = new DirectPropComparer();
             // Вычисляем идентификатор
-            string id = record.Attribute(ONames.rdfabout).Value;
+            string id = record.Attribute(ONames.rdfabout)?.Value;
 
             // Вычисляем новую запись в объектном представлении
             object nrec;
             if (record.Name == "delete")
             {
                 nrec = new object[] { id, "delete", new object[0] };
+            }
+            else if (record.Name.LocalName == "substitute")
+            {
+                return null;
             }
             else
             {
