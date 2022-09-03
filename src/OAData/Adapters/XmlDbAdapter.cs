@@ -385,8 +385,10 @@ namespace OAData.Adapters
             foreach (XElement record in xflow)
             {
                 string id = record.Attribute(ONames.rdfabout).Value;
+                //if (id == "Mc2816_1142") { }
                 // Корректируем идентификатор
                 if (orig_ids.TryGetValue(id, out string idd)) id = idd;
+                if (id == null) continue;
                 //int rec_type = store.CodeEntity(ONames.fog + record.Name.LocalName);
                 //int id_ent = store.CodeEntity(id);
                 //XElement xrecord = new XElement(record.Name,
@@ -427,8 +429,8 @@ namespace OAData.Adapters
                     null);
                 db.Add(nrec);
 
-        }
+            }
 
-    }
+        }
     }
 }

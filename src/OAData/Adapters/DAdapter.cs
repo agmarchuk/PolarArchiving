@@ -28,7 +28,7 @@ namespace OAData.Adapters
         public abstract void FinishFillDb(Action<string> turlog);
 
 
-        public void FillDb(IEnumerable<FogInfo> fogflow, Action<string> turlog)
+        public void FillDb0(IEnumerable<FogInfo> fogflow, Action<string> turlog)
         {
             // Нулевой проход сканирования фог-файлов. Строим таблицу строка-строка с соответствием идентификатору
             // идентификатора оригинала или null.
@@ -231,7 +231,7 @@ namespace OAData.Adapters
         /// </summary>
         /// <param name="fogflow">Поток fog-файлов</param>
         /// <param name="turlog">лог для сообщений</param>
-        public void FillDb1(IEnumerable<FogInfo> fogflow, Action<string> turlog)
+        public void FillDb(IEnumerable<FogInfo> fogflow, Action<string> turlog)
         {
             // Опеределим поток элементов при сканировании фог-файлов
             var fogelementsflow = fogflow
@@ -243,13 +243,23 @@ namespace OAData.Adapters
                 });
                 
 
-            // Нулевой проход сканирования фог-файлов. Строим таблицу строка-строка с соответствием идентификатору
-            // идентификатора оригинала или null.
             Dictionary<string, string> substitutes = new Dictionary<string, string>();
+
+            // Готовим битовый массив для отметки того, что хеш id уже "попадал" в этот бит
+            int rang = 24; // пока предполагается, что число записей (много) меньше 16 млн.
+            int mask = ~((-1) << rang);
+            int ba_volume = mask + 1;
+            System.Collections.BitArray bitArr = new System.Collections.BitArray(ba_volume);
+            // Хеш-функция будет ограничена rang разрядами, массив и функция нужны только временно
+            Func<string, int> Hash = s => s.GetHashCode() & mask;
+
+            // Множество кандидатов на многократное определение
+            HashSet<string> candidates = new HashSet<string>();
+
+            // Первый проход сканирования. Строим таблицу substitutes строка-строка с соответствием идентификатору
+            // идентификатора оригинала или null. Строим 
             foreach (XElement record in fogelementsflow)
             {
-                string id = record.Attribute(ONames.rdfabout)?.Value;
-
                 // Обработаем delete и replace
                 if (record.Name == ONames.fogi + "delete")
                 {
@@ -262,7 +272,7 @@ namespace OAData.Adapters
                     substitutes.Add(idd, null);
                     continue;
                 }
-                if (record.Name == ONames.fogi + "substitute")
+                else if (record.Name == ONames.fogi + "substitute")
                 {
                     string idold = record.Attribute("old-id").Value;
                     string idnew = record.Attribute("new-id").Value;
@@ -276,52 +286,23 @@ namespace OAData.Adapters
                     substitutes.Add(idold, idnew);
                     continue;
                 }
-            }
-
-            int nfogs = 0;
-            foreach (FogInfo fi in fogflow)
-            {
-                // Чтение фога
-                if (fi.vid == ".fog")
+                else
                 {
-                    nfogs++;
-                    fi.fogx = XElement.Load(fi.pth);
-                    foreach (XElement xrec in fi.fogx.Elements())
+                    string id = record.Attribute(ONames.rdfabout)?.Value;
+                    if (id == null) throw new Exception("29283");
+                    int code = Hash(id);
+                    if (bitArr[code])
                     {
-                        XElement record = ConvertXElement(xrec);
-
-                        string id = record.Attribute(ONames.rdfabout)?.Value;
-
-                        // Обработаем delete и replace
-                        if (record.Name == ONames.fogi + "delete")
-                        {
-                            string idd = record.Attribute(ONames.rdfabout)?.Value;
-                            if (idd == null) idd = record.Attribute("id").Value;
-                            if (substitutes.ContainsKey(idd))
-                            {
-                                substitutes.Remove(idd);
-                            }
-                            substitutes.Add(idd, null);
-                            continue;
-                        }
-                        if (record.Name == ONames.fogi + "substitute")
-                        {
-                            string idold = record.Attribute("old-id").Value;
-                            string idnew = record.Attribute("new-id").Value;
-                            // может old-id уже уничтожен, огда ничего не менять
-                            if (substitutes.TryGetValue(idold, out string value))
-                            {
-                                if (value == null) continue;
-                                substitutes.Remove(idold);
-                            }
-                            // иначе заменить в любом случае
-                            substitutes.Add(idold, idnew);
-                            continue;
-                        }
+                        // Это означает, что кандидат id выявлен
+                        candidates.Add(id);
+                    }
+                    else
+                    {
+                        bitArr.Set(code, true);
                     }
                 }
             }
-            Console.WriteLine($"{nfogs} fogs");
+
             // Функция, добирающаяся до последнего определения или это и есть последнее
             Func<string, string> original = null;
             original = id =>
@@ -333,6 +314,7 @@ namespace OAData.Adapters
                 }
                 return id;
             };
+
             // Обработаем словарь, формируя новый 
             Dictionary<string, string> orig_ids = new Dictionary<string, string>();
             foreach (var pair in substitutes)
@@ -343,125 +325,80 @@ namespace OAData.Adapters
                 orig_ids.Add(key, value);
             }
 
-            Console.WriteLine($"{orig_ids.Count} orig_ids");
-
-            // Готовим битовый массив для отметки того, что хеш id уже "попадал" в этот бит
-            int rang = 24; // пока предполагается, что число записей (много) меньше 16 млн.
-            int mask = ~((-1) << rang);
-            int ba_volume = mask + 1;
-            System.Collections.BitArray bitArr = new System.Collections.BitArray(ba_volume);
-            // Хеш-функция будет ограничена rang разрядами, массив и функция нужны только временно
-            Func<string, int> Hash = s => s.GetHashCode() & mask;
             // Словарь, фиксирующий максимальную дату для заданного идентификатора, первая запись не учитывается
             Dictionary<string, DateTime> lastDefs = new Dictionary<string, DateTime>();
-
-            // Первый проход сканирования фог-файлов. В этом проходе определяется набор повторно определенных записей и
-            // формируется словарь lastDefs
-            foreach (FogInfo fi in fogflow)
+            foreach (XElement record in fogelementsflow)
             {
-                // Чтение фога
-                if (fi.vid == ".fog")
+
+                // Обработаем delete и replace
+                if (record.Name == ONames.fogi + "delete")
                 {
-                    fi.fogx = XElement.Load(fi.pth);
-                    foreach (XElement xrec in fi.fogx.Elements())
+                }
+                else if (record.Name == ONames.fogi + "substitute")
+                {
+                }
+                else
+                {
+                    string id = record.Attribute(ONames.rdfabout).Value;
+                    if (candidates.Contains(id))
                     {
-                        XElement record = ConvertXElement(xrec);
-                        // Обработаем "странные" delete и replace
-                        if (record.Name == ONames.fogi + "delete")
+                        XAttribute mt_att = record.Attribute("mT");
+                        DateTime mt = mt_att == null ? DateTime.MinValue : DateTime.Parse(mt_att.Value);
+                        if (lastDefs.TryGetValue(id, out DateTime dt))
                         {
-                            string idd = record.Attribute(ONames.rdfabout)?.Value;
-                            if (idd == null) idd = record.Attribute("id").Value;
-                            // Если нет атрибута mT, временная отметка устанавливается максимальной, чтобы "забить" другие отметки
-                            string mTvalue = record.Attribute("mT") == null ? DateTime.MaxValue.ToString() : record.Attribute("mT").Value;
-                            CheckAndSet(bitArr, Hash, lastDefs, idd, mTvalue);
-                            continue;
+                            if (mt > dt)
+                            {
+                                lastDefs.Remove(id);
+                                lastDefs.Add(id, mt);
+                            }
                         }
-                        if (record.Name == ONames.fogi + "substitute")
+                        else
                         {
-                            continue;
+                            lastDefs.Add(id, mt);
                         }
-                        string id = record.Attribute(ONames.rdfabout).Value;
-                        CheckAndSet(bitArr, Hash, lastDefs, id, record.Attribute("mT")?.Value);
                     }
-                    fi.fogx = null;
                 }
-                else if (fi.vid == ".fogp")
-                {
-
-                }
-                GC.Collect();
             }
-            Console.WriteLine($"{lastDefs.Count} lastDefs");
-
-            // Второй проход сканирования фог-файлов. В этом проходе, для каждого фога формируется поток записей в 
-            // объектном представлении, потом этот поток добавляется в store
 
             // Будем формировать единый поток x-ЗАПИСЕЙ
             IEnumerable<XElement> xflow = Enumerable.Repeat<XElement>(new XElement("{http://fogid.net/o/}collection",
-                new XAttribute(ONames.rdfabout, "cassetterootcollection"), new XElement("{http://fogid.net/o/}name", "кассеты")), 1);
-            int nrecords = 0;
-            foreach (FogInfo fi in fogflow)
-            {
-                // Чтение фога
-                if (fi.vid == ".fog" || fi.vid == ".fogx") //TODO: раньше .fogx не было
-                {
-                    fi.fogx = XElement.Load(fi.pth);
-
-                    Console.WriteLine($"loaded {fi.fogx.Elements().Count()} elements from {fi.pth}");
-
-                    var flow = fi.fogx.Elements()
-                    .Select(xrec => ConvertXElement(xrec))
-                    // Обработаем delete и replace. delete доминирует (по времени), но в выходной поток ничего не попадает
-                    // substitute (Может наод orig_ids?) - не обрабатываем
-                    .Where(record => record.Name != ONames.fogi + "delete" &&
-                            record.Name != ONames.fogi + "substitute")
-
-                    // Отфильтруем все записи, попавшие в substitutes
-                    .Where(record => !orig_ids.ContainsKey(record.Attribute(ONames.rdfabout).Value))
-
-                    // Отфильтруем записи с малыми временами. т.е. если идентификатор есть в словаре, но он меньше.
-                    // Если он больше, то не фильтруем, а словарный вход корректируем
-                    .Where(record =>
+                new XAttribute(ONames.rdfabout, "cassetterootcollection"), new XElement("{http://fogid.net/o/}name", "кассеты")), 1)
+                .Concat(
+                    fogelementsflow
+                    .Where(rec => rec.Name != ONames.fogi + "delete" && rec.Name != ONames.fogi + "substitute")
+                    .Where(rec =>
                     {
-                        string id = record.Attribute(ONames.rdfabout).Value;
-                        if (lastDefs.ContainsKey(id))
+                        // Пропустить надо а) записи, не являющиеся кандидатами на дублирование
+                        // б) Записи, являюшиеся кандидатами, но не попавшие в lastDefs
+                        // в) попавшие в lastDefs такие, что отметка времени mt >= dt
+                        // (наверное достаточно ==). В этом последнем случае надо изменить вход
+                        // с id
+                        string id = rec.Attribute(ONames.rdfabout).Value;
+                        if (candidates.Contains(id))
                         {
-                            DateTime mT = DateTime.MinValue;
-                            string mTvalue = record.Attribute("mT")?.Value;
-                            if (mTvalue != null) mT = DateTime.Parse(mTvalue);
-                            DateTime last = lastDefs[id];
-                            if (mT < last) return false; // пропускаем
-                            else if (mT == last) return true; // берем
-                            else // if(mT > last) // берем и корректируем last
+                            XAttribute mt_att = rec.Attribute("mT");
+                            DateTime mt = mt_att == null ? DateTime.MinValue : DateTime.Parse(mt_att.Value);
+                            if (lastDefs.TryGetValue(id, out DateTime dt))
                             {
-                                lastDefs.Remove(id);
-                                lastDefs.Add(id, mT);
-                                return true;
+                                if (mt >= dt)
+                                {
+                                    lastDefs.Remove(id);
+                                    lastDefs.Add(id, DateTime.MaxValue);
+                                    return true;
+                                }
+                                else return false;
                             }
+                            else return true;
                         }
-                        return true;
+                        else return true;
                     })
-                    .Where(record => { nrecords++; return true; });
+                );
 
-                    xflow = xflow.Concat(flow);
-                    //LoadXFlow(flow, orig_ids);
 
-                    fi.fogx = null;
-                }
-                else if (fi.vid == ".fogp")
-                {
+            XElement[] els = xflow.ToArray();
+            LoadXFlow(els, orig_ids);
+            //LoadXFlow(xflow, orig_ids);
 
-                }
-                GC.Collect();
-            }
-
-            LoadXFlow(xflow, orig_ids);
-
-            Console.WriteLine($"Total {nrecords} records");
-
-            //store.Build();
-            //store.Flush();
-            //GC.Collect();
         }
 
 
