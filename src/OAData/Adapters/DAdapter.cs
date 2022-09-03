@@ -368,12 +368,14 @@ namespace OAData.Adapters
                     .Where(rec => rec.Name != ONames.fogi + "delete" && rec.Name != ONames.fogi + "substitute")
                     .Where(rec =>
                     {
-                        // Пропустить надо а) записи, не являющиеся кандидатами на дублирование
-                        // б) Записи, являюшиеся кандидатами, но не попавшие в lastDefs
-                        // в) попавшие в lastDefs такие, что отметка времени mt >= dt
+                        // Пропустить надо а) записи, идентификаторы которых являются ключами в
+                        // orig_ids; б) записи, не являющиеся кандидатами на дублирование
+                        // в) Записи, являюшиеся кандидатами, но не попавшие в lastDefs
+                        // г) попавшие в lastDefs такие, что отметка времени mt >= dt
                         // (наверное достаточно ==). В этом последнем случае надо изменить вход
                         // с id
                         string id = rec.Attribute(ONames.rdfabout).Value;
+                        if (orig_ids.ContainsKey(id)) return false;
                         if (candidates.Contains(id))
                         {
                             XAttribute mt_att = rec.Attribute("mT");

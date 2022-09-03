@@ -163,8 +163,9 @@ namespace OAData.Adapters
             {
                 string id = record.Attribute(ONames.rdfabout).Value;
                 //if (id == "Mc2816_1142") { }
-                // Корректируем идентификатор
-                if (orig_ids.TryGetValue(id, out string idd)) id = idd;
+                // Корректируем идентификатор -- ЭТО НЕ НУЖНО поскольку все переопределенные 
+                // отсутствуют в потоке, но поставлю выбрасывание исключения
+                if (orig_ids.TryGetValue(id, out string idd)) throw new Exception("e8eh2"); // id = idd;
                 if (id == null) return new OTriple[0]; 
                 var directProps = record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
                     .Select(el =>
