@@ -54,6 +54,7 @@ namespace OAData.Adapters
         private char[] delimeters;
         public override void Init(string connectionstring)
         {
+            Console.WriteLine("Init of UniAdapter: " + DateTime.Now);
             if (connectionstring != null && connectionstring.StartsWith("uni:"))
             {
                 dbfolder = connectionstring.Substring("uni:".Length);

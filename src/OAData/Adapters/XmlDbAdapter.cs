@@ -24,7 +24,10 @@ namespace OAData.Adapters
         /// Инициирование базы данных
         /// </summary>
         /// <param name="connectionstring">префикс варианта базы данных xml:, больше в connectionstring ничего не существенно </param>
-        public override void Init(string connectionstring) { }
+        public override void Init(string connectionstring) 
+        {
+            Console.WriteLine("Init of XmlDbAdapter " + DateTime.Now );
+        }
         // Загрузка базы данных
         public override void StartFillDb(Action<string> turlog)
         {
