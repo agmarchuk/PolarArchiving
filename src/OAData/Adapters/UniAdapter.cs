@@ -17,7 +17,7 @@ namespace OAData.Adapters
         private PType tp_triple;
         private USequence records;
         private SVectorIndex names;
-        private SVectorIndex words;
+        private SVectorIndex svwords;
 
         private Func<object, bool> Isnull;
 
@@ -126,18 +126,18 @@ namespace OAData.Adapters
                     }).ToArray();
                 return query;
             };
-            words = new SVectorIndex(GenStream, records, toWords);
+            svwords = new SVectorIndex(GenStream, records, toWords);
             records.uindexes = new IUIndex[]
             {
                 names,
-                words
+                svwords
             };
         }
         public override void Close()
         {
             records?.Close();
             names?.Close();
-            words?.Close();
+            svwords?.Close();
         }
 
 
