@@ -54,25 +54,49 @@ namespace OAData.Adapters
         private char[] delimeters;
         public override void Init(string connectionstring)
         {
+            Console.WriteLine("UniAdapter.Init()");
             if (connectionstring != null && connectionstring.StartsWith("uni:"))
             {
                 dbfolder = connectionstring.Substring("uni:".Length);
             }
             if (File.Exists(dbfolder + "0.bin"))
             {
-                nodatabase = false;
-                Console.WriteLine("Before try to close adapter... ");
-                if (OAData.OADB.adapter != null)
-                {
-                    Console.WriteLine("try to close adapter... ");
-                    //TODO: Зачем так сложно, почему не this.Close() или
-                    // даже просто закрытие последовательностей?
-                    OAData.OADB.adapter.Close();
-                    Console.WriteLine("OK.");
-                }
+                //nodatabase = false;
+                //Console.WriteLine("Before try to close adapter... ");
+                //if (OAData.OADB.adapter != null)
+                //{
+                //    Console.WriteLine("try to close adapter... ");
+                //    //TODO: Зачем так сложно, почему не this.Close() или
+                //    // даже просто закрытие последовательностей?
+                //    //OAData.OADB.adapter.Close();
+                //    this.Close();
+                //    Console.WriteLine("OK. time="+DateTime.Now);
+                //}
+
+                // Самое грубое решение - все файлы закрыть и уничтожить, а потом уже создавать
+                Console.WriteLine($"file {dbfolder + "0.bin"} exists");
+                this.Close();
+                Console.WriteLine($"this.Close()");
+                Console.Write("Deleting db files: ");
+                DirectoryInfo di = new DirectoryInfo(dbfolder);
+                FileInfo[] files = di.GetFiles("*.bin");
+                foreach (var file in files) file.Delete();
+                Console.WriteLine("Done.");
             }
             Func<Stream> GenStream = () =>
-                new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            {
+                try
+                {
+                    var ff = new FileStream(dbfolder + (file_no++) + ".bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    return ff;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message + " time=" + DateTime.Now);
+                }
+                return null;
+            };
+                
 
             // Полключение к базе данных
             Func<object, int> hashId = obj => Hashfunctions.HashRot13(((string)(((object[])obj)[0])));
