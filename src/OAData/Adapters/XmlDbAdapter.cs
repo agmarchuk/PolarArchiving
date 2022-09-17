@@ -24,62 +24,15 @@ namespace OAData.Adapters
         /// Инициирование базы данных
         /// </summary>
         /// <param name="connectionstring">префикс варианта базы данных xml:, больше в connectionstring ничего не существенно </param>
-        public override void Init(string connectionstring) {   }
+        public override void Init(string connectionstring) 
+        {
+            Console.WriteLine("Init of XmlDbAdapter " + DateTime.Now );
+        }
         // Загрузка базы данных
         public override void StartFillDb(Action<string> turlog)
         {
             db = new XElement("db");
         }
-        //public override void LoadFromCassettesExpress(IEnumerable<string> fogfilearr, Action<string> turlog, Action<string> convertlog)
-        //{
-        //    InitTableRI();
-        //    foreach (string filename in fogfilearr)
-        //    {
-        //        XElement fog = XElement.Load(filename);
-        //        var xflow = fog.Elements()
-        //            .Select(el => ConvertXElement(el));
-        //        AppendXflowToRiTable(xflow, filename, errors);
-        //    }
-        //    // Использование таблицы
-        //    foreach (string filename in fogfilearr)
-        //    {
-        //        XElement fog = XElement.Load(filename);
-        //        var xflow = fog.Elements()
-        //            .Select(el => ConvertXElement(el));
-        //        LoadXFlowUsingRiTable(xflow);
-        //    }
-
-        //}
-        //public override void Save(string filename)
-        //{
-        //    db.Save(filename);
-        //}
-
-        //public override void LoadXFlowUsingRiTable(IEnumerable<XElement> xflow)
-        //{
-        //    foreach (XElement xel in xflow)
-        //    {
-        //        if (xel.Name == "{http://fogid.net/o/}delete" || xel.Name == "{http://fogid.net/o/}substitute") continue;
-        //        var aboutatt = xel.Attribute(ONames.rdfabout);
-        //        if (aboutatt == null) continue;
-        //        string id = aboutatt.Value;
-        //        // выявим Resource Info
-        //        ResInfo ri = null;
-        //        if (!table_ri.TryGetValue(id, out ri)) continue; // если нет, то отбрасываем вариант (это на всякий случай)
-        //        if (ri.removed) continue; // пропускаем уничтоженные
-        //        if (ri.id != id || ri.processed) continue; // это не оригинал или запись уже обрабатывалась
-        //        // Выявляем временную отметку
-        //        DateTime modificationTime_new = DateTime.MinValue;
-        //        XAttribute mt = xel.Attribute("mT");
-        //        if (mt != null) DateTime.TryParse(mt.Value, out modificationTime_new);
-        //        modificationTime_new = modificationTime_new.ToUniversalTime();
-
-        //        if (modificationTime_new != ri.timestamp) continue; // отметка времени не совпала
-
-        //        db.Add(xel);
-        //        ri.processed = true; // Это на случай, если будет второй оригинал, он обрабатываться не будет.
-        //    }
-        //}
         public override void FinishFillDb(Action<string> turlog)
         {
             records = new Dictionary<string, DbNode>();
@@ -117,8 +70,24 @@ namespace OAData.Adapters
                     }
                 }
             }
+            // Заполнение wordsDic
+            foreach (XElement xel in db.Elements())
+            {
+                string id = xel.Attribute(ONames.rdfabout)?.Value;
+                var words = toWords(xel);
+                foreach (string w in words)
+                {
+                    List<string> list;
+                    if (wordsDic.TryGetValue(w, out list)) list.Add(id);
+                    else
+                    {
+                        list = new List<string>(new string[] { id });
+                        wordsDic.Add(w, list);
+                    }
+                    
+                }
+            }
         }
-
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
             string ss = searchstring.ToLower();
@@ -136,7 +105,55 @@ namespace OAData.Adapters
                 //.Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(ONames.rdfabout).Value)));
             return query;
         }
-        public override IEnumerable<XElement> SearchByWords(string searchwords) { throw new NotImplementedException(); }
+        private static char[] delimeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?', '\"', '\'', '=', '\\', '|', '/', 
+                '(', ')', '[', ']', '{', '}', ';', '*', '<', '>'};
+        private static string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
+        Func<XElement, IEnumerable<string>> toWords = xrec =>
+        {
+            var query = xrec.Elements()
+                .Where(xel => propnames.Contains(xel.Name.NamespaceName + xel.Name.LocalName))
+                .SelectMany(xel =>
+                {
+                    string line = (string)xel.Value;
+                    var words = line.Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
+                    return words.Select(w =>
+                    {
+                        if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out string wrd))
+                        {
+                            return wrd;
+                        }
+                        return w;
+                    });
+                });
+            return query;
+        };
+
+        /// <summary>
+        /// Словарь, сопоставляющий нормализованным словам списки идентификаторов 
+        /// элементов из db, в которых эти слова присутствуют.
+        /// </summary>
+        private Dictionary<string, List<string>> wordsDic = new Dictionary<string, List<string>>();
+        public override IEnumerable<XElement> SearchByWords(string searchwords) 
+        {
+            string[] wrds = searchwords.Split(delimeters);
+
+            var qq = wrds.SelectMany(w =>
+            {
+                if (OAData.OADB.toNormalForm != null &&
+                    OAData.OADB.toNormalForm.TryGetValue(w, out string wrd)) { }
+                else wrd = w;
+                List<string> xels = new List<string>();
+                if (wordsDic.TryGetValue(wrd, out xels)) { }
+                return xels.Select(x => new { id = x, wrd = wrd });
+            }).ToArray();
+            var qqq = qq
+                .GroupBy(iw => iw.id)
+                .Select(gr => new { key = gr.Key, c = gr.Count(), o = gr.First() })
+                .OrderByDescending(tri => tri.c)
+                .Take(20).ToArray();
+            var query = qqq.Select(tri => GetItemByIdBasic(tri.o.id, false)).ToArray();
+            return query;
+        }
 
         public override XElement GetItemByIdBasic(string id, bool addinverse)
         {
