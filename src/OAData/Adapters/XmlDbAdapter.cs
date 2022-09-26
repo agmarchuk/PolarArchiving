@@ -88,33 +88,109 @@ namespace OAData.Adapters
                 }
             }
         }
+        internal class XElementRdfSame : EqualityComparer<XElement>
+        {
+            public override bool Equals(XElement b1, XElement b2)
+            {
+                if (b1 == null && b2 == null)
+                    return true;
+                else if (b1 == null || b2 == null)
+                    return false;
+
+                return (b1.Attribute(ONames.rdfabout).Value ==
+                        b2.Attribute(ONames.rdfabout).Value);
+            }
+
+            public override int GetHashCode(XElement bx)
+            {
+                string hCode = bx.Attribute(ONames.rdfabout).Value;
+                return hCode.GetHashCode();
+            }
+        }
+        internal class XRecordSame : EqualityComparer<XElement>
+        {
+            public override bool Equals(XElement b1, XElement b2)
+            {
+                if (b1 == null && b2 == null)
+                    return true;
+                else if (b1 == null || b2 == null)
+                    return false;
+                return (b1.Attribute("id").Value ==
+                        b2.Attribute("id").Value);
+            }
+            public override int GetHashCode(XElement bx)
+            {
+                string hCode = bx.Attribute("id").Value;
+                return hCode.GetHashCode();
+            }
+        }
+
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
             string ss = searchstring.ToLower();
+            var rdfSame = new XElementRdfSame();
             //var query1 = db.Elements()
             //    .Where(xel => xel.Elements("{http://fogid.net/o/}name").Any(f => f.Value.ToLower().StartsWith(ss)))
             //    .ToArray();
             var query = db.Elements()
-                .SelectMany(xel => xel.Elements().Where(el => el.Name == "{http://fogid.net/o/}name"))
+                .SelectMany(xel => xel.Elements().Where(el =>
+                    el.Name == "{http://fogid.net/o/}name" || el.Name == "{http://fogid.net/o/}alias"))
                 .Where(el => el.Value.ToLower().StartsWith(ss))
-                .Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(ONames.rdfabout).Value),
-                    new XAttribute("type", el.Parent.Name.NamespaceName + el.Parent.Name.LocalName),
-                    new XElement("field", new XAttribute("prop", "http://fogid.net/o/name"), el.Value)))
-                //.ToArray()
+                .Select(el => el.Parent)
+                .Select(el =>
+                {
+                    if (el.Name == "{http://fogid.net/o/}naming")
+                    {
+                        string referred = el.Element("{http://fogid.net/o/}referred-sys")?
+                            .Attribute(ONames.rdfresource)?.Value;
+                        if (referred != null && records.TryGetValue(referred, out DbNode node))
+                        {
+                            return node.xel;
+                        }
+                        else return el;
+                    }
+                    else return el;
+                })
+                .Distinct<XElement>(rdfSame)
+                .Select(el => new XElement("record", new XAttribute("id", el.Attribute(ONames.rdfabout).Value),
+                    new XAttribute("type", el.Name.NamespaceName + el.Name.LocalName),
+                    el.Elements()
+                        .Select(ff =>
+                        {
+                            XAttribute res_att = ff.Attribute(ONames.rdfresource);
+                            string prop_name = ff.Name.NamespaceName + ff.Name.LocalName;
+                            if (res_att == null)
+                            {
+                                return new XElement("field", new XAttribute("prop", prop_name), ff.Value);
+                            }
+                            else
+                            {
+                                return new XElement("direct", new XAttribute("prop", prop_name),
+                                    new XElement("record", new XAttribute("id", res_att.Value)));
+                            }
+                        })
+                    ))
+                .ToArray()
                 ;
                 //.Select(el => new XElement("record", new XAttribute("id", el.Parent.Attribute(ONames.rdfabout).Value)));
             return query;
         }
         private static char[] delimeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?', '\"', '\'', '=', '\\', '|', '/', 
                 '(', ')', '[', ']', '{', '}', ';', '*', '<', '>'};
-        private static string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
+        private static string[] propnames = new string[] 
+        { 
+            "http://fogid.net/o/name",
+            "http://fogid.net/o/alias",
+            "http://fogid.net/o/description",
+            "http://fogid.net/o/doc-content"
+        };
         Func<XElement, IEnumerable<string>> toWords = xrec =>
         {
             var query = xrec.Elements()
                 .Where(xel => propnames.Contains(xel.Name.NamespaceName + xel.Name.LocalName))
                 .SelectMany(xel =>
                 {
-                    string line = (string)xel.Value;
+                    string line = (string)xel.Value.ToLower();
                     var words = line.Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
                     return words.Select(w =>
                     {
@@ -128,22 +204,27 @@ namespace OAData.Adapters
             return query;
         };
 
+
         /// <summary>
         /// Словарь, сопоставляющий нормализованным словам списки идентификаторов 
         /// элементов из db, в которых эти слова присутствуют.
         /// </summary>
         private Dictionary<string, List<string>> wordsDic = new Dictionary<string, List<string>>();
-        public override IEnumerable<XElement> SearchByWords(string searchwords) 
+        public override IEnumerable<XElement> SearchByWords(string searchwords)
         {
-            string[] wrds = searchwords.Split(delimeters);
+            var xSame = new XRecordSame();
+            string[] wrds = searchwords.ToLower().Split(delimeters);
 
             var qq = wrds.SelectMany(w =>
             {
                 if (OAData.OADB.toNormalForm != null &&
                     OAData.OADB.toNormalForm.TryGetValue(w, out string wrd)) { }
                 else wrd = w;
-                List<string> xels = new List<string>();
-                if (wordsDic.TryGetValue(wrd, out xels)) { }
+                List<string> xels;
+                if (wordsDic.TryGetValue(wrd, out xels))
+                {
+                }
+                else xels = new List<string>();
                 return xels.Select(x => new { id = x, wrd = wrd });
             }).ToArray();
             var qqq = qq
@@ -151,7 +232,21 @@ namespace OAData.Adapters
                 .Select(gr => new { key = gr.Key, c = gr.Count(), o = gr.First() })
                 .OrderByDescending(tri => tri.c)
                 .Take(20).ToArray();
-            var query = qqq.Select(tri => GetItemByIdBasic(tri.o.id, false)).ToArray();
+            var query = qqq.Select(tri =>
+                {
+                    XElement res = GetItemByIdBasic(tri.o.id, false);
+                    if (res.Attribute("type").Value == "http://fogid.net/o/naming")
+                    {
+                        XElement xref = res.Elements("direct")
+                            .FirstOrDefault(d =>
+                                d.Attribute("prop").Value == "http://fogid.net/o/referred-sys");
+                        string idd = xref.Element("record").Attribute("id").Value;
+                        if (idd != null) res = GetItemByIdBasic(idd, false);
+                    }
+                    return res;
+                })
+                .Distinct<XElement>(xSame)
+                ;
             return query;
         }
 

@@ -19,6 +19,8 @@ namespace OAData.Adapters
         private SVectorIndex names;
         private SVectorIndex svwords;
 
+        private RRecordSame rSame; 
+
         private Func<object, bool> Isnull;
 
         // Констуктор инициализирует то, что можно и не изменяется
@@ -46,6 +48,9 @@ namespace OAData.Adapters
                 new NamedType("pred", new PType(PTypeEnumeration.sstring)),
                 new NamedType("obj", new PType(PTypeEnumeration.sstring)));
             Isnull = ob => (string)((object[])ob)[1] == "delete"; // в поле tp находится "delete" //TODO: проверить, что delete без пространств имен 
+            
+            // Компаратор
+            rSame = new RRecordSame();
         }
 
         // Главный инициализатор. Используем connectionstring 
@@ -118,7 +123,8 @@ namespace OAData.Adapters
                 var query = props.Where(p => (int)((object[])p)[0] == 1)
                     .Select(p => ((object[])p)[1])
                     .Cast<object[]>()
-                    .Where(f => (string)f[0] == "http://fogid.net/o/name")
+                    .Where(f => (string)f[0] == "http://fogid.net/o/name" ||
+                        (string)f[0] == "http://fogid.net/o/alias")
                     .Select(f => (string)f[1]).ToArray();
                 return query;
             };
@@ -126,7 +132,14 @@ namespace OAData.Adapters
 
             delimeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?', '\"', '\'', '=', '\\', '|', '/', 
                 '(', ')', '[', ']', '{', '}', ';', '*', '<', '>'};
-            string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
+            //string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
+            string[] propnames = new string[]
+            {
+                "http://fogid.net/o/name",
+                "http://fogid.net/o/alias",
+                "http://fogid.net/o/description",
+                "http://fogid.net/o/doc-content"
+            };
             Func<object, IEnumerable<string>> toWords = obj =>
             {
                 object[] props = (object[])((object[])obj)[2];
@@ -138,7 +151,8 @@ namespace OAData.Adapters
                     .SelectMany(f => 
                     {
                         string line = (string)f[1];
-                        var words = line.Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
+                        var words = line.ToLower()
+                            .Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
                         return words.Select(w => 
                         {
                             if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out string wrd))
@@ -250,12 +264,15 @@ namespace OAData.Adapters
 
         public override IEnumerable<XElement> SearchByName(string searchstring)
         {
-            var qu = records.GetAllByLike(0, searchstring);
-            return qu.Select(r => ORecToXRec((object[])r, false));
+            var qu1 = records.GetAllByLike(0, searchstring).Distinct<object>(rSame);
+            var qu = qu1
+                .Select(r => ORecToXRec((object[])r, false))
+                ;
+            return qu;
         }
         public override IEnumerable<XElement> SearchByWords(string line) 
         {
-            string[] wrds = line.Split(delimeters);
+            string[] wrds = line.ToLower().Split(delimeters);
             var qqq = wrds.SelectMany(w =>
             {
                 if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out string wrd)) { }
@@ -269,7 +286,10 @@ namespace OAData.Adapters
                 .OrderByDescending(tri => tri.c)
                 .Take(20)
                 .ToArray();
-            var query = qqq.Select(tri => ORecToXRec((object[])(tri.o.obj), false));
+            var query = qqq.Select(tri => tri.o.obj)
+                .Distinct<object>(rSame)
+                .Select(r => 
+                ORecToXRec((object[])r, false));
             return query;
             //throw new NotImplementedException(); 
         }
@@ -572,6 +592,22 @@ namespace OAData.Adapters
                 return ((string)((object[])obj)[1]).GetHashCode();
             }
         }
-
+        public class RRecordSame : EqualityComparer<object>
+        {
+            public override bool Equals(object b1, object b2)
+            {
+                if (b1 == null && b2 == null)
+                    return true;
+                else if (b1 == null || b2 == null)
+                    return false;
+                return ((string)((object[])b1)[0] ==
+                        (string)((object[])b2)[0]);
+            }
+            public override int GetHashCode(object bx)
+            {
+                string hCode = (string)((object[])bx)[0];
+                return hCode.GetHashCode();
+            }
+        }
     }
 }
