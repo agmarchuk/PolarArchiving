@@ -65,30 +65,18 @@ namespace OAData.Adapters
             {
                 dbfolder = connectionstring.Substring("uni:".Length);
             }
-            if (File.Exists(dbfolder + "0.bin"))
-            {
-                //nodatabase = false;
-                //Console.WriteLine("Before try to close adapter... ");
-                //if (OAData.OADB.adapter != null)
-                //{
-                //    Console.WriteLine("try to close adapter... ");
-                //    //TODO: Зачем так сложно, почему не this.Close() или
-                //    // даже просто закрытие последовательностей?
-                //    //OAData.OADB.adapter.Close();
-                //    this.Close();
-                //    Console.WriteLine("OK. time="+DateTime.Now);
-                //}
-
-                // Самое грубое решение - все файлы закрыть и уничтожить, а потом уже создавать
-                Console.WriteLine($"file {dbfolder + "0.bin"} exists");
-                this.Close();
-                Console.WriteLine($"this.Close()");
-                Console.Write("Deleting db files: ");
-                DirectoryInfo di = new DirectoryInfo(dbfolder);
-                FileInfo[] files = di.GetFiles("*.bin");
-                foreach (var file in files) file.Delete();
-                Console.WriteLine("mag: uni-adapter Init Done.");
-            }
+            //if (File.Exists(dbfolder + "0.bin"))
+            //{
+            //    // Самое грубое решение - все файлы закрыть и уничтожить, а потом уже создавать
+            //    Console.WriteLine($"file {dbfolder + "0.bin"} exists");
+            //    this.Close();
+            //    Console.WriteLine($"this.Close()");
+            //    Console.Write("Deleting db files: ");
+            //    DirectoryInfo di = new DirectoryInfo(dbfolder);
+            //    FileInfo[] files = di.GetFiles("*.bin");
+            //    foreach (var file in files) file.Delete();
+            //    Console.WriteLine("mag: uni-adapter Init Done.");
+            //}
             Func<Stream> GenStream = () =>
             {
                 try
@@ -175,10 +163,12 @@ namespace OAData.Adapters
         public override void Close()
         {
             Console.WriteLine($"mag: UniAdapter Closing {DateTime.Now} {records == null} {names == null} {svwords == null}");
+            records.Close();
+            Console.WriteLine($"mag: UniAdapter Closed {DateTime.Now}");
 
-            records?.Close();
-            names?.Close();
-            svwords?.Close();
+            //records?.Close();
+            //names?.Close();
+            //svwords?.Close();
         }
 
 
