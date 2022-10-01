@@ -31,6 +31,7 @@ namespace OAData
             Console.WriteLine("DoSomething from FactographDataService");
         }
 
+        public CassInfo[] Cassettes { get { return cassettes; } }
         private CassInfo[] cassettes = null;
         private FogInfo[] fogs = null;
         private DAdapter adapter = null;

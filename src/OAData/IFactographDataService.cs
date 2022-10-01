@@ -29,6 +29,8 @@ namespace OAData
         // ============== Работа с файлами и кассетами ================
         string CassDirPath(string uri);
         string GetFilePath(string u, string s);
+        bool HasWritabeFogForUser(string user);
+        OAData.Adapters.CassInfo[] Cassettes { get; }
 
     }
 }
