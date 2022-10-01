@@ -26,6 +26,7 @@ namespace OAData.Adapters
         // Констуктор инициализирует то, что можно и не изменяется
         public UniAdapter()
         {
+            Console.WriteLine("mag: UniAdapter constructed " + DateTime.Now);
             tp_prop = new PTypeUnion(
                 new NamedType("novariant", new PType(PTypeEnumeration.none)),
                 new NamedType("field", new PTypeRecord(
@@ -59,7 +60,7 @@ namespace OAData.Adapters
         private char[] delimeters;
         public override void Init(string connectionstring)
         {
-            Console.WriteLine("Init of UniAdapter: " + DateTime.Now);
+            Console.WriteLine("mag: Init of UniAdapter: " + DateTime.Now);
             if (connectionstring != null && connectionstring.StartsWith("uni:"))
             {
                 dbfolder = connectionstring.Substring("uni:".Length);
@@ -86,7 +87,7 @@ namespace OAData.Adapters
                 DirectoryInfo di = new DirectoryInfo(dbfolder);
                 FileInfo[] files = di.GetFiles("*.bin");
                 foreach (var file in files) file.Delete();
-                Console.WriteLine("Done.");
+                Console.WriteLine("mag: uni-adapter Init Done.");
             }
             Func<Stream> GenStream = () =>
             {
@@ -173,6 +174,8 @@ namespace OAData.Adapters
         }
         public override void Close()
         {
+            Console.WriteLine($"mag: UniAdapter Closing {DateTime.Now} {records == null} {names == null} {svwords == null}");
+
             records?.Close();
             names?.Close();
             svwords?.Close();

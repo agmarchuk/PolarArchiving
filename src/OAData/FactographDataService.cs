@@ -21,6 +21,7 @@ namespace OAData
         //}
         public FactographDataService()
         {
+            Console.WriteLine("mag: FactofraphDataService Constructing " + DateTime.Now);
             path = "wwwroot/";
             Init(path);
         }
@@ -223,6 +224,11 @@ namespace OAData
         public void Close()
         {
             adapter.Close();
+        }
+        public void Dispose()
+        {
+            Close();
+            Console.WriteLine("mag: FactofraphDataService Diposed " + DateTime.Now);
         }
 
         // ================= Заливка данными ==================
@@ -716,10 +722,6 @@ namespace OAData
             return (owner, prefix, counter);
         }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
 
     }
 }
