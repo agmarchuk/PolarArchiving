@@ -65,18 +65,12 @@ namespace OAData.Adapters
             {
                 dbfolder = connectionstring.Substring("uni:".Length);
             }
-            //if (File.Exists(dbfolder + "0.bin"))
-            //{
-            //    // Самое грубое решение - все файлы закрыть и уничтожить, а потом уже создавать
-            //    Console.WriteLine($"file {dbfolder + "0.bin"} exists");
-            //    this.Close();
-            //    Console.WriteLine($"this.Close()");
-            //    Console.Write("Deleting db files: ");
-            //    DirectoryInfo di = new DirectoryInfo(dbfolder);
-            //    FileInfo[] files = di.GetFiles("*.bin");
-            //    foreach (var file in files) file.Delete();
-            //    Console.WriteLine("mag: uni-adapter Init Done.");
-            //}
+            this.nodatabase = false;
+            if (!File.Exists(dbfolder + "0.bin"))
+            {
+                Console.Write("Reload db files");
+                this.nodatabase = true;
+            }
             Func<Stream> GenStream = () =>
             {
                 try

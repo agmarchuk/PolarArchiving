@@ -103,12 +103,13 @@ namespace OAData
                 adapter.Init(connectionstring);
                 PrepareFogs(XConfig);
 
-                if (!adapter.nodatabase) nodatabase = false;
+                if (adapter.nodatabase) nodatabase = true;
+                else nodatabase = false;
 
                 if (pre == "trs" && (directreload || nodatabase)) Load();
                 else if (pre == "xml") Load();
                 else if (pre == "om" && (directreload || nodatabase)) Load();
-                else if (pre == "uni") Load(); // Всегда загружать!
+                else if (pre == "uni" && (directreload || nodatabase)) Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";

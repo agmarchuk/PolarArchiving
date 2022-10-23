@@ -10,6 +10,7 @@ namespace OAData
     {
         void Init(string connectionstring);
         void Close();
+        void Reload();
         // ============== Основные методы доступа к БД =============
         IEnumerable<XElement> SearchByName(string searchstring);
         IEnumerable<XElement> SearchByWords(string searchwords);
