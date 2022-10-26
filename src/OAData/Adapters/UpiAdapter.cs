@@ -9,7 +9,7 @@ using Polar.Universal;
 
 namespace OAData.Adapters
 {
-    public class UniAdapter : DAdapter
+    public class UpiAdapter : DAdapter
     {
         // Адаптер состоит из последовательности записей, дополнительного индекса и последовательности триплетов объектных свойств 
         private PType tp_prop;
@@ -19,12 +19,12 @@ namespace OAData.Adapters
         private SVectorIndex names;
         private SVectorIndex svwords;
 
-        private RRecordSame rSame; 
+        private RRecordSame rSame;
 
         private Func<object, bool> Isnull;
 
         // Констуктор инициализирует то, что можно и не изменяется
-        public UniAdapter()
+        public UpiAdapter()
         {
             Console.WriteLine("mag: UniAdapter constructed " + DateTime.Now);
             tp_prop = new PTypeUnion(
@@ -49,7 +49,7 @@ namespace OAData.Adapters
                 new NamedType("pred", new PType(PTypeEnumeration.sstring)),
                 new NamedType("obj", new PType(PTypeEnumeration.sstring)));
             Isnull = ob => (string)((object[])ob)[1] == "delete"; // в поле tp находится "delete" //TODO: проверить, что delete без пространств имен 
-            
+
             // Компаратор
             rSame = new RRecordSame();
         }
@@ -60,10 +60,10 @@ namespace OAData.Adapters
         private char[] delimeters;
         public override void Init(string connectionstring)
         {
-            Console.WriteLine("mag: Init of UniAdapter: " + DateTime.Now);
-            if (connectionstring != null && connectionstring.StartsWith("uni:"))
+            Console.WriteLine("mag: Init of UpiAdapter: " + DateTime.Now);
+            if (connectionstring != null && connectionstring.StartsWith("upi:"))
             {
-                dbfolder = connectionstring.Substring("uni:".Length);
+                dbfolder = connectionstring.Substring("upi:".Length);
             }
             else dbfolder = connectionstring.Substring(4);
 
@@ -86,7 +86,7 @@ namespace OAData.Adapters
                 }
                 return null;
             };
-                
+
 
             // Полключение к базе данных
             Func<object, int> hashId = obj => Hashfunctions.HashRot13(((string)(((object[])obj)[0])));
@@ -101,7 +101,8 @@ namespace OAData.Adapters
             records = new USequence(tp_rec, GenStream,
                 rec => (string)((object[])rec)[1] == "deleted",
                 rec => (string)((object[])rec)[0],
-                str => Hashfunctions.HashRot13((string)str));
+                str => Hashfunctions.HashRot13((string)str), 
+                false);
             Func<object, IEnumerable<string>> skey = obj =>
             {
                 object[] props = (object[])((object[])obj)[2];
@@ -114,8 +115,9 @@ namespace OAData.Adapters
                 return query;
             };
             names = new SVectorIndex(GenStream, records, skey);
+            names.Refresh();
 
-            delimeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?', '\"', '\'', '=', '\\', '|', '/', 
+            delimeters = new char[] { ' ', '\n', '\t', ',', '.', ':', '-', '!', '?', '\"', '\'', '=', '\\', '|', '/',
                 '(', ')', '[', ']', '{', '}', ';', '*', '<', '>'};
             //string[] propnames = new string[] { "http://fogid.net/o/name", "http://fogid.net/o/description" };
             string[] propnames = new string[]
@@ -133,12 +135,12 @@ namespace OAData.Adapters
                     .Select(p => ((object[])p)[1])
                     .Cast<object[]>()
                     .Where(f => (propnames.Contains((string)f[0])))
-                    .SelectMany(f => 
+                    .SelectMany(f =>
                     {
                         string line = (string)f[1];
                         var words = line.ToLower()
                             .Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
-                        return words.Select(w => 
+                        return words.Select(w =>
                         {
                             if (OAData.OADB.toNormalForm != null && OAData.OADB.toNormalForm.TryGetValue(w, out string wrd))
                             {
@@ -150,6 +152,7 @@ namespace OAData.Adapters
                 return query;
             };
             svwords = new SVectorIndex(GenStream, records, toWords);
+            svwords.Refresh();
             records.uindexes = new IUIndex[]
             {
                 names,
@@ -175,7 +178,7 @@ namespace OAData.Adapters
         }
         public override void FinishFillDb(Action<string> turlog)
         {
-            records.Build(); 
+            records.Build();
             GC.Collect();
         }
 
@@ -193,7 +196,7 @@ namespace OAData.Adapters
                 // Корректируем идентификатор -- ЭТО НЕ НУЖНО поскольку все переопределенные 
                 // отсутствуют в потоке, но поставлю выбрасывание исключения
                 if (orig_ids.TryGetValue(id, out string idd)) throw new Exception("e8eh2"); // id = idd;
-                if (id == null) return new OTriple[0]; 
+                if (id == null) return new OTriple[0];
                 var directProps = record.Elements().Where(el => el.Attribute(ONames.rdfresource) != null)
                     .Select(el =>
                     {
@@ -259,7 +262,7 @@ namespace OAData.Adapters
                 ;
             return qu;
         }
-        public override IEnumerable<XElement> SearchByWords(string line) 
+        public override IEnumerable<XElement> SearchByWords(string line)
         {
             string[] wrds = line.ToLower().Split(delimeters);
             var qqq = wrds.SelectMany(w =>
@@ -271,13 +274,13 @@ namespace OAData.Adapters
                 return qu;
             })
                 .GroupBy(ow => (string)((object[])ow.obj)[0])
-                .Select(gr => new { key=gr.Key, c=gr.Count(), o=gr.First() })
+                .Select(gr => new { key = gr.Key, c = gr.Count(), o = gr.First() })
                 .OrderByDescending(tri => tri.c)
                 .Take(20)
                 .ToArray();
             var query = qqq.Select(tri => tri.o.obj)
                 .Distinct<object>(rSame)
-                .Select(r => 
+                .Select(r =>
                 ORecToXRec((object[])r, false));
             return query;
             //throw new NotImplementedException(); 

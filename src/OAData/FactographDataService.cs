@@ -122,6 +122,10 @@ namespace OAData
                 {
                     adapter = new UniAdapter();
                 }
+                else if (pre == "upi")
+                {
+                    adapter = new UpiAdapter();
+                }
                 adapter.Init(connectionstring);
                 PrepareFogs(XConfig);
 
@@ -131,8 +135,8 @@ namespace OAData
                 if (pre == "trs" && (directreload || nodatabase)) Load();
                 else if (pre == "xml") Load();
                 else if (pre == "om" && (directreload || nodatabase)) Load();
-                //else if (pre == "uni") Load(); // Всегда загружать!
-                else if (pre == "uni" && (directreload || nodatabase)) Load();
+                else if (pre == "uni") Load(); // Всегда загружать!
+                else if (pre == "upi" && (directreload || nodatabase)) Load();
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";
