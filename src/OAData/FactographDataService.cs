@@ -136,7 +136,18 @@ namespace OAData
                 else if (pre == "xml") Load();
                 else if (pre == "om" && (directreload || nodatabase)) Load();
                 else if (pre == "uni") Load(); // Всегда загружать!
-                else if (pre == "upi" && (directreload || nodatabase)) Load();
+                else if (pre == "upi")
+                {
+                    if (directreload || nodatabase) //Load
+                    {
+                        Load();
+                        // Надо сохранить точку записи
+                    }
+                    else // Connect and restore
+                    {
+                        
+                    }
+                }
 
                 // Логфайл элементов Put()
                 //putlogfilename = connectionstring.Substring(connectionstring.IndexOf(':') + 1) + "logfile_put.txt";

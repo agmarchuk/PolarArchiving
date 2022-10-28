@@ -102,7 +102,7 @@ namespace OAData.Adapters
                 rec => (string)((object[])rec)[1] == "deleted",
                 rec => (string)((object[])rec)[0],
                 str => Hashfunctions.HashRot13((string)str), 
-                false);
+                true);
             Func<object, IEnumerable<string>> skey = obj =>
             {
                 object[] props = (object[])((object[])obj)[2];
@@ -114,6 +114,8 @@ namespace OAData.Adapters
                     .Select(f => (string)f[1]).ToArray();
                 return query;
             };
+            records.Refresh();
+
             names = new SVectorIndex(GenStream, records, skey);
             names.Refresh();
 
@@ -180,6 +182,11 @@ namespace OAData.Adapters
         {
             records.Build();
             GC.Collect();
+            // =========== Сохранение динамической точки =========
+            // Открываем файл для бинарной записи
+            FileStream statefile = new FileStream(dbfolder + "state.bin", FileMode.OpenOrCreate, FileAccess.Write);
+            BinaryWriter writer = new BinaryWriter(statefile);
+            statefile.Close();
         }
 
         // Загрузка потока x-элементов
