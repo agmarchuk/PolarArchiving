@@ -101,8 +101,8 @@ namespace OAData.Adapters
             records = new USequence(tp_rec, GenStream,
                 rec => (string)((object[])rec)[1] == "deleted",
                 rec => (string)((object[])rec)[0],
-                str => Hashfunctions.HashRot13((string)str), 
-                true);
+                str => Hashfunctions.HashRot13((string)str),
+                true) { StateFile = dbfolder + "state.bin" };
             Func<object, IEnumerable<string>> skey = obj =>
             {
                 object[] props = (object[])((object[])obj)[2];
@@ -167,9 +167,6 @@ namespace OAData.Adapters
             records.Close();
             Console.WriteLine($"mag: UniAdapter Closed {DateTime.Now}");
 
-            //records?.Close();
-            //names?.Close();
-            //svwords?.Close();
         }
 
 
@@ -182,11 +179,12 @@ namespace OAData.Adapters
         {
             records.Build();
             GC.Collect();
-            // =========== Сохранение динамической точки =========
-            // Открываем файл для бинарной записи
-            FileStream statefile = new FileStream(dbfolder + "state.bin", FileMode.OpenOrCreate, FileAccess.Write);
-            BinaryWriter writer = new BinaryWriter(statefile);
-            statefile.Close();
+            // Состояние сохраняется в методе Build
+        }
+        public void RestoreDynamic()
+        {
+            // Восстановить динаические значения в индексах можно так:
+            records.RestoreDynamic();
         }
 
         // Загрузка потока x-элементов

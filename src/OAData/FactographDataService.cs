@@ -141,11 +141,12 @@ namespace OAData
                     if (directreload || nodatabase) //Load
                     {
                         Load();
-                        // Надо сохранить точку записи
+                        // Надо сохранить точку записи, это делается в конце загрузки.
+                        // Метод adapter.FinishFillDb(null);
                     }
                     else // Connect and restore
                     {
-                        
+                        ((UpiAdapter)adapter).RestoreDynamic();
                     }
                 }
 
