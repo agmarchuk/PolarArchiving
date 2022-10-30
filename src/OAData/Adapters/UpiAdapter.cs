@@ -281,14 +281,14 @@ namespace OAData.Adapters
                 .GroupBy(ow => (string)((object[])ow.obj)[0])
                 .Select(gr => new { key = gr.Key, c = gr.Count(), o = gr.First() })
                 .OrderByDescending(tri => tri.c)
-                .Take(20)
-                .ToArray();
+                //.Take(20)
+                //.ToArray()
+                ;
             var query = qqq.Select(tri => tri.o.obj)
                 .Distinct<object>(rSame)
                 .Select(r =>
                 ORecToXRec((object[])r, false));
             return query;
-            //throw new NotImplementedException(); 
         }
 
         public override XElement GetItemByIdBasic(string id, bool addinverse)
