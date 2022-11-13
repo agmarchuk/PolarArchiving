@@ -21,7 +21,7 @@ namespace OAData
         //}
         public FactographDataService()
         {
-            Console.WriteLine("mag: FactofraphDataService Constructing " + DateTime.Now);
+            Console.WriteLine("mag: FactoraphDataService Constructing " + DateTime.Now);
             path = "wwwroot/";
             Init(path);
         }
