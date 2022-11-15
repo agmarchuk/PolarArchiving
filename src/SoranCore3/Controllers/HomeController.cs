@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SoranCore3.Models;
 using System;
@@ -31,13 +32,13 @@ namespace SoranCore3.Controllers
             string sdir = HttpContext.Request.Query["sdirection"].FirstOrDefault();
 
             // Поработаем с сессией TODO:?
-            //if (sdir == null)
-            //{
-            //    sdir = HttpContext.Session.GetString("sdirection");
-            //    if (sdir == null) sdir = "person";
-            //}
-            //if (sdir != null) model.TabDirection = sdir;
-            //HttpContext.Session.SetString("sdirection", sdir);
+            if (sdir == null)
+            {
+                sdir = HttpContext.Session.GetString("sdirection");
+                if (sdir == null) sdir = "person";
+            }
+            if (sdir != null) model.TabDirection = sdir;
+            HttpContext.Session.SetString("sdirection", sdir);
 
             string p = HttpContext.Request.Query["p"].FirstOrDefault();
             string id = HttpContext.Request.Query["id"].FirstOrDefault();
@@ -58,7 +59,7 @@ namespace SoranCore3.Controllers
                     string t = el.Attribute("type").Value;
                     string name = el.Elements("field").FirstOrDefault(f => f.Attribute("prop").Value == "http://fogid.net/o/name")?.Value;
                     string name1 = IndexModel.GetField(el, "http://fogid.net/o/name");
-                    if (t == "http://fogid.net/o/person")
+                    if (t == "http://fogid.net/o/"+sdir)
                     {
                         list.Add(new object[] { el.Attribute("id").Value, name });
                     }

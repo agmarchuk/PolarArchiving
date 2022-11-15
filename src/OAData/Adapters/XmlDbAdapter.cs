@@ -132,6 +132,11 @@ namespace OAData.Adapters
             //var query1 = db.Elements()
             //    .Where(xel => xel.Elements("{http://fogid.net/o/}name").Any(f => f.Value.ToLower().StartsWith(ss)))
             //    .ToArray();
+            var qu = db.Elements()
+                .SelectMany(xel => xel.Elements().Where(el =>
+                    el.Name == "{http://fogid.net/o/}name" || el.Name == "{http://fogid.net/o/}alias"))
+                .Where(el => el.Value.ToLower().StartsWith(ss))
+                .ToArray();
             var query = db.Elements()
                 .SelectMany(xel => xel.Elements().Where(el =>
                     el.Name == "{http://fogid.net/o/}name" || el.Name == "{http://fogid.net/o/}alias"))
