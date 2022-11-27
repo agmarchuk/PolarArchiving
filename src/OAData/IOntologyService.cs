@@ -11,5 +11,8 @@ namespace OAData
         string GetInvOntName(string name);
         string GetEnumStateLabel(string enum_type, string state_value);
         IEnumerable<XElement> GetEnumStates(string enum_type);
+
+
     }
+
 }

@@ -84,5 +84,40 @@ namespace OAData
             return et_states;
         }
 
+        // ================== Реализация базового интерфейса ==================
+        public string EnumValue(string specificator, string stateval, string lang)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> AncestorsAndSelf(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> DescendantsAndSelf(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetInversePropsByType(string tp)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string LabelOfOnto(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string InvLabelOfOnto(string propId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> DomainsOfProp(string propId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

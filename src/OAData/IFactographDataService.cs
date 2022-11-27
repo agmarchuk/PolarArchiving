@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
+
 namespace OAData
 {
     public interface IFactographDataService
     {
+        
         void Init(string connectionstring);
         void Close();
         void Reload();
@@ -32,6 +34,5 @@ namespace OAData
         string GetFilePath(string u, string s);
         bool HasWritabeFogForUser(string user);
         OAData.Adapters.CassInfo[] Cassettes { get; }
-
     }
 }
