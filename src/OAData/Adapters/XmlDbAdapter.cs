@@ -125,7 +125,7 @@ namespace OAData.Adapters
             }
         }
 
-        public override IEnumerable<XElement> SearchByName(string searchstring)
+        public override IEnumerable<XElement> SearchByName(string searchstring) //TODO: сделать с хешем
         {
             string ss = searchstring.ToLower();
             var rdfSame = new XElementRdfSame();

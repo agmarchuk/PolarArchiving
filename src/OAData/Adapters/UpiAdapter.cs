@@ -12,8 +12,8 @@ namespace OAData.Adapters
     public class UpiAdapter : DAdapter
     {
         // Адаптер состоит из последовательности записей, дополнительного индекса и последовательности триплетов объектных свойств 
-        private PType tp_prop;
-        private PType tp_rec;
+        public PType tp_prop;
+        public PType tp_rec;
         private PType tp_triple;
         private USequence records;
         private SVectorIndex names;
@@ -300,7 +300,7 @@ namespace OAData.Adapters
 
             return xres;
         }
-        private object GetRecord(string id)
+        public object GetRecord(string id)
         {
             object rec;
             rec = records.GetByKey(id);
@@ -400,7 +400,7 @@ namespace OAData.Adapters
                     }
 
                     // Мы подобрали формат к записи и можем рекурсивно применить метод
-                    return Enumerable.Repeat<XElement>(new XElement("direct", ItemByRecord(drec, f)), 1);
+                    return Enumerable.Repeat<XElement>(new XElement("direct", new XAttribute("prop", prop), ItemByRecord(drec, f)), 1);
                 }
                 else if (fe.Name.LocalName == "inverse")
                 {

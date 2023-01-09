@@ -25,6 +25,11 @@ namespace OAData
             path = "wwwroot/";
             Init(path);
         }
+        public FactographDataService(string path) 
+        {
+            this.path = path;
+            Init(path);
+        }
 
         // Публичные методы согласно интерфейсу
         public void DoSomething()
