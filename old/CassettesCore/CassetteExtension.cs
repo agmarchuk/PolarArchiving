@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 //using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using System.IO;
+using ExifPhotoReader;
+
 //using Microsoft.DeepZoomTools;
 
 namespace Polar.Cassettes
@@ -149,7 +152,7 @@ namespace Polar.Cassettes
         /// <returns></returns>
         public static IEnumerable<XElement> AddFile(this Cassette cassette, FileInfo file, string collectionId)
         {
-            // Эта реализация используется (только) в CManager'е
+            // Эта реализация используется (только) в CManager2'е
             List<XElement> addedElements = new List<XElement>(); // string smallImageFullName = null;
             string fname = file.FullName;
             XElement doc = null;
@@ -241,15 +244,15 @@ namespace Polar.Cassettes
                         }
                         try
                         {
-                            using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
-                            {
+                            var exifImageProperties = ExifPhotoReader.ExifPhoto.GetExifDataPhoto( new Bitmap(stream));
+                            
                                 // Extract the tag data using the ExifTags enumeration
-                                if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized,
-                                                                out datePictureTaken))
+                                datePictureTaken = exifImageProperties.DateTimeDigitized; 
+                                if (datePictureTaken != default)
                                 {
                                     exifok = true;
                                 }
-                            }
+                            
                         }
                         catch (Exception)
                         {
@@ -528,13 +531,13 @@ namespace Polar.Cassettes
                         // Использую ExifLib.Standard
                         try
                         {
-                            using (ExifLib.ExifReader reader = new ExifLib.ExifReader(stream))
-                            {
-                                // Extract the tag data using the ExifTags enumeration
-                                if (reader.GetTagValue<DateTime>(ExifLib.ExifTags.DateTimeDigitized, out dateDocumentCreated)) {  }
-                            }
+                            var exifImageProperties = ExifPhotoReader.ExifPhoto.GetExifDataPhoto(new Bitmap(stream));
+                            // Extract the tag data using the ExifTags enumeration
+                            dateDocumentCreated = exifImageProperties.DateTimeDigitized;
                         }
-                        catch (Exception) { Console.WriteLine("Can't create EXIF!!!!!"); }
+                        catch (Exception)
+                        { Console.WriteLine("Can't create EXIF!!!!!");
+                        }
 
                         var fi = file;
                         Console.WriteLine($"Width={original.Width} Height={original.Height} ImageFormat={original.ImageFormat} {dateDocumentCreated} ");
