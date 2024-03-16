@@ -39,8 +39,13 @@ namespace Polar.Cassettes
                     new XAttribute("videoBitrate", "400K"),
                     new XAttribute("audioBitrate", "22050"),
                     new XAttribute("rate", "10"),
-                    new XAttribute("framesize", "480x360")))
-            );
+                    new XAttribute("framesize", "480x360")),
+                new XElement("audio",
+                    new XElement("medium",
+                        new XAttribute("videoBitrate", "400K"),
+                        new XAttribute("audioBitrate", "22050"),
+                        new XAttribute("rate", "10"),
+                        new XAttribute("framesize", "480x360")))));
 
         private string docnameprefix = "";
         public string DocNamePrefix { get { return docnameprefix; } }
